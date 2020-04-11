@@ -1,0 +1,73 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29926.136
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kdl.NetStandard", "Kdl.NetStandard\Kdl.NetStandard.csproj", "{4744005F-9F75-4AFC-B8A2-F03ADEF1A161}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7B766E8D-EC14-401F-B215-183C54D90121} = {7B766E8D-EC14-401F-B215-183C54D90121}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kdl_wrap", "kdl_wrap\kdl_wrap.vcxproj", "{7B766E8D-EC14-401F-B215-183C54D90121}"
+	ProjectSection(ProjectDependencies) = postProject
+		{261CD4EB-A009-36A9-9FDB-82B037CD7C9F} = {261CD4EB-A009-36A9-9FDB-82B037CD7C9F}
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kdl.NetStandard.UnitTests", "Kdl.NetStandard.UnitTests\Kdl.NetStandard.UnitTests.csproj", "{D0601A6D-E981-4815-AFA5-292EDC639E5F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4744005F-9F75-4AFC-B8A2-F03ADEF1A161} = {4744005F-9F75-4AFC-B8A2-F03ADEF1A161}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "orocos_kdl", "orocos_kinematics_dynamics\orocos_kdl\build-v142-x64\orocos_kdl.vcxproj", "{261CD4EB-A009-36A9-9FDB-82B037CD7C9F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "C++", "C++", "{A9F566E5-AB22-476A-835D-72144F94247F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4744005F-9F75-4AFC-B8A2-F03ADEF1A161}.Debug|x64.ActiveCfg = Debug|x64
+		{4744005F-9F75-4AFC-B8A2-F03ADEF1A161}.Debug|x64.Build.0 = Debug|x64
+		{4744005F-9F75-4AFC-B8A2-F03ADEF1A161}.Debug|x86.ActiveCfg = Debug|x86
+		{4744005F-9F75-4AFC-B8A2-F03ADEF1A161}.Debug|x86.Build.0 = Debug|x86
+		{4744005F-9F75-4AFC-B8A2-F03ADEF1A161}.Release|x64.ActiveCfg = Release|x64
+		{4744005F-9F75-4AFC-B8A2-F03ADEF1A161}.Release|x64.Build.0 = Release|x64
+		{4744005F-9F75-4AFC-B8A2-F03ADEF1A161}.Release|x86.ActiveCfg = Release|Any CPU
+		{4744005F-9F75-4AFC-B8A2-F03ADEF1A161}.Release|x86.Build.0 = Release|Any CPU
+		{7B766E8D-EC14-401F-B215-183C54D90121}.Debug|x64.ActiveCfg = Debug|x64
+		{7B766E8D-EC14-401F-B215-183C54D90121}.Debug|x64.Build.0 = Debug|x64
+		{7B766E8D-EC14-401F-B215-183C54D90121}.Debug|x86.ActiveCfg = Debug|Win32
+		{7B766E8D-EC14-401F-B215-183C54D90121}.Debug|x86.Build.0 = Debug|Win32
+		{7B766E8D-EC14-401F-B215-183C54D90121}.Release|x64.ActiveCfg = Release|x64
+		{7B766E8D-EC14-401F-B215-183C54D90121}.Release|x64.Build.0 = Release|x64
+		{7B766E8D-EC14-401F-B215-183C54D90121}.Release|x86.ActiveCfg = Release|Win32
+		{7B766E8D-EC14-401F-B215-183C54D90121}.Release|x86.Build.0 = Release|Win32
+		{D0601A6D-E981-4815-AFA5-292EDC639E5F}.Debug|x64.ActiveCfg = Debug|x64
+		{D0601A6D-E981-4815-AFA5-292EDC639E5F}.Debug|x64.Build.0 = Debug|x64
+		{D0601A6D-E981-4815-AFA5-292EDC639E5F}.Debug|x86.ActiveCfg = Debug|x86
+		{D0601A6D-E981-4815-AFA5-292EDC639E5F}.Debug|x86.Build.0 = Debug|x86
+		{D0601A6D-E981-4815-AFA5-292EDC639E5F}.Release|x64.ActiveCfg = Release|x64
+		{D0601A6D-E981-4815-AFA5-292EDC639E5F}.Release|x64.Build.0 = Release|x64
+		{D0601A6D-E981-4815-AFA5-292EDC639E5F}.Release|x86.ActiveCfg = Release|Any CPU
+		{D0601A6D-E981-4815-AFA5-292EDC639E5F}.Release|x86.Build.0 = Release|Any CPU
+		{261CD4EB-A009-36A9-9FDB-82B037CD7C9F}.Debug|x64.ActiveCfg = Debug|x64
+		{261CD4EB-A009-36A9-9FDB-82B037CD7C9F}.Debug|x86.ActiveCfg = Debug|x64
+		{261CD4EB-A009-36A9-9FDB-82B037CD7C9F}.Release|x64.ActiveCfg = Release|x64
+		{261CD4EB-A009-36A9-9FDB-82B037CD7C9F}.Release|x64.Build.0 = Release|x64
+		{261CD4EB-A009-36A9-9FDB-82B037CD7C9F}.Release|x86.ActiveCfg = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7B766E8D-EC14-401F-B215-183C54D90121} = {A9F566E5-AB22-476A-835D-72144F94247F}
+		{261CD4EB-A009-36A9-9FDB-82B037CD7C9F} = {A9F566E5-AB22-476A-835D-72144F94247F}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F4445F2F-F2E4-4CDB-BEB9-233412101D0A}
+	EndGlobalSection
+EndGlobal

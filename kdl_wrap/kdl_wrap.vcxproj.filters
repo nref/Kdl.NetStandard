@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="kdl_wrap.cxx">
+      <Filter>generated_cxx</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="framework.h" />
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="kdl_wrap.h">
+      <Filter>generated_cxx</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="generated_cxx">
+      <UniqueIdentifier>{acf405bd-97d4-4464-a09f-bff87a0bd6d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="swig">
+      <UniqueIdentifier>{fd74a837-3b67-4d9e-8b8e-492c6df05dbc}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="kdl.i">
+      <Filter>swig</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>

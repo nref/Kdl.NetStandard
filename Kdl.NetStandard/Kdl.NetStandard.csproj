@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <RunPostBuildEvent></RunPostBuildEvent>
+    <Platforms>AnyCPU;x64;x86</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="generated\**" />
+    <EmbeddedResource Remove="generated\**" />
+    <None Remove="generated\**" />
+  </ItemGroup>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="echo rmdir /S /Q $(ProjectDir)Kdl&#xD;&#xA;rmdir /S /Q $(ProjectDir)Kdl&#xD;&#xA;&#xD;&#xA;echo xcopy /E /Y $(ProjectDir)..\kdl_wrap\generated\* $(ProjectDir)&#xD;&#xA;xcopy /E /Y $(ProjectDir)..\kdl_wrap\generated\* $(ProjectDir)&#xD;&#xA;&#xD;&#xA;echo copy $(ProjectDir)..\kdl_wrap\bin\$(Platform)\$(Configuration)\kdl_wrap.dll $(OutDir)&#xD;&#xA;copy $(ProjectDir)..\kdl_wrap\bin\$(Platform)\$(Configuration)\kdl_wrap.dll $(OutDir)" />
+  </Target>
+
+</Project>
