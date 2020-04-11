@@ -1,3 +1,6 @@
 [submodule "orocos_kinematics_dynamics"]
 	path = orocos_kinematics_dynamics
 	url = https://github.com/slater1/orocos_kinematics_dynamics
+[submodule "eigen"]
+	path = eigen
+	url = https://gitlab.com/libeigen/eigen
