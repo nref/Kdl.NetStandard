@@ -13,6 +13,9 @@
     <ClInclude Include="kdl_wrap.h">
       <Filter>generated_cxx</Filter>
     </ClInclude>
+    <ClInclude Include="Properties.h">
+      <Filter>swig</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="generated_cxx">

@@ -1,15 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <RunPostBuildEvent></RunPostBuildEvent>
-    <Platforms>AnyCPU;x64;x86</Platforms>
+    <Platforms>x64</Platforms>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>Kdl.NetStandard.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="generated\**" />
-    <EmbeddedResource Remove="generated\**" />
-    <None Remove="generated\**" />
+    <Folder Include="Kdl\" />
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">

@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug|Win32">
-      <Configuration>Debug</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
@@ -27,19 +19,6 @@
     <ProjectName>kdl_wrap</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
@@ -54,12 +33,6 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -71,18 +44,8 @@
     <OutDir>bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
-    <OutDir>bin\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>obj\$(Platform)\$(Configuration)\</IntDir>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>bin\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>obj\$(Platform)\$(Configuration)\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>false</LinkIncremental>
     <OutDir>bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
@@ -96,7 +59,7 @@
       <PreprocessorDefinitions>NDEBUG;KDLWRAP_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\orocos_kinematics_dynamics\orocos_kdl\src;..\orocos_kinematics_dynamics\orocos_kdl\build-v142-x64;..\eigen</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\orocos_kinematics_dynamics\orocos_kdl\src;..\orocos_kinematics_dynamics\orocos_kdl\build-vs142;..\eigen</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -105,33 +68,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>..\orocos_kinematics_dynamics\orocos_kdl\build-v142-$(Platform)\bin\$(Configuration)\orocos-kdl.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-    <PreBuildEvent>
-      <Command>
-        echo rmdir /S /Q $(ProjectDir)generated
-        rmdir /S /Q $(ProjectDir)generated
-        mkdir generated
-        mkdir generated\Kdl
-      </Command>
-    </PreBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;KDLWRAP_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\orocos_kinematics_dynamics\orocos_kdl\src;..\orocos_kinematics_dynamics\orocos_kdl\build-v142-x64;..\eigen</AdditionalIncludeDirectories>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>..\orocos_kinematics_dynamics\orocos_kdl\build-v142-$(Platform)\bin\$(Configuration)\orocos-kdld.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\orocos_kinematics_dynamics\orocos_kdl\build-vs142\bin\$(Platform)\$(Configuration)\orocos-kdl.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -150,44 +87,14 @@
       <PreprocessorDefinitions>_DEBUG;KDLWRAP_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\orocos_kinematics_dynamics\orocos_kdl\src;..\orocos_kinematics_dynamics\orocos_kdl\build-v142-x64;..\eigen</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\orocos_kinematics_dynamics\orocos_kdl\src;..\orocos_kinematics_dynamics\orocos_kdl\build-vs142;..\eigen</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>..\orocos_kinematics_dynamics\orocos_kdl\build-v142-$(Platform)\bin\$(Configuration)\orocos-kdld.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-    <PreBuildEvent>
-      <Command>
-        echo rmdir /S /Q $(ProjectDir)generated
-        rmdir /S /Q $(ProjectDir)generated
-        mkdir generated
-        mkdir generated\Kdl
-      </Command>
-    </PreBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;KDLWRAP_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\orocos_kinematics_dynamics\orocos_kdl\src;..\orocos_kinematics_dynamics\orocos_kdl\build-v142-x64;..\eigen</AdditionalIncludeDirectories>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>..\orocos_kinematics_dynamics\orocos_kdl\build-v142-$(Platform)\bin\$(Configuration)\orocos-kdl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\orocos_kinematics_dynamics\orocos_kdl\build-vs142\bin\$(Configuration)\orocos-kdld.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -202,18 +109,19 @@
     <CustomBuild Include="kdl.i">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-        echo swig -Wall -Wallkw -I..\orocos_kinematics_dynamics\orocos_kdl\src -I..\orocos_kinematics_dynamics\orocos_kdl\build-v142-x64 -outdir generated\Kdl -c++ -csharp -namespace Kdl -dllimport kdl_wrap %(Identity)
-        swig -Wall -Wallkw -I..\orocos_kinematics_dynamics\orocos_kdl\src -I..\orocos_kinematics_dynamics\orocos_kdl\build-v142-x64 -outdir generated\Kdl -c++ -csharp -namespace Kdl -dllimport kdl_wrap %(Identity)
+        echo swig -v -Wall -Wallkw -I..\orocos_kinematics_dynamics\orocos_kdl\src -I..\orocos_kinematics_dynamics\orocos_kdl\build-vs142 -I../eigen -outdir generated\Kdl -c++ -csharp -namespace Kdl -dllimport kdl_wrap %(Identity)
+        swig -v -Wall -Wallkw -I..\orocos_kinematics_dynamics\orocos_kdl\src -I..\orocos_kinematics_dynamics\orocos_kdl\build-vs142 -I../eigen -outdir generated\Kdl -c++ -csharp -namespace Kdl -dllimport kdl_wrap %(Identity)
       </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-        echo swig -Wall -Wallkw -I..\orocos_kinematics_dynamics\orocos_kdl\src -I..\orocos_kinematics_dynamics\orocos_kdl\build-v142-x64 -outdir generated\Kdl -c++ -csharp -namespace Kdl -dllimport  %(Identity)
-        swig -Wall -Wallkw -I..\orocos_kinematics_dynamics\orocos_kdl\src -I..\orocos_kinematics_dynamics\orocos_kdl\build-v142-x64 -outdir generated\Kdl -c++ -csharp -namespace Kdl -dllimport kdl_wrap %(Identity)
+        echo swig -v -Wall -Wallkw -I..\orocos_kinematics_dynamics\orocos_kdl\src -I..\orocos_kinematics_dynamics\orocos_kdl\build-vs142 -I../eigen -outdir generated\Kdl -c++ -csharp -namespace Kdl -dllimport kdl_wrap %(Identity)
+        swig -v -Wall -Wallkw -I..\orocos_kinematics_dynamics\orocos_kdl\src -I..\orocos_kinematics_dynamics\orocos_kdl\build-vs142 -I../eigen -outdir generated\Kdl -c++ -csharp -namespace Kdl -dllimport kdl_wrap %(Identity)
       </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">kdl_wrap.cxx</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">kdl_wrap.cxx</Outputs>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Properties.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="kdl_wrap.h" />
     <ClInclude Include="pch.h" />
@@ -223,9 +131,7 @@
     <ClCompile Include="kdl_wrap.cxx" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

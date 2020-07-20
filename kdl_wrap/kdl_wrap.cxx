@@ -383,11 +383,15 @@ namespace Swig {
 
 
 
+#define EIGEN_NO_DEPRECATED_WARNING
+
 #include "config.h"
+#include "utilities/kdl-config.h"
 #include "utilities/utility.h"
 #include "utilities/rall1d.h"
 #include "utilities/rall2d.h"
 #include "utilities/traits.h"
+#include "Properties.h"
 #include "frames.hpp"
 #include "framevel.hpp"
 #include "frameacc.hpp"
@@ -400,8 +404,17 @@ namespace Swig {
 #include "segment.hpp"
 #include "chain.hpp"
 #include "solveri.hpp"
+#include "chainjnttojacsolver.hpp"
+#include "chainfksolver.hpp"
 #include "chainiksolver.hpp"
-#include "chainiksolverpos_nr_jl.hpp"
+#include "chainfksolverpos_recursive.hpp"
+#include "chainfksolvervel_recursive.hpp"
+#include "chainiksolverpos_lma.hpp"
+#include "chainiksolvervel_pinv.hpp"
+#include "chainiksolvervel_wdls.hpp"
+
+int KDL::VSIZE = 0;
+using namespace KDL;
 
 
 
@@ -448,6 +461,516 @@ SWIGINTERN void SWIG_CSharpException(int code, const char *msg) {
 #include <stdexcept>
 
 
+typedef double DoublePointer;
+
+SWIGINTERN DoublePointer *new_DoublePointer(){
+  return new double();
+}
+SWIGINTERN void delete_DoublePointer(DoublePointer *self){
+  if (self) delete self;
+}
+SWIGINTERN void DoublePointer_assign(DoublePointer *self,double value){
+  *self = value;
+}
+SWIGINTERN double DoublePointer_value(DoublePointer *self){
+  return *self;
+}
+SWIGINTERN double *DoublePointer_cast(DoublePointer *self){
+  return self;
+}
+SWIGINTERN DoublePointer *DoublePointer_frompointer(double *t){
+  return (DoublePointer *) t;
+}
+
+#include <typeinfo>
+#include <stdexcept>
+
+
+#include <vector>
+#include <algorithm>
+#include <stdexcept>
+
+SWIGINTERN std::vector< KDL::Frame > *new_std_vector_Sl_KDL_Frame_Sg___SWIG_2(int capacity){
+        std::vector< KDL::Frame >* pv = 0;
+        if (capacity >= 0) {
+          pv = new std::vector< KDL::Frame >();
+          pv->reserve(capacity);
+       } else {
+          throw std::out_of_range("capacity");
+       }
+       return pv;
+      }
+SWIGINTERN KDL::Frame std_vector_Sl_KDL_Frame_Sg__getitemcopy(std::vector< KDL::Frame > *self,int index){
+        if (index>=0 && index<(int)self->size())
+          return (*self)[index];
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN std::vector< KDL::Frame >::value_type const &std_vector_Sl_KDL_Frame_Sg__getitem(std::vector< KDL::Frame > *self,int index){
+        if (index>=0 && index<(int)self->size())
+          return (*self)[index];
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void std_vector_Sl_KDL_Frame_Sg__setitem(std::vector< KDL::Frame > *self,int index,KDL::Frame const &val){
+        if (index>=0 && index<(int)self->size())
+          (*self)[index] = val;
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void std_vector_Sl_KDL_Frame_Sg__AddRange(std::vector< KDL::Frame > *self,std::vector< KDL::Frame > const &values){
+        self->insert(self->end(), values.begin(), values.end());
+      }
+SWIGINTERN std::vector< KDL::Frame > *std_vector_Sl_KDL_Frame_Sg__GetRange(std::vector< KDL::Frame > *self,int index,int count){
+        if (index < 0)
+          throw std::out_of_range("index");
+        if (count < 0)
+          throw std::out_of_range("count");
+        if (index >= (int)self->size()+1 || index+count > (int)self->size())
+          throw std::invalid_argument("invalid range");
+        return new std::vector< KDL::Frame >(self->begin()+index, self->begin()+index+count);
+      }
+SWIGINTERN void std_vector_Sl_KDL_Frame_Sg__Insert(std::vector< KDL::Frame > *self,int index,KDL::Frame const &x){
+        if (index>=0 && index<(int)self->size()+1)
+          self->insert(self->begin()+index, x);
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void std_vector_Sl_KDL_Frame_Sg__InsertRange(std::vector< KDL::Frame > *self,int index,std::vector< KDL::Frame > const &values){
+        if (index>=0 && index<(int)self->size()+1)
+          self->insert(self->begin()+index, values.begin(), values.end());
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void std_vector_Sl_KDL_Frame_Sg__RemoveAt(std::vector< KDL::Frame > *self,int index){
+        if (index>=0 && index<(int)self->size())
+          self->erase(self->begin() + index);
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void std_vector_Sl_KDL_Frame_Sg__RemoveRange(std::vector< KDL::Frame > *self,int index,int count){
+        if (index < 0)
+          throw std::out_of_range("index");
+        if (count < 0)
+          throw std::out_of_range("count");
+        if (index >= (int)self->size()+1 || index+count > (int)self->size())
+          throw std::invalid_argument("invalid range");
+        self->erase(self->begin()+index, self->begin()+index+count);
+      }
+SWIGINTERN std::vector< KDL::Frame > *std_vector_Sl_KDL_Frame_Sg__Repeat(KDL::Frame const &value,int count){
+        if (count < 0)
+          throw std::out_of_range("count");
+        return new std::vector< KDL::Frame >(count, value);
+      }
+SWIGINTERN void std_vector_Sl_KDL_Frame_Sg__Reverse__SWIG_0(std::vector< KDL::Frame > *self){
+        std::reverse(self->begin(), self->end());
+      }
+SWIGINTERN void std_vector_Sl_KDL_Frame_Sg__Reverse__SWIG_1(std::vector< KDL::Frame > *self,int index,int count){
+        if (index < 0)
+          throw std::out_of_range("index");
+        if (count < 0)
+          throw std::out_of_range("count");
+        if (index >= (int)self->size()+1 || index+count > (int)self->size())
+          throw std::invalid_argument("invalid range");
+        std::reverse(self->begin()+index, self->begin()+index+count);
+      }
+SWIGINTERN void std_vector_Sl_KDL_Frame_Sg__SetRange(std::vector< KDL::Frame > *self,int index,std::vector< KDL::Frame > const &values){
+        if (index < 0)
+          throw std::out_of_range("index");
+        if (index+values.size() > self->size())
+          throw std::out_of_range("index");
+        std::copy(values.begin(), values.end(), self->begin()+index);
+      }
+SWIGINTERN std::vector< KDL::FrameVel > *new_std_vector_Sl_KDL_FrameVel_Sg___SWIG_2(int capacity){
+        std::vector< KDL::FrameVel >* pv = 0;
+        if (capacity >= 0) {
+          pv = new std::vector< KDL::FrameVel >();
+          pv->reserve(capacity);
+       } else {
+          throw std::out_of_range("capacity");
+       }
+       return pv;
+      }
+SWIGINTERN KDL::FrameVel std_vector_Sl_KDL_FrameVel_Sg__getitemcopy(std::vector< KDL::FrameVel > *self,int index){
+        if (index>=0 && index<(int)self->size())
+          return (*self)[index];
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN std::vector< KDL::FrameVel >::value_type const &std_vector_Sl_KDL_FrameVel_Sg__getitem(std::vector< KDL::FrameVel > *self,int index){
+        if (index>=0 && index<(int)self->size())
+          return (*self)[index];
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void std_vector_Sl_KDL_FrameVel_Sg__setitem(std::vector< KDL::FrameVel > *self,int index,KDL::FrameVel const &val){
+        if (index>=0 && index<(int)self->size())
+          (*self)[index] = val;
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void std_vector_Sl_KDL_FrameVel_Sg__AddRange(std::vector< KDL::FrameVel > *self,std::vector< KDL::FrameVel > const &values){
+        self->insert(self->end(), values.begin(), values.end());
+      }
+SWIGINTERN std::vector< KDL::FrameVel > *std_vector_Sl_KDL_FrameVel_Sg__GetRange(std::vector< KDL::FrameVel > *self,int index,int count){
+        if (index < 0)
+          throw std::out_of_range("index");
+        if (count < 0)
+          throw std::out_of_range("count");
+        if (index >= (int)self->size()+1 || index+count > (int)self->size())
+          throw std::invalid_argument("invalid range");
+        return new std::vector< KDL::FrameVel >(self->begin()+index, self->begin()+index+count);
+      }
+SWIGINTERN void std_vector_Sl_KDL_FrameVel_Sg__Insert(std::vector< KDL::FrameVel > *self,int index,KDL::FrameVel const &x){
+        if (index>=0 && index<(int)self->size()+1)
+          self->insert(self->begin()+index, x);
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void std_vector_Sl_KDL_FrameVel_Sg__InsertRange(std::vector< KDL::FrameVel > *self,int index,std::vector< KDL::FrameVel > const &values){
+        if (index>=0 && index<(int)self->size()+1)
+          self->insert(self->begin()+index, values.begin(), values.end());
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void std_vector_Sl_KDL_FrameVel_Sg__RemoveAt(std::vector< KDL::FrameVel > *self,int index){
+        if (index>=0 && index<(int)self->size())
+          self->erase(self->begin() + index);
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void std_vector_Sl_KDL_FrameVel_Sg__RemoveRange(std::vector< KDL::FrameVel > *self,int index,int count){
+        if (index < 0)
+          throw std::out_of_range("index");
+        if (count < 0)
+          throw std::out_of_range("count");
+        if (index >= (int)self->size()+1 || index+count > (int)self->size())
+          throw std::invalid_argument("invalid range");
+        self->erase(self->begin()+index, self->begin()+index+count);
+      }
+SWIGINTERN std::vector< KDL::FrameVel > *std_vector_Sl_KDL_FrameVel_Sg__Repeat(KDL::FrameVel const &value,int count){
+        if (count < 0)
+          throw std::out_of_range("count");
+        return new std::vector< KDL::FrameVel >(count, value);
+      }
+SWIGINTERN void std_vector_Sl_KDL_FrameVel_Sg__Reverse__SWIG_0(std::vector< KDL::FrameVel > *self){
+        std::reverse(self->begin(), self->end());
+      }
+SWIGINTERN void std_vector_Sl_KDL_FrameVel_Sg__Reverse__SWIG_1(std::vector< KDL::FrameVel > *self,int index,int count){
+        if (index < 0)
+          throw std::out_of_range("index");
+        if (count < 0)
+          throw std::out_of_range("count");
+        if (index >= (int)self->size()+1 || index+count > (int)self->size())
+          throw std::invalid_argument("invalid range");
+        std::reverse(self->begin()+index, self->begin()+index+count);
+      }
+SWIGINTERN void std_vector_Sl_KDL_FrameVel_Sg__SetRange(std::vector< KDL::FrameVel > *self,int index,std::vector< KDL::FrameVel > const &values){
+        if (index < 0)
+          throw std::out_of_range("index");
+        if (index+values.size() > self->size())
+          throw std::out_of_range("index");
+        std::copy(values.begin(), values.end(), self->begin()+index);
+      }
+SWIGINTERN std::vector< KDL::FrameAcc > *new_std_vector_Sl_KDL_FrameAcc_Sg___SWIG_2(int capacity){
+        std::vector< KDL::FrameAcc >* pv = 0;
+        if (capacity >= 0) {
+          pv = new std::vector< KDL::FrameAcc >();
+          pv->reserve(capacity);
+       } else {
+          throw std::out_of_range("capacity");
+       }
+       return pv;
+      }
+SWIGINTERN KDL::FrameAcc std_vector_Sl_KDL_FrameAcc_Sg__getitemcopy(std::vector< KDL::FrameAcc > *self,int index){
+        if (index>=0 && index<(int)self->size())
+          return (*self)[index];
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN std::vector< KDL::FrameAcc >::value_type const &std_vector_Sl_KDL_FrameAcc_Sg__getitem(std::vector< KDL::FrameAcc > *self,int index){
+        if (index>=0 && index<(int)self->size())
+          return (*self)[index];
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void std_vector_Sl_KDL_FrameAcc_Sg__setitem(std::vector< KDL::FrameAcc > *self,int index,KDL::FrameAcc const &val){
+        if (index>=0 && index<(int)self->size())
+          (*self)[index] = val;
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void std_vector_Sl_KDL_FrameAcc_Sg__AddRange(std::vector< KDL::FrameAcc > *self,std::vector< KDL::FrameAcc > const &values){
+        self->insert(self->end(), values.begin(), values.end());
+      }
+SWIGINTERN std::vector< KDL::FrameAcc > *std_vector_Sl_KDL_FrameAcc_Sg__GetRange(std::vector< KDL::FrameAcc > *self,int index,int count){
+        if (index < 0)
+          throw std::out_of_range("index");
+        if (count < 0)
+          throw std::out_of_range("count");
+        if (index >= (int)self->size()+1 || index+count > (int)self->size())
+          throw std::invalid_argument("invalid range");
+        return new std::vector< KDL::FrameAcc >(self->begin()+index, self->begin()+index+count);
+      }
+SWIGINTERN void std_vector_Sl_KDL_FrameAcc_Sg__Insert(std::vector< KDL::FrameAcc > *self,int index,KDL::FrameAcc const &x){
+        if (index>=0 && index<(int)self->size()+1)
+          self->insert(self->begin()+index, x);
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void std_vector_Sl_KDL_FrameAcc_Sg__InsertRange(std::vector< KDL::FrameAcc > *self,int index,std::vector< KDL::FrameAcc > const &values){
+        if (index>=0 && index<(int)self->size()+1)
+          self->insert(self->begin()+index, values.begin(), values.end());
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void std_vector_Sl_KDL_FrameAcc_Sg__RemoveAt(std::vector< KDL::FrameAcc > *self,int index){
+        if (index>=0 && index<(int)self->size())
+          self->erase(self->begin() + index);
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void std_vector_Sl_KDL_FrameAcc_Sg__RemoveRange(std::vector< KDL::FrameAcc > *self,int index,int count){
+        if (index < 0)
+          throw std::out_of_range("index");
+        if (count < 0)
+          throw std::out_of_range("count");
+        if (index >= (int)self->size()+1 || index+count > (int)self->size())
+          throw std::invalid_argument("invalid range");
+        self->erase(self->begin()+index, self->begin()+index+count);
+      }
+SWIGINTERN std::vector< KDL::FrameAcc > *std_vector_Sl_KDL_FrameAcc_Sg__Repeat(KDL::FrameAcc const &value,int count){
+        if (count < 0)
+          throw std::out_of_range("count");
+        return new std::vector< KDL::FrameAcc >(count, value);
+      }
+SWIGINTERN void std_vector_Sl_KDL_FrameAcc_Sg__Reverse__SWIG_0(std::vector< KDL::FrameAcc > *self){
+        std::reverse(self->begin(), self->end());
+      }
+SWIGINTERN void std_vector_Sl_KDL_FrameAcc_Sg__Reverse__SWIG_1(std::vector< KDL::FrameAcc > *self,int index,int count){
+        if (index < 0)
+          throw std::out_of_range("index");
+        if (count < 0)
+          throw std::out_of_range("count");
+        if (index >= (int)self->size()+1 || index+count > (int)self->size())
+          throw std::invalid_argument("invalid range");
+        std::reverse(self->begin()+index, self->begin()+index+count);
+      }
+SWIGINTERN void std_vector_Sl_KDL_FrameAcc_Sg__SetRange(std::vector< KDL::FrameAcc > *self,int index,std::vector< KDL::FrameAcc > const &values){
+        if (index < 0)
+          throw std::out_of_range("index");
+        if (index+values.size() > self->size())
+          throw std::out_of_range("index");
+        std::copy(values.begin(), values.end(), self->begin()+index);
+      }
+SWIGINTERN std::vector< KDL::Segment > *new_std_vector_Sl_KDL_Segment_Sg___SWIG_2(int capacity){
+        std::vector< KDL::Segment >* pv = 0;
+        if (capacity >= 0) {
+          pv = new std::vector< KDL::Segment >();
+          pv->reserve(capacity);
+       } else {
+          throw std::out_of_range("capacity");
+       }
+       return pv;
+      }
+SWIGINTERN KDL::Segment std_vector_Sl_KDL_Segment_Sg__getitemcopy(std::vector< KDL::Segment > *self,int index){
+        if (index>=0 && index<(int)self->size())
+          return (*self)[index];
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN std::vector< KDL::Segment >::value_type const &std_vector_Sl_KDL_Segment_Sg__getitem(std::vector< KDL::Segment > *self,int index){
+        if (index>=0 && index<(int)self->size())
+          return (*self)[index];
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void std_vector_Sl_KDL_Segment_Sg__setitem(std::vector< KDL::Segment > *self,int index,KDL::Segment const &val){
+        if (index>=0 && index<(int)self->size())
+          (*self)[index] = val;
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void std_vector_Sl_KDL_Segment_Sg__AddRange(std::vector< KDL::Segment > *self,std::vector< KDL::Segment > const &values){
+        self->insert(self->end(), values.begin(), values.end());
+      }
+SWIGINTERN std::vector< KDL::Segment > *std_vector_Sl_KDL_Segment_Sg__GetRange(std::vector< KDL::Segment > *self,int index,int count){
+        if (index < 0)
+          throw std::out_of_range("index");
+        if (count < 0)
+          throw std::out_of_range("count");
+        if (index >= (int)self->size()+1 || index+count > (int)self->size())
+          throw std::invalid_argument("invalid range");
+        return new std::vector< KDL::Segment >(self->begin()+index, self->begin()+index+count);
+      }
+SWIGINTERN void std_vector_Sl_KDL_Segment_Sg__Insert(std::vector< KDL::Segment > *self,int index,KDL::Segment const &x){
+        if (index>=0 && index<(int)self->size()+1)
+          self->insert(self->begin()+index, x);
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void std_vector_Sl_KDL_Segment_Sg__InsertRange(std::vector< KDL::Segment > *self,int index,std::vector< KDL::Segment > const &values){
+        if (index>=0 && index<(int)self->size()+1)
+          self->insert(self->begin()+index, values.begin(), values.end());
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void std_vector_Sl_KDL_Segment_Sg__RemoveAt(std::vector< KDL::Segment > *self,int index){
+        if (index>=0 && index<(int)self->size())
+          self->erase(self->begin() + index);
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void std_vector_Sl_KDL_Segment_Sg__RemoveRange(std::vector< KDL::Segment > *self,int index,int count){
+        if (index < 0)
+          throw std::out_of_range("index");
+        if (count < 0)
+          throw std::out_of_range("count");
+        if (index >= (int)self->size()+1 || index+count > (int)self->size())
+          throw std::invalid_argument("invalid range");
+        self->erase(self->begin()+index, self->begin()+index+count);
+      }
+SWIGINTERN std::vector< KDL::Segment > *std_vector_Sl_KDL_Segment_Sg__Repeat(KDL::Segment const &value,int count){
+        if (count < 0)
+          throw std::out_of_range("count");
+        return new std::vector< KDL::Segment >(count, value);
+      }
+SWIGINTERN void std_vector_Sl_KDL_Segment_Sg__Reverse__SWIG_0(std::vector< KDL::Segment > *self){
+        std::reverse(self->begin(), self->end());
+      }
+SWIGINTERN void std_vector_Sl_KDL_Segment_Sg__Reverse__SWIG_1(std::vector< KDL::Segment > *self,int index,int count){
+        if (index < 0)
+          throw std::out_of_range("index");
+        if (count < 0)
+          throw std::out_of_range("count");
+        if (index >= (int)self->size()+1 || index+count > (int)self->size())
+          throw std::invalid_argument("invalid range");
+        std::reverse(self->begin()+index, self->begin()+index+count);
+      }
+SWIGINTERN void std_vector_Sl_KDL_Segment_Sg__SetRange(std::vector< KDL::Segment > *self,int index,std::vector< KDL::Segment > const &values){
+        if (index < 0)
+          throw std::out_of_range("index");
+        if (index+values.size() > self->size())
+          throw std::out_of_range("index");
+        std::copy(values.begin(), values.end(), self->begin()+index);
+      }
+SWIGINTERN std::vector< bool > *new_std_vector_Sl_bool_Sg___SWIG_2(int capacity){
+        std::vector< bool >* pv = 0;
+        if (capacity >= 0) {
+          pv = new std::vector< bool >();
+          pv->reserve(capacity);
+       } else {
+          throw std::out_of_range("capacity");
+       }
+       return pv;
+      }
+SWIGINTERN bool std_vector_Sl_bool_Sg__getitemcopy(std::vector< bool > *self,int index){
+        if (index>=0 && index<(int)self->size())
+          return (*self)[index];
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN bool std_vector_Sl_bool_Sg__getitem(std::vector< bool > *self,int index){
+        if (index>=0 && index<(int)self->size())
+          return (*self)[index];
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void std_vector_Sl_bool_Sg__setitem(std::vector< bool > *self,int index,bool const &val){
+        if (index>=0 && index<(int)self->size())
+          (*self)[index] = val;
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void std_vector_Sl_bool_Sg__AddRange(std::vector< bool > *self,std::vector< bool > const &values){
+        self->insert(self->end(), values.begin(), values.end());
+      }
+SWIGINTERN std::vector< bool > *std_vector_Sl_bool_Sg__GetRange(std::vector< bool > *self,int index,int count){
+        if (index < 0)
+          throw std::out_of_range("index");
+        if (count < 0)
+          throw std::out_of_range("count");
+        if (index >= (int)self->size()+1 || index+count > (int)self->size())
+          throw std::invalid_argument("invalid range");
+        return new std::vector< bool >(self->begin()+index, self->begin()+index+count);
+      }
+SWIGINTERN void std_vector_Sl_bool_Sg__Insert(std::vector< bool > *self,int index,bool const &x){
+        if (index>=0 && index<(int)self->size()+1)
+          self->insert(self->begin()+index, x);
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void std_vector_Sl_bool_Sg__InsertRange(std::vector< bool > *self,int index,std::vector< bool > const &values){
+        if (index>=0 && index<(int)self->size()+1)
+          self->insert(self->begin()+index, values.begin(), values.end());
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void std_vector_Sl_bool_Sg__RemoveAt(std::vector< bool > *self,int index){
+        if (index>=0 && index<(int)self->size())
+          self->erase(self->begin() + index);
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void std_vector_Sl_bool_Sg__RemoveRange(std::vector< bool > *self,int index,int count){
+        if (index < 0)
+          throw std::out_of_range("index");
+        if (count < 0)
+          throw std::out_of_range("count");
+        if (index >= (int)self->size()+1 || index+count > (int)self->size())
+          throw std::invalid_argument("invalid range");
+        self->erase(self->begin()+index, self->begin()+index+count);
+      }
+SWIGINTERN std::vector< bool > *std_vector_Sl_bool_Sg__Repeat(bool const &value,int count){
+        if (count < 0)
+          throw std::out_of_range("count");
+        return new std::vector< bool >(count, value);
+      }
+SWIGINTERN void std_vector_Sl_bool_Sg__Reverse__SWIG_0(std::vector< bool > *self){
+        std::reverse(self->begin(), self->end());
+      }
+SWIGINTERN void std_vector_Sl_bool_Sg__Reverse__SWIG_1(std::vector< bool > *self,int index,int count){
+        if (index < 0)
+          throw std::out_of_range("index");
+        if (count < 0)
+          throw std::out_of_range("count");
+        if (index >= (int)self->size()+1 || index+count > (int)self->size())
+          throw std::invalid_argument("invalid range");
+        std::reverse(self->begin()+index, self->begin()+index+count);
+      }
+SWIGINTERN void std_vector_Sl_bool_Sg__SetRange(std::vector< bool > *self,int index,std::vector< bool > const &values){
+        if (index < 0)
+          throw std::out_of_range("index");
+        if (index+values.size() > self->size())
+          throw std::out_of_range("index");
+        std::copy(values.begin(), values.end(), self->begin()+index);
+      }
+SWIGINTERN bool std_vector_Sl_bool_Sg__Contains(std::vector< bool > *self,bool const &value){
+        return std::find(self->begin(), self->end(), value) != self->end();
+      }
+SWIGINTERN int std_vector_Sl_bool_Sg__IndexOf(std::vector< bool > *self,bool const &value){
+        int index = -1;
+        std::vector< bool >::iterator it = std::find(self->begin(), self->end(), value);
+        if (it != self->end())
+          index = (int)(it - self->begin());
+        return index;
+      }
+SWIGINTERN int std_vector_Sl_bool_Sg__LastIndexOf(std::vector< bool > *self,bool const &value){
+        int index = -1;
+        std::vector< bool >::reverse_iterator rit = std::find(self->rbegin(), self->rend(), value);
+        if (rit != self->rend())
+          index = (int)(self->rend() - 1 - rit);
+        return index;
+      }
+SWIGINTERN bool std_vector_Sl_bool_Sg__Remove(std::vector< bool > *self,bool const &value){
+        std::vector< bool >::iterator it = std::find(self->begin(), self->end(), value);
+        if (it != self->end()) {
+          self->erase(it);
+          return true;
+        }
+        return false;
+      }
+
 
 /* ---------------------------------------------------
  * C++ director class methods
@@ -459,6 +982,20694 @@ SWIGINTERN void SWIG_CSharpException(int code, const char *msg) {
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_DoublePointer() {
+  void * jresult ;
+  DoublePointer *result = 0 ;
+  
+  {
+    try {
+      result = (DoublePointer *)new_DoublePointer();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_DoublePointer(void * jarg1) {
+  DoublePointer *arg1 = (DoublePointer *) 0 ;
+  
+  arg1 = (DoublePointer *)jarg1; 
+  {
+    try {
+      delete_DoublePointer(arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_DoublePointer_assign(void * jarg1, double jarg2) {
+  DoublePointer *arg1 = (DoublePointer *) 0 ;
+  double arg2 ;
+  
+  arg1 = (DoublePointer *)jarg1; 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      DoublePointer_assign(arg1,arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_DoublePointer_value(void * jarg1) {
+  double jresult ;
+  DoublePointer *arg1 = (DoublePointer *) 0 ;
+  double result;
+  
+  arg1 = (DoublePointer *)jarg1; 
+  {
+    try {
+      result = (double)DoublePointer_value(arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_DoublePointer__cast(void * jarg1) {
+  void * jresult ;
+  DoublePointer *arg1 = (DoublePointer *) 0 ;
+  double *result = 0 ;
+  
+  arg1 = (DoublePointer *)jarg1; 
+  {
+    try {
+      result = (double *)DoublePointer_cast(arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_DoublePointer_frompointer(void * jarg1) {
+  void * jresult ;
+  double *arg1 = (double *) 0 ;
+  DoublePointer *result = 0 ;
+  
+  arg1 = (double *)jarg1; 
+  {
+    try {
+      result = (DoublePointer *)DoublePointer_frompointer(arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameVector_Clear(void * jarg1) {
+  std::vector< KDL::Frame > *arg1 = (std::vector< KDL::Frame > *) 0 ;
+  
+  arg1 = (std::vector< KDL::Frame > *)jarg1; 
+  {
+    try {
+      (arg1)->clear();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameVector_Add(void * jarg1, void * jarg2) {
+  std::vector< KDL::Frame > *arg1 = (std::vector< KDL::Frame > *) 0 ;
+  KDL::Frame *arg2 = 0 ;
+  
+  arg1 = (std::vector< KDL::Frame > *)jarg1; 
+  arg2 = (KDL::Frame *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      (arg1)->push_back((KDL::Frame const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT unsigned long SWIGSTDCALL CSharp_Kdl_FrameVector_size(void * jarg1) {
+  unsigned long jresult ;
+  std::vector< KDL::Frame > *arg1 = (std::vector< KDL::Frame > *) 0 ;
+  std::vector< KDL::Frame >::size_type result;
+  
+  arg1 = (std::vector< KDL::Frame > *)jarg1; 
+  {
+    try {
+      result = ((std::vector< KDL::Frame > const *)arg1)->size();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (unsigned long)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned long SWIGSTDCALL CSharp_Kdl_FrameVector_capacity(void * jarg1) {
+  unsigned long jresult ;
+  std::vector< KDL::Frame > *arg1 = (std::vector< KDL::Frame > *) 0 ;
+  std::vector< KDL::Frame >::size_type result;
+  
+  arg1 = (std::vector< KDL::Frame > *)jarg1; 
+  {
+    try {
+      result = ((std::vector< KDL::Frame > const *)arg1)->capacity();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (unsigned long)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameVector_reserve(void * jarg1, unsigned long jarg2) {
+  std::vector< KDL::Frame > *arg1 = (std::vector< KDL::Frame > *) 0 ;
+  std::vector< KDL::Frame >::size_type arg2 ;
+  
+  arg1 = (std::vector< KDL::Frame > *)jarg1; 
+  arg2 = (std::vector< KDL::Frame >::size_type)jarg2; 
+  {
+    try {
+      (arg1)->reserve(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_FrameVector__SWIG_0() {
+  void * jresult ;
+  std::vector< KDL::Frame > *result = 0 ;
+  
+  {
+    try {
+      result = (std::vector< KDL::Frame > *)new std::vector< KDL::Frame >();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_FrameVector__SWIG_1(void * jarg1) {
+  void * jresult ;
+  std::vector< KDL::Frame > *arg1 = 0 ;
+  std::vector< KDL::Frame > *result = 0 ;
+  
+  arg1 = (std::vector< KDL::Frame > *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector< KDL::Frame > const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (std::vector< KDL::Frame > *)new std::vector< KDL::Frame >((std::vector< KDL::Frame > const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_FrameVector__SWIG_2(int jarg1) {
+  void * jresult ;
+  int arg1 ;
+  std::vector< KDL::Frame > *result = 0 ;
+  
+  arg1 = (int)jarg1; 
+  {
+    try {
+      try {
+        result = (std::vector< KDL::Frame > *)new_std_vector_Sl_KDL_Frame_Sg___SWIG_2(arg1);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return 0;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_FrameVector_getitemcopy(void * jarg1, int jarg2) {
+  void * jresult ;
+  std::vector< KDL::Frame > *arg1 = (std::vector< KDL::Frame > *) 0 ;
+  int arg2 ;
+  KDL::Frame result;
+  
+  arg1 = (std::vector< KDL::Frame > *)jarg1; 
+  arg2 = (int)jarg2; 
+  {
+    try {
+      try {
+        result = std_vector_Sl_KDL_Frame_Sg__getitemcopy(arg1,arg2);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return 0;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Frame((const KDL::Frame &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_FrameVector_getitem(void * jarg1, int jarg2) {
+  void * jresult ;
+  std::vector< KDL::Frame > *arg1 = (std::vector< KDL::Frame > *) 0 ;
+  int arg2 ;
+  std::vector< KDL::Frame >::value_type *result = 0 ;
+  
+  arg1 = (std::vector< KDL::Frame > *)jarg1; 
+  arg2 = (int)jarg2; 
+  {
+    try {
+      try {
+        result = (std::vector< KDL::Frame >::value_type *) &std_vector_Sl_KDL_Frame_Sg__getitem(arg1,arg2);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return 0;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameVector_setitem(void * jarg1, int jarg2, void * jarg3) {
+  std::vector< KDL::Frame > *arg1 = (std::vector< KDL::Frame > *) 0 ;
+  int arg2 ;
+  KDL::Frame *arg3 = 0 ;
+  
+  arg1 = (std::vector< KDL::Frame > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (KDL::Frame *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      try {
+        std_vector_Sl_KDL_Frame_Sg__setitem(arg1,arg2,(KDL::Frame const &)*arg3);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return ;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameVector_AddRange(void * jarg1, void * jarg2) {
+  std::vector< KDL::Frame > *arg1 = (std::vector< KDL::Frame > *) 0 ;
+  std::vector< KDL::Frame > *arg2 = 0 ;
+  
+  arg1 = (std::vector< KDL::Frame > *)jarg1; 
+  arg2 = (std::vector< KDL::Frame > *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector< KDL::Frame > const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      std_vector_Sl_KDL_Frame_Sg__AddRange(arg1,(std::vector< KDL::Frame > const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_FrameVector_GetRange(void * jarg1, int jarg2, int jarg3) {
+  void * jresult ;
+  std::vector< KDL::Frame > *arg1 = (std::vector< KDL::Frame > *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  std::vector< KDL::Frame > *result = 0 ;
+  
+  arg1 = (std::vector< KDL::Frame > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  {
+    try {
+      try {
+        result = (std::vector< KDL::Frame > *)std_vector_Sl_KDL_Frame_Sg__GetRange(arg1,arg2,arg3);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return 0;
+      } catch(std::invalid_argument &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentException, (&_e)->what(), "");
+        return 0;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameVector_Insert(void * jarg1, int jarg2, void * jarg3) {
+  std::vector< KDL::Frame > *arg1 = (std::vector< KDL::Frame > *) 0 ;
+  int arg2 ;
+  KDL::Frame *arg3 = 0 ;
+  
+  arg1 = (std::vector< KDL::Frame > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (KDL::Frame *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      try {
+        std_vector_Sl_KDL_Frame_Sg__Insert(arg1,arg2,(KDL::Frame const &)*arg3);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return ;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameVector_InsertRange(void * jarg1, int jarg2, void * jarg3) {
+  std::vector< KDL::Frame > *arg1 = (std::vector< KDL::Frame > *) 0 ;
+  int arg2 ;
+  std::vector< KDL::Frame > *arg3 = 0 ;
+  
+  arg1 = (std::vector< KDL::Frame > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (std::vector< KDL::Frame > *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector< KDL::Frame > const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      try {
+        std_vector_Sl_KDL_Frame_Sg__InsertRange(arg1,arg2,(std::vector< KDL::Frame > const &)*arg3);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return ;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameVector_RemoveAt(void * jarg1, int jarg2) {
+  std::vector< KDL::Frame > *arg1 = (std::vector< KDL::Frame > *) 0 ;
+  int arg2 ;
+  
+  arg1 = (std::vector< KDL::Frame > *)jarg1; 
+  arg2 = (int)jarg2; 
+  {
+    try {
+      try {
+        std_vector_Sl_KDL_Frame_Sg__RemoveAt(arg1,arg2);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return ;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameVector_RemoveRange(void * jarg1, int jarg2, int jarg3) {
+  std::vector< KDL::Frame > *arg1 = (std::vector< KDL::Frame > *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  
+  arg1 = (std::vector< KDL::Frame > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  {
+    try {
+      try {
+        std_vector_Sl_KDL_Frame_Sg__RemoveRange(arg1,arg2,arg3);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return ;
+      } catch(std::invalid_argument &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentException, (&_e)->what(), "");
+        return ;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_FrameVector_Repeat(void * jarg1, int jarg2) {
+  void * jresult ;
+  KDL::Frame *arg1 = 0 ;
+  int arg2 ;
+  std::vector< KDL::Frame > *result = 0 ;
+  
+  arg1 = (KDL::Frame *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (int)jarg2; 
+  {
+    try {
+      try {
+        result = (std::vector< KDL::Frame > *)std_vector_Sl_KDL_Frame_Sg__Repeat((KDL::Frame const &)*arg1,arg2);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return 0;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameVector_Reverse__SWIG_0(void * jarg1) {
+  std::vector< KDL::Frame > *arg1 = (std::vector< KDL::Frame > *) 0 ;
+  
+  arg1 = (std::vector< KDL::Frame > *)jarg1; 
+  {
+    try {
+      std_vector_Sl_KDL_Frame_Sg__Reverse__SWIG_0(arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameVector_Reverse__SWIG_1(void * jarg1, int jarg2, int jarg3) {
+  std::vector< KDL::Frame > *arg1 = (std::vector< KDL::Frame > *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  
+  arg1 = (std::vector< KDL::Frame > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  {
+    try {
+      try {
+        std_vector_Sl_KDL_Frame_Sg__Reverse__SWIG_1(arg1,arg2,arg3);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return ;
+      } catch(std::invalid_argument &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentException, (&_e)->what(), "");
+        return ;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameVector_SetRange(void * jarg1, int jarg2, void * jarg3) {
+  std::vector< KDL::Frame > *arg1 = (std::vector< KDL::Frame > *) 0 ;
+  int arg2 ;
+  std::vector< KDL::Frame > *arg3 = 0 ;
+  
+  arg1 = (std::vector< KDL::Frame > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (std::vector< KDL::Frame > *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector< KDL::Frame > const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      try {
+        std_vector_Sl_KDL_Frame_Sg__SetRange(arg1,arg2,(std::vector< KDL::Frame > const &)*arg3);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return ;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_FrameVector(void * jarg1) {
+  std::vector< KDL::Frame > *arg1 = (std::vector< KDL::Frame > *) 0 ;
+  
+  arg1 = (std::vector< KDL::Frame > *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameVelVector_Clear(void * jarg1) {
+  std::vector< KDL::FrameVel > *arg1 = (std::vector< KDL::FrameVel > *) 0 ;
+  
+  arg1 = (std::vector< KDL::FrameVel > *)jarg1; 
+  {
+    try {
+      (arg1)->clear();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameVelVector_Add(void * jarg1, void * jarg2) {
+  std::vector< KDL::FrameVel > *arg1 = (std::vector< KDL::FrameVel > *) 0 ;
+  KDL::FrameVel *arg2 = 0 ;
+  
+  arg1 = (std::vector< KDL::FrameVel > *)jarg1; 
+  arg2 = (KDL::FrameVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameVel const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      (arg1)->push_back((KDL::FrameVel const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT unsigned long SWIGSTDCALL CSharp_Kdl_FrameVelVector_size(void * jarg1) {
+  unsigned long jresult ;
+  std::vector< KDL::FrameVel > *arg1 = (std::vector< KDL::FrameVel > *) 0 ;
+  std::vector< KDL::FrameVel >::size_type result;
+  
+  arg1 = (std::vector< KDL::FrameVel > *)jarg1; 
+  {
+    try {
+      result = ((std::vector< KDL::FrameVel > const *)arg1)->size();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (unsigned long)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned long SWIGSTDCALL CSharp_Kdl_FrameVelVector_capacity(void * jarg1) {
+  unsigned long jresult ;
+  std::vector< KDL::FrameVel > *arg1 = (std::vector< KDL::FrameVel > *) 0 ;
+  std::vector< KDL::FrameVel >::size_type result;
+  
+  arg1 = (std::vector< KDL::FrameVel > *)jarg1; 
+  {
+    try {
+      result = ((std::vector< KDL::FrameVel > const *)arg1)->capacity();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (unsigned long)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameVelVector_reserve(void * jarg1, unsigned long jarg2) {
+  std::vector< KDL::FrameVel > *arg1 = (std::vector< KDL::FrameVel > *) 0 ;
+  std::vector< KDL::FrameVel >::size_type arg2 ;
+  
+  arg1 = (std::vector< KDL::FrameVel > *)jarg1; 
+  arg2 = (std::vector< KDL::FrameVel >::size_type)jarg2; 
+  {
+    try {
+      (arg1)->reserve(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_FrameVelVector__SWIG_0() {
+  void * jresult ;
+  std::vector< KDL::FrameVel > *result = 0 ;
+  
+  {
+    try {
+      result = (std::vector< KDL::FrameVel > *)new std::vector< KDL::FrameVel >();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_FrameVelVector__SWIG_1(void * jarg1) {
+  void * jresult ;
+  std::vector< KDL::FrameVel > *arg1 = 0 ;
+  std::vector< KDL::FrameVel > *result = 0 ;
+  
+  arg1 = (std::vector< KDL::FrameVel > *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector< KDL::FrameVel > const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (std::vector< KDL::FrameVel > *)new std::vector< KDL::FrameVel >((std::vector< KDL::FrameVel > const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_FrameVelVector__SWIG_2(int jarg1) {
+  void * jresult ;
+  int arg1 ;
+  std::vector< KDL::FrameVel > *result = 0 ;
+  
+  arg1 = (int)jarg1; 
+  {
+    try {
+      try {
+        result = (std::vector< KDL::FrameVel > *)new_std_vector_Sl_KDL_FrameVel_Sg___SWIG_2(arg1);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return 0;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_FrameVelVector_getitemcopy(void * jarg1, int jarg2) {
+  void * jresult ;
+  std::vector< KDL::FrameVel > *arg1 = (std::vector< KDL::FrameVel > *) 0 ;
+  int arg2 ;
+  KDL::FrameVel result;
+  
+  arg1 = (std::vector< KDL::FrameVel > *)jarg1; 
+  arg2 = (int)jarg2; 
+  {
+    try {
+      try {
+        result = std_vector_Sl_KDL_FrameVel_Sg__getitemcopy(arg1,arg2);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return 0;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::FrameVel((const KDL::FrameVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_FrameVelVector_getitem(void * jarg1, int jarg2) {
+  void * jresult ;
+  std::vector< KDL::FrameVel > *arg1 = (std::vector< KDL::FrameVel > *) 0 ;
+  int arg2 ;
+  std::vector< KDL::FrameVel >::value_type *result = 0 ;
+  
+  arg1 = (std::vector< KDL::FrameVel > *)jarg1; 
+  arg2 = (int)jarg2; 
+  {
+    try {
+      try {
+        result = (std::vector< KDL::FrameVel >::value_type *) &std_vector_Sl_KDL_FrameVel_Sg__getitem(arg1,arg2);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return 0;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameVelVector_setitem(void * jarg1, int jarg2, void * jarg3) {
+  std::vector< KDL::FrameVel > *arg1 = (std::vector< KDL::FrameVel > *) 0 ;
+  int arg2 ;
+  KDL::FrameVel *arg3 = 0 ;
+  
+  arg1 = (std::vector< KDL::FrameVel > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (KDL::FrameVel *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameVel const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      try {
+        std_vector_Sl_KDL_FrameVel_Sg__setitem(arg1,arg2,(KDL::FrameVel const &)*arg3);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return ;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameVelVector_AddRange(void * jarg1, void * jarg2) {
+  std::vector< KDL::FrameVel > *arg1 = (std::vector< KDL::FrameVel > *) 0 ;
+  std::vector< KDL::FrameVel > *arg2 = 0 ;
+  
+  arg1 = (std::vector< KDL::FrameVel > *)jarg1; 
+  arg2 = (std::vector< KDL::FrameVel > *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector< KDL::FrameVel > const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      std_vector_Sl_KDL_FrameVel_Sg__AddRange(arg1,(std::vector< KDL::FrameVel > const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_FrameVelVector_GetRange(void * jarg1, int jarg2, int jarg3) {
+  void * jresult ;
+  std::vector< KDL::FrameVel > *arg1 = (std::vector< KDL::FrameVel > *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  std::vector< KDL::FrameVel > *result = 0 ;
+  
+  arg1 = (std::vector< KDL::FrameVel > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  {
+    try {
+      try {
+        result = (std::vector< KDL::FrameVel > *)std_vector_Sl_KDL_FrameVel_Sg__GetRange(arg1,arg2,arg3);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return 0;
+      } catch(std::invalid_argument &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentException, (&_e)->what(), "");
+        return 0;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameVelVector_Insert(void * jarg1, int jarg2, void * jarg3) {
+  std::vector< KDL::FrameVel > *arg1 = (std::vector< KDL::FrameVel > *) 0 ;
+  int arg2 ;
+  KDL::FrameVel *arg3 = 0 ;
+  
+  arg1 = (std::vector< KDL::FrameVel > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (KDL::FrameVel *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameVel const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      try {
+        std_vector_Sl_KDL_FrameVel_Sg__Insert(arg1,arg2,(KDL::FrameVel const &)*arg3);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return ;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameVelVector_InsertRange(void * jarg1, int jarg2, void * jarg3) {
+  std::vector< KDL::FrameVel > *arg1 = (std::vector< KDL::FrameVel > *) 0 ;
+  int arg2 ;
+  std::vector< KDL::FrameVel > *arg3 = 0 ;
+  
+  arg1 = (std::vector< KDL::FrameVel > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (std::vector< KDL::FrameVel > *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector< KDL::FrameVel > const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      try {
+        std_vector_Sl_KDL_FrameVel_Sg__InsertRange(arg1,arg2,(std::vector< KDL::FrameVel > const &)*arg3);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return ;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameVelVector_RemoveAt(void * jarg1, int jarg2) {
+  std::vector< KDL::FrameVel > *arg1 = (std::vector< KDL::FrameVel > *) 0 ;
+  int arg2 ;
+  
+  arg1 = (std::vector< KDL::FrameVel > *)jarg1; 
+  arg2 = (int)jarg2; 
+  {
+    try {
+      try {
+        std_vector_Sl_KDL_FrameVel_Sg__RemoveAt(arg1,arg2);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return ;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameVelVector_RemoveRange(void * jarg1, int jarg2, int jarg3) {
+  std::vector< KDL::FrameVel > *arg1 = (std::vector< KDL::FrameVel > *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  
+  arg1 = (std::vector< KDL::FrameVel > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  {
+    try {
+      try {
+        std_vector_Sl_KDL_FrameVel_Sg__RemoveRange(arg1,arg2,arg3);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return ;
+      } catch(std::invalid_argument &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentException, (&_e)->what(), "");
+        return ;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_FrameVelVector_Repeat(void * jarg1, int jarg2) {
+  void * jresult ;
+  KDL::FrameVel *arg1 = 0 ;
+  int arg2 ;
+  std::vector< KDL::FrameVel > *result = 0 ;
+  
+  arg1 = (KDL::FrameVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (int)jarg2; 
+  {
+    try {
+      try {
+        result = (std::vector< KDL::FrameVel > *)std_vector_Sl_KDL_FrameVel_Sg__Repeat((KDL::FrameVel const &)*arg1,arg2);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return 0;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameVelVector_Reverse__SWIG_0(void * jarg1) {
+  std::vector< KDL::FrameVel > *arg1 = (std::vector< KDL::FrameVel > *) 0 ;
+  
+  arg1 = (std::vector< KDL::FrameVel > *)jarg1; 
+  {
+    try {
+      std_vector_Sl_KDL_FrameVel_Sg__Reverse__SWIG_0(arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameVelVector_Reverse__SWIG_1(void * jarg1, int jarg2, int jarg3) {
+  std::vector< KDL::FrameVel > *arg1 = (std::vector< KDL::FrameVel > *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  
+  arg1 = (std::vector< KDL::FrameVel > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  {
+    try {
+      try {
+        std_vector_Sl_KDL_FrameVel_Sg__Reverse__SWIG_1(arg1,arg2,arg3);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return ;
+      } catch(std::invalid_argument &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentException, (&_e)->what(), "");
+        return ;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameVelVector_SetRange(void * jarg1, int jarg2, void * jarg3) {
+  std::vector< KDL::FrameVel > *arg1 = (std::vector< KDL::FrameVel > *) 0 ;
+  int arg2 ;
+  std::vector< KDL::FrameVel > *arg3 = 0 ;
+  
+  arg1 = (std::vector< KDL::FrameVel > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (std::vector< KDL::FrameVel > *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector< KDL::FrameVel > const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      try {
+        std_vector_Sl_KDL_FrameVel_Sg__SetRange(arg1,arg2,(std::vector< KDL::FrameVel > const &)*arg3);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return ;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_FrameVelVector(void * jarg1) {
+  std::vector< KDL::FrameVel > *arg1 = (std::vector< KDL::FrameVel > *) 0 ;
+  
+  arg1 = (std::vector< KDL::FrameVel > *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameAccVector_Clear(void * jarg1) {
+  std::vector< KDL::FrameAcc > *arg1 = (std::vector< KDL::FrameAcc > *) 0 ;
+  
+  arg1 = (std::vector< KDL::FrameAcc > *)jarg1; 
+  {
+    try {
+      (arg1)->clear();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameAccVector_Add(void * jarg1, void * jarg2) {
+  std::vector< KDL::FrameAcc > *arg1 = (std::vector< KDL::FrameAcc > *) 0 ;
+  KDL::FrameAcc *arg2 = 0 ;
+  
+  arg1 = (std::vector< KDL::FrameAcc > *)jarg1; 
+  arg2 = (KDL::FrameAcc *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameAcc const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      (arg1)->push_back((KDL::FrameAcc const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT unsigned long SWIGSTDCALL CSharp_Kdl_FrameAccVector_size(void * jarg1) {
+  unsigned long jresult ;
+  std::vector< KDL::FrameAcc > *arg1 = (std::vector< KDL::FrameAcc > *) 0 ;
+  std::vector< KDL::FrameAcc >::size_type result;
+  
+  arg1 = (std::vector< KDL::FrameAcc > *)jarg1; 
+  {
+    try {
+      result = ((std::vector< KDL::FrameAcc > const *)arg1)->size();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (unsigned long)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned long SWIGSTDCALL CSharp_Kdl_FrameAccVector_capacity(void * jarg1) {
+  unsigned long jresult ;
+  std::vector< KDL::FrameAcc > *arg1 = (std::vector< KDL::FrameAcc > *) 0 ;
+  std::vector< KDL::FrameAcc >::size_type result;
+  
+  arg1 = (std::vector< KDL::FrameAcc > *)jarg1; 
+  {
+    try {
+      result = ((std::vector< KDL::FrameAcc > const *)arg1)->capacity();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (unsigned long)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameAccVector_reserve(void * jarg1, unsigned long jarg2) {
+  std::vector< KDL::FrameAcc > *arg1 = (std::vector< KDL::FrameAcc > *) 0 ;
+  std::vector< KDL::FrameAcc >::size_type arg2 ;
+  
+  arg1 = (std::vector< KDL::FrameAcc > *)jarg1; 
+  arg2 = (std::vector< KDL::FrameAcc >::size_type)jarg2; 
+  {
+    try {
+      (arg1)->reserve(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_FrameAccVector__SWIG_0() {
+  void * jresult ;
+  std::vector< KDL::FrameAcc > *result = 0 ;
+  
+  {
+    try {
+      result = (std::vector< KDL::FrameAcc > *)new std::vector< KDL::FrameAcc >();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_FrameAccVector__SWIG_1(void * jarg1) {
+  void * jresult ;
+  std::vector< KDL::FrameAcc > *arg1 = 0 ;
+  std::vector< KDL::FrameAcc > *result = 0 ;
+  
+  arg1 = (std::vector< KDL::FrameAcc > *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector< KDL::FrameAcc > const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (std::vector< KDL::FrameAcc > *)new std::vector< KDL::FrameAcc >((std::vector< KDL::FrameAcc > const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_FrameAccVector__SWIG_2(int jarg1) {
+  void * jresult ;
+  int arg1 ;
+  std::vector< KDL::FrameAcc > *result = 0 ;
+  
+  arg1 = (int)jarg1; 
+  {
+    try {
+      try {
+        result = (std::vector< KDL::FrameAcc > *)new_std_vector_Sl_KDL_FrameAcc_Sg___SWIG_2(arg1);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return 0;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_FrameAccVector_getitemcopy(void * jarg1, int jarg2) {
+  void * jresult ;
+  std::vector< KDL::FrameAcc > *arg1 = (std::vector< KDL::FrameAcc > *) 0 ;
+  int arg2 ;
+  KDL::FrameAcc result;
+  
+  arg1 = (std::vector< KDL::FrameAcc > *)jarg1; 
+  arg2 = (int)jarg2; 
+  {
+    try {
+      try {
+        result = std_vector_Sl_KDL_FrameAcc_Sg__getitemcopy(arg1,arg2);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return 0;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::FrameAcc((const KDL::FrameAcc &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_FrameAccVector_getitem(void * jarg1, int jarg2) {
+  void * jresult ;
+  std::vector< KDL::FrameAcc > *arg1 = (std::vector< KDL::FrameAcc > *) 0 ;
+  int arg2 ;
+  std::vector< KDL::FrameAcc >::value_type *result = 0 ;
+  
+  arg1 = (std::vector< KDL::FrameAcc > *)jarg1; 
+  arg2 = (int)jarg2; 
+  {
+    try {
+      try {
+        result = (std::vector< KDL::FrameAcc >::value_type *) &std_vector_Sl_KDL_FrameAcc_Sg__getitem(arg1,arg2);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return 0;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameAccVector_setitem(void * jarg1, int jarg2, void * jarg3) {
+  std::vector< KDL::FrameAcc > *arg1 = (std::vector< KDL::FrameAcc > *) 0 ;
+  int arg2 ;
+  KDL::FrameAcc *arg3 = 0 ;
+  
+  arg1 = (std::vector< KDL::FrameAcc > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (KDL::FrameAcc *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameAcc const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      try {
+        std_vector_Sl_KDL_FrameAcc_Sg__setitem(arg1,arg2,(KDL::FrameAcc const &)*arg3);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return ;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameAccVector_AddRange(void * jarg1, void * jarg2) {
+  std::vector< KDL::FrameAcc > *arg1 = (std::vector< KDL::FrameAcc > *) 0 ;
+  std::vector< KDL::FrameAcc > *arg2 = 0 ;
+  
+  arg1 = (std::vector< KDL::FrameAcc > *)jarg1; 
+  arg2 = (std::vector< KDL::FrameAcc > *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector< KDL::FrameAcc > const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      std_vector_Sl_KDL_FrameAcc_Sg__AddRange(arg1,(std::vector< KDL::FrameAcc > const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_FrameAccVector_GetRange(void * jarg1, int jarg2, int jarg3) {
+  void * jresult ;
+  std::vector< KDL::FrameAcc > *arg1 = (std::vector< KDL::FrameAcc > *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  std::vector< KDL::FrameAcc > *result = 0 ;
+  
+  arg1 = (std::vector< KDL::FrameAcc > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  {
+    try {
+      try {
+        result = (std::vector< KDL::FrameAcc > *)std_vector_Sl_KDL_FrameAcc_Sg__GetRange(arg1,arg2,arg3);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return 0;
+      } catch(std::invalid_argument &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentException, (&_e)->what(), "");
+        return 0;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameAccVector_Insert(void * jarg1, int jarg2, void * jarg3) {
+  std::vector< KDL::FrameAcc > *arg1 = (std::vector< KDL::FrameAcc > *) 0 ;
+  int arg2 ;
+  KDL::FrameAcc *arg3 = 0 ;
+  
+  arg1 = (std::vector< KDL::FrameAcc > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (KDL::FrameAcc *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameAcc const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      try {
+        std_vector_Sl_KDL_FrameAcc_Sg__Insert(arg1,arg2,(KDL::FrameAcc const &)*arg3);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return ;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameAccVector_InsertRange(void * jarg1, int jarg2, void * jarg3) {
+  std::vector< KDL::FrameAcc > *arg1 = (std::vector< KDL::FrameAcc > *) 0 ;
+  int arg2 ;
+  std::vector< KDL::FrameAcc > *arg3 = 0 ;
+  
+  arg1 = (std::vector< KDL::FrameAcc > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (std::vector< KDL::FrameAcc > *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector< KDL::FrameAcc > const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      try {
+        std_vector_Sl_KDL_FrameAcc_Sg__InsertRange(arg1,arg2,(std::vector< KDL::FrameAcc > const &)*arg3);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return ;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameAccVector_RemoveAt(void * jarg1, int jarg2) {
+  std::vector< KDL::FrameAcc > *arg1 = (std::vector< KDL::FrameAcc > *) 0 ;
+  int arg2 ;
+  
+  arg1 = (std::vector< KDL::FrameAcc > *)jarg1; 
+  arg2 = (int)jarg2; 
+  {
+    try {
+      try {
+        std_vector_Sl_KDL_FrameAcc_Sg__RemoveAt(arg1,arg2);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return ;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameAccVector_RemoveRange(void * jarg1, int jarg2, int jarg3) {
+  std::vector< KDL::FrameAcc > *arg1 = (std::vector< KDL::FrameAcc > *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  
+  arg1 = (std::vector< KDL::FrameAcc > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  {
+    try {
+      try {
+        std_vector_Sl_KDL_FrameAcc_Sg__RemoveRange(arg1,arg2,arg3);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return ;
+      } catch(std::invalid_argument &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentException, (&_e)->what(), "");
+        return ;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_FrameAccVector_Repeat(void * jarg1, int jarg2) {
+  void * jresult ;
+  KDL::FrameAcc *arg1 = 0 ;
+  int arg2 ;
+  std::vector< KDL::FrameAcc > *result = 0 ;
+  
+  arg1 = (KDL::FrameAcc *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameAcc const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (int)jarg2; 
+  {
+    try {
+      try {
+        result = (std::vector< KDL::FrameAcc > *)std_vector_Sl_KDL_FrameAcc_Sg__Repeat((KDL::FrameAcc const &)*arg1,arg2);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return 0;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameAccVector_Reverse__SWIG_0(void * jarg1) {
+  std::vector< KDL::FrameAcc > *arg1 = (std::vector< KDL::FrameAcc > *) 0 ;
+  
+  arg1 = (std::vector< KDL::FrameAcc > *)jarg1; 
+  {
+    try {
+      std_vector_Sl_KDL_FrameAcc_Sg__Reverse__SWIG_0(arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameAccVector_Reverse__SWIG_1(void * jarg1, int jarg2, int jarg3) {
+  std::vector< KDL::FrameAcc > *arg1 = (std::vector< KDL::FrameAcc > *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  
+  arg1 = (std::vector< KDL::FrameAcc > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  {
+    try {
+      try {
+        std_vector_Sl_KDL_FrameAcc_Sg__Reverse__SWIG_1(arg1,arg2,arg3);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return ;
+      } catch(std::invalid_argument &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentException, (&_e)->what(), "");
+        return ;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameAccVector_SetRange(void * jarg1, int jarg2, void * jarg3) {
+  std::vector< KDL::FrameAcc > *arg1 = (std::vector< KDL::FrameAcc > *) 0 ;
+  int arg2 ;
+  std::vector< KDL::FrameAcc > *arg3 = 0 ;
+  
+  arg1 = (std::vector< KDL::FrameAcc > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (std::vector< KDL::FrameAcc > *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector< KDL::FrameAcc > const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      try {
+        std_vector_Sl_KDL_FrameAcc_Sg__SetRange(arg1,arg2,(std::vector< KDL::FrameAcc > const &)*arg3);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return ;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_FrameAccVector(void * jarg1) {
+  std::vector< KDL::FrameAcc > *arg1 = (std::vector< KDL::FrameAcc > *) 0 ;
+  
+  arg1 = (std::vector< KDL::FrameAcc > *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_SegmentVector_Clear(void * jarg1) {
+  std::vector< KDL::Segment > *arg1 = (std::vector< KDL::Segment > *) 0 ;
+  
+  arg1 = (std::vector< KDL::Segment > *)jarg1; 
+  {
+    try {
+      (arg1)->clear();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_SegmentVector_Add(void * jarg1, void * jarg2) {
+  std::vector< KDL::Segment > *arg1 = (std::vector< KDL::Segment > *) 0 ;
+  KDL::Segment *arg2 = 0 ;
+  
+  arg1 = (std::vector< KDL::Segment > *)jarg1; 
+  arg2 = (KDL::Segment *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Segment const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      (arg1)->push_back((KDL::Segment const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT unsigned long SWIGSTDCALL CSharp_Kdl_SegmentVector_size(void * jarg1) {
+  unsigned long jresult ;
+  std::vector< KDL::Segment > *arg1 = (std::vector< KDL::Segment > *) 0 ;
+  std::vector< KDL::Segment >::size_type result;
+  
+  arg1 = (std::vector< KDL::Segment > *)jarg1; 
+  {
+    try {
+      result = ((std::vector< KDL::Segment > const *)arg1)->size();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (unsigned long)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned long SWIGSTDCALL CSharp_Kdl_SegmentVector_capacity(void * jarg1) {
+  unsigned long jresult ;
+  std::vector< KDL::Segment > *arg1 = (std::vector< KDL::Segment > *) 0 ;
+  std::vector< KDL::Segment >::size_type result;
+  
+  arg1 = (std::vector< KDL::Segment > *)jarg1; 
+  {
+    try {
+      result = ((std::vector< KDL::Segment > const *)arg1)->capacity();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (unsigned long)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_SegmentVector_reserve(void * jarg1, unsigned long jarg2) {
+  std::vector< KDL::Segment > *arg1 = (std::vector< KDL::Segment > *) 0 ;
+  std::vector< KDL::Segment >::size_type arg2 ;
+  
+  arg1 = (std::vector< KDL::Segment > *)jarg1; 
+  arg2 = (std::vector< KDL::Segment >::size_type)jarg2; 
+  {
+    try {
+      (arg1)->reserve(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_SegmentVector__SWIG_0() {
+  void * jresult ;
+  std::vector< KDL::Segment > *result = 0 ;
+  
+  {
+    try {
+      result = (std::vector< KDL::Segment > *)new std::vector< KDL::Segment >();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_SegmentVector__SWIG_1(void * jarg1) {
+  void * jresult ;
+  std::vector< KDL::Segment > *arg1 = 0 ;
+  std::vector< KDL::Segment > *result = 0 ;
+  
+  arg1 = (std::vector< KDL::Segment > *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector< KDL::Segment > const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (std::vector< KDL::Segment > *)new std::vector< KDL::Segment >((std::vector< KDL::Segment > const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_SegmentVector__SWIG_2(int jarg1) {
+  void * jresult ;
+  int arg1 ;
+  std::vector< KDL::Segment > *result = 0 ;
+  
+  arg1 = (int)jarg1; 
+  {
+    try {
+      try {
+        result = (std::vector< KDL::Segment > *)new_std_vector_Sl_KDL_Segment_Sg___SWIG_2(arg1);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return 0;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_SegmentVector_getitemcopy(void * jarg1, int jarg2) {
+  void * jresult ;
+  std::vector< KDL::Segment > *arg1 = (std::vector< KDL::Segment > *) 0 ;
+  int arg2 ;
+  KDL::Segment result;
+  
+  arg1 = (std::vector< KDL::Segment > *)jarg1; 
+  arg2 = (int)jarg2; 
+  {
+    try {
+      try {
+        result = std_vector_Sl_KDL_Segment_Sg__getitemcopy(arg1,arg2);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return 0;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Segment((const KDL::Segment &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_SegmentVector_getitem(void * jarg1, int jarg2) {
+  void * jresult ;
+  std::vector< KDL::Segment > *arg1 = (std::vector< KDL::Segment > *) 0 ;
+  int arg2 ;
+  std::vector< KDL::Segment >::value_type *result = 0 ;
+  
+  arg1 = (std::vector< KDL::Segment > *)jarg1; 
+  arg2 = (int)jarg2; 
+  {
+    try {
+      try {
+        result = (std::vector< KDL::Segment >::value_type *) &std_vector_Sl_KDL_Segment_Sg__getitem(arg1,arg2);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return 0;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_SegmentVector_setitem(void * jarg1, int jarg2, void * jarg3) {
+  std::vector< KDL::Segment > *arg1 = (std::vector< KDL::Segment > *) 0 ;
+  int arg2 ;
+  KDL::Segment *arg3 = 0 ;
+  
+  arg1 = (std::vector< KDL::Segment > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (KDL::Segment *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Segment const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      try {
+        std_vector_Sl_KDL_Segment_Sg__setitem(arg1,arg2,(KDL::Segment const &)*arg3);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return ;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_SegmentVector_AddRange(void * jarg1, void * jarg2) {
+  std::vector< KDL::Segment > *arg1 = (std::vector< KDL::Segment > *) 0 ;
+  std::vector< KDL::Segment > *arg2 = 0 ;
+  
+  arg1 = (std::vector< KDL::Segment > *)jarg1; 
+  arg2 = (std::vector< KDL::Segment > *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector< KDL::Segment > const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      std_vector_Sl_KDL_Segment_Sg__AddRange(arg1,(std::vector< KDL::Segment > const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_SegmentVector_GetRange(void * jarg1, int jarg2, int jarg3) {
+  void * jresult ;
+  std::vector< KDL::Segment > *arg1 = (std::vector< KDL::Segment > *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  std::vector< KDL::Segment > *result = 0 ;
+  
+  arg1 = (std::vector< KDL::Segment > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  {
+    try {
+      try {
+        result = (std::vector< KDL::Segment > *)std_vector_Sl_KDL_Segment_Sg__GetRange(arg1,arg2,arg3);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return 0;
+      } catch(std::invalid_argument &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentException, (&_e)->what(), "");
+        return 0;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_SegmentVector_Insert(void * jarg1, int jarg2, void * jarg3) {
+  std::vector< KDL::Segment > *arg1 = (std::vector< KDL::Segment > *) 0 ;
+  int arg2 ;
+  KDL::Segment *arg3 = 0 ;
+  
+  arg1 = (std::vector< KDL::Segment > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (KDL::Segment *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Segment const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      try {
+        std_vector_Sl_KDL_Segment_Sg__Insert(arg1,arg2,(KDL::Segment const &)*arg3);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return ;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_SegmentVector_InsertRange(void * jarg1, int jarg2, void * jarg3) {
+  std::vector< KDL::Segment > *arg1 = (std::vector< KDL::Segment > *) 0 ;
+  int arg2 ;
+  std::vector< KDL::Segment > *arg3 = 0 ;
+  
+  arg1 = (std::vector< KDL::Segment > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (std::vector< KDL::Segment > *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector< KDL::Segment > const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      try {
+        std_vector_Sl_KDL_Segment_Sg__InsertRange(arg1,arg2,(std::vector< KDL::Segment > const &)*arg3);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return ;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_SegmentVector_RemoveAt(void * jarg1, int jarg2) {
+  std::vector< KDL::Segment > *arg1 = (std::vector< KDL::Segment > *) 0 ;
+  int arg2 ;
+  
+  arg1 = (std::vector< KDL::Segment > *)jarg1; 
+  arg2 = (int)jarg2; 
+  {
+    try {
+      try {
+        std_vector_Sl_KDL_Segment_Sg__RemoveAt(arg1,arg2);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return ;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_SegmentVector_RemoveRange(void * jarg1, int jarg2, int jarg3) {
+  std::vector< KDL::Segment > *arg1 = (std::vector< KDL::Segment > *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  
+  arg1 = (std::vector< KDL::Segment > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  {
+    try {
+      try {
+        std_vector_Sl_KDL_Segment_Sg__RemoveRange(arg1,arg2,arg3);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return ;
+      } catch(std::invalid_argument &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentException, (&_e)->what(), "");
+        return ;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_SegmentVector_Repeat(void * jarg1, int jarg2) {
+  void * jresult ;
+  KDL::Segment *arg1 = 0 ;
+  int arg2 ;
+  std::vector< KDL::Segment > *result = 0 ;
+  
+  arg1 = (KDL::Segment *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Segment const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (int)jarg2; 
+  {
+    try {
+      try {
+        result = (std::vector< KDL::Segment > *)std_vector_Sl_KDL_Segment_Sg__Repeat((KDL::Segment const &)*arg1,arg2);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return 0;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_SegmentVector_Reverse__SWIG_0(void * jarg1) {
+  std::vector< KDL::Segment > *arg1 = (std::vector< KDL::Segment > *) 0 ;
+  
+  arg1 = (std::vector< KDL::Segment > *)jarg1; 
+  {
+    try {
+      std_vector_Sl_KDL_Segment_Sg__Reverse__SWIG_0(arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_SegmentVector_Reverse__SWIG_1(void * jarg1, int jarg2, int jarg3) {
+  std::vector< KDL::Segment > *arg1 = (std::vector< KDL::Segment > *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  
+  arg1 = (std::vector< KDL::Segment > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  {
+    try {
+      try {
+        std_vector_Sl_KDL_Segment_Sg__Reverse__SWIG_1(arg1,arg2,arg3);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return ;
+      } catch(std::invalid_argument &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentException, (&_e)->what(), "");
+        return ;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_SegmentVector_SetRange(void * jarg1, int jarg2, void * jarg3) {
+  std::vector< KDL::Segment > *arg1 = (std::vector< KDL::Segment > *) 0 ;
+  int arg2 ;
+  std::vector< KDL::Segment > *arg3 = 0 ;
+  
+  arg1 = (std::vector< KDL::Segment > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (std::vector< KDL::Segment > *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector< KDL::Segment > const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      try {
+        std_vector_Sl_KDL_Segment_Sg__SetRange(arg1,arg2,(std::vector< KDL::Segment > const &)*arg3);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return ;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_SegmentVector(void * jarg1) {
+  std::vector< KDL::Segment > *arg1 = (std::vector< KDL::Segment > *) 0 ;
+  
+  arg1 = (std::vector< KDL::Segment > *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_BoolVector_Clear(void * jarg1) {
+  std::vector< bool > *arg1 = (std::vector< bool > *) 0 ;
+  
+  arg1 = (std::vector< bool > *)jarg1; 
+  {
+    try {
+      (arg1)->clear();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_BoolVector_Add(void * jarg1, unsigned int jarg2) {
+  std::vector< bool > *arg1 = (std::vector< bool > *) 0 ;
+  bool *arg2 = 0 ;
+  bool temp2 ;
+  
+  arg1 = (std::vector< bool > *)jarg1; 
+  temp2 = jarg2 ? true : false; 
+  arg2 = &temp2; 
+  {
+    try {
+      (arg1)->push_back((bool const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT unsigned long SWIGSTDCALL CSharp_Kdl_BoolVector_size(void * jarg1) {
+  unsigned long jresult ;
+  std::vector< bool > *arg1 = (std::vector< bool > *) 0 ;
+  std::vector< bool >::size_type result;
+  
+  arg1 = (std::vector< bool > *)jarg1; 
+  {
+    try {
+      result = ((std::vector< bool > const *)arg1)->size();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (unsigned long)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned long SWIGSTDCALL CSharp_Kdl_BoolVector_capacity(void * jarg1) {
+  unsigned long jresult ;
+  std::vector< bool > *arg1 = (std::vector< bool > *) 0 ;
+  std::vector< bool >::size_type result;
+  
+  arg1 = (std::vector< bool > *)jarg1; 
+  {
+    try {
+      result = ((std::vector< bool > const *)arg1)->capacity();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (unsigned long)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_BoolVector_reserve(void * jarg1, unsigned long jarg2) {
+  std::vector< bool > *arg1 = (std::vector< bool > *) 0 ;
+  std::vector< bool >::size_type arg2 ;
+  
+  arg1 = (std::vector< bool > *)jarg1; 
+  arg2 = (std::vector< bool >::size_type)jarg2; 
+  {
+    try {
+      (arg1)->reserve(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_BoolVector__SWIG_0() {
+  void * jresult ;
+  std::vector< bool > *result = 0 ;
+  
+  {
+    try {
+      result = (std::vector< bool > *)new std::vector< bool >();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_BoolVector__SWIG_1(void * jarg1) {
+  void * jresult ;
+  std::vector< bool > *arg1 = 0 ;
+  std::vector< bool > *result = 0 ;
+  
+  arg1 = (std::vector< bool > *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector< bool > const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (std::vector< bool > *)new std::vector< bool >((std::vector< bool > const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_BoolVector__SWIG_2(int jarg1) {
+  void * jresult ;
+  int arg1 ;
+  std::vector< bool > *result = 0 ;
+  
+  arg1 = (int)jarg1; 
+  {
+    try {
+      try {
+        result = (std::vector< bool > *)new_std_vector_Sl_bool_Sg___SWIG_2(arg1);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return 0;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_BoolVector_getitemcopy(void * jarg1, int jarg2) {
+  unsigned int jresult ;
+  std::vector< bool > *arg1 = (std::vector< bool > *) 0 ;
+  int arg2 ;
+  bool result;
+  
+  arg1 = (std::vector< bool > *)jarg1; 
+  arg2 = (int)jarg2; 
+  {
+    try {
+      try {
+        result = (bool)std_vector_Sl_bool_Sg__getitemcopy(arg1,arg2);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return 0;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_BoolVector_getitem(void * jarg1, int jarg2) {
+  unsigned int jresult ;
+  std::vector< bool > *arg1 = (std::vector< bool > *) 0 ;
+  int arg2 ;
+  bool result;
+  
+  arg1 = (std::vector< bool > *)jarg1; 
+  arg2 = (int)jarg2; 
+  {
+    try {
+      try {
+        result = (bool)std_vector_Sl_bool_Sg__getitem(arg1,arg2);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return 0;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_BoolVector_setitem(void * jarg1, int jarg2, unsigned int jarg3) {
+  std::vector< bool > *arg1 = (std::vector< bool > *) 0 ;
+  int arg2 ;
+  bool *arg3 = 0 ;
+  bool temp3 ;
+  
+  arg1 = (std::vector< bool > *)jarg1; 
+  arg2 = (int)jarg2; 
+  temp3 = jarg3 ? true : false; 
+  arg3 = &temp3; 
+  {
+    try {
+      try {
+        std_vector_Sl_bool_Sg__setitem(arg1,arg2,(bool const &)*arg3);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return ;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_BoolVector_AddRange(void * jarg1, void * jarg2) {
+  std::vector< bool > *arg1 = (std::vector< bool > *) 0 ;
+  std::vector< bool > *arg2 = 0 ;
+  
+  arg1 = (std::vector< bool > *)jarg1; 
+  arg2 = (std::vector< bool > *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector< bool > const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      std_vector_Sl_bool_Sg__AddRange(arg1,(std::vector< bool > const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_BoolVector_GetRange(void * jarg1, int jarg2, int jarg3) {
+  void * jresult ;
+  std::vector< bool > *arg1 = (std::vector< bool > *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  std::vector< bool > *result = 0 ;
+  
+  arg1 = (std::vector< bool > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  {
+    try {
+      try {
+        result = (std::vector< bool > *)std_vector_Sl_bool_Sg__GetRange(arg1,arg2,arg3);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return 0;
+      } catch(std::invalid_argument &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentException, (&_e)->what(), "");
+        return 0;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_BoolVector_Insert(void * jarg1, int jarg2, unsigned int jarg3) {
+  std::vector< bool > *arg1 = (std::vector< bool > *) 0 ;
+  int arg2 ;
+  bool *arg3 = 0 ;
+  bool temp3 ;
+  
+  arg1 = (std::vector< bool > *)jarg1; 
+  arg2 = (int)jarg2; 
+  temp3 = jarg3 ? true : false; 
+  arg3 = &temp3; 
+  {
+    try {
+      try {
+        std_vector_Sl_bool_Sg__Insert(arg1,arg2,(bool const &)*arg3);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return ;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_BoolVector_InsertRange(void * jarg1, int jarg2, void * jarg3) {
+  std::vector< bool > *arg1 = (std::vector< bool > *) 0 ;
+  int arg2 ;
+  std::vector< bool > *arg3 = 0 ;
+  
+  arg1 = (std::vector< bool > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (std::vector< bool > *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector< bool > const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      try {
+        std_vector_Sl_bool_Sg__InsertRange(arg1,arg2,(std::vector< bool > const &)*arg3);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return ;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_BoolVector_RemoveAt(void * jarg1, int jarg2) {
+  std::vector< bool > *arg1 = (std::vector< bool > *) 0 ;
+  int arg2 ;
+  
+  arg1 = (std::vector< bool > *)jarg1; 
+  arg2 = (int)jarg2; 
+  {
+    try {
+      try {
+        std_vector_Sl_bool_Sg__RemoveAt(arg1,arg2);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return ;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_BoolVector_RemoveRange(void * jarg1, int jarg2, int jarg3) {
+  std::vector< bool > *arg1 = (std::vector< bool > *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  
+  arg1 = (std::vector< bool > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  {
+    try {
+      try {
+        std_vector_Sl_bool_Sg__RemoveRange(arg1,arg2,arg3);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return ;
+      } catch(std::invalid_argument &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentException, (&_e)->what(), "");
+        return ;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_BoolVector_Repeat(unsigned int jarg1, int jarg2) {
+  void * jresult ;
+  bool *arg1 = 0 ;
+  int arg2 ;
+  bool temp1 ;
+  std::vector< bool > *result = 0 ;
+  
+  temp1 = jarg1 ? true : false; 
+  arg1 = &temp1; 
+  arg2 = (int)jarg2; 
+  {
+    try {
+      try {
+        result = (std::vector< bool > *)std_vector_Sl_bool_Sg__Repeat((bool const &)*arg1,arg2);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return 0;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_BoolVector_Reverse__SWIG_0(void * jarg1) {
+  std::vector< bool > *arg1 = (std::vector< bool > *) 0 ;
+  
+  arg1 = (std::vector< bool > *)jarg1; 
+  {
+    try {
+      std_vector_Sl_bool_Sg__Reverse__SWIG_0(arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_BoolVector_Reverse__SWIG_1(void * jarg1, int jarg2, int jarg3) {
+  std::vector< bool > *arg1 = (std::vector< bool > *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  
+  arg1 = (std::vector< bool > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  {
+    try {
+      try {
+        std_vector_Sl_bool_Sg__Reverse__SWIG_1(arg1,arg2,arg3);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return ;
+      } catch(std::invalid_argument &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentException, (&_e)->what(), "");
+        return ;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_BoolVector_SetRange(void * jarg1, int jarg2, void * jarg3) {
+  std::vector< bool > *arg1 = (std::vector< bool > *) 0 ;
+  int arg2 ;
+  std::vector< bool > *arg3 = 0 ;
+  
+  arg1 = (std::vector< bool > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (std::vector< bool > *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector< bool > const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      try {
+        std_vector_Sl_bool_Sg__SetRange(arg1,arg2,(std::vector< bool > const &)*arg3);
+      } catch(std::out_of_range &_e) {
+        SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+        return ;
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_BoolVector_Contains(void * jarg1, unsigned int jarg2) {
+  unsigned int jresult ;
+  std::vector< bool > *arg1 = (std::vector< bool > *) 0 ;
+  bool *arg2 = 0 ;
+  bool temp2 ;
+  bool result;
+  
+  arg1 = (std::vector< bool > *)jarg1; 
+  temp2 = jarg2 ? true : false; 
+  arg2 = &temp2; 
+  {
+    try {
+      result = (bool)std_vector_Sl_bool_Sg__Contains(arg1,(bool const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_BoolVector_IndexOf(void * jarg1, unsigned int jarg2) {
+  int jresult ;
+  std::vector< bool > *arg1 = (std::vector< bool > *) 0 ;
+  bool *arg2 = 0 ;
+  bool temp2 ;
+  int result;
+  
+  arg1 = (std::vector< bool > *)jarg1; 
+  temp2 = jarg2 ? true : false; 
+  arg2 = &temp2; 
+  {
+    try {
+      result = (int)std_vector_Sl_bool_Sg__IndexOf(arg1,(bool const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_BoolVector_LastIndexOf(void * jarg1, unsigned int jarg2) {
+  int jresult ;
+  std::vector< bool > *arg1 = (std::vector< bool > *) 0 ;
+  bool *arg2 = 0 ;
+  bool temp2 ;
+  int result;
+  
+  arg1 = (std::vector< bool > *)jarg1; 
+  temp2 = jarg2 ? true : false; 
+  arg2 = &temp2; 
+  {
+    try {
+      result = (int)std_vector_Sl_bool_Sg__LastIndexOf(arg1,(bool const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_BoolVector_Remove(void * jarg1, unsigned int jarg2) {
+  unsigned int jresult ;
+  std::vector< bool > *arg1 = (std::vector< bool > *) 0 ;
+  bool *arg2 = 0 ;
+  bool temp2 ;
+  bool result;
+  
+  arg1 = (std::vector< bool > *)jarg1; 
+  temp2 = jarg2 ? true : false; 
+  arg2 = &temp2; 
+  {
+    try {
+      result = (bool)std_vector_Sl_bool_Sg__Remove(arg1,(bool const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_BoolVector(void * jarg1) {
+  std::vector< bool > *arg1 = (std::vector< bool > *) 0 ;
+  
+  arg1 = (std::vector< bool > *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl__MSC_VER_get() {
+  int jresult ;
+  int result;
+  
+  {
+    try {
+      result = (int)(1926);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_KDL_VERSION_MAJOR_get() {
+  int jresult ;
+  int result;
+  
+  {
+    try {
+      result = (int)(1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_KDL_VERSION_MINOR_get() {
+  int jresult ;
+  int result;
+  
+  {
+    try {
+      result = (int)(4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_KDL_VERSION_PATCH_get() {
+  int jresult ;
+  int result;
+  
+  {
+    try {
+      result = (int)(0);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_KDL_VERSION_get() {
+  int jresult ;
+  int result;
+  
+  {
+    try {
+      result = (int)((1 << 16)|(4 << 8)|0);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT char * SWIGSTDCALL CSharp_Kdl_KDL_VERSION_STRING_get() {
+  char * jresult ;
+  char *result = 0 ;
+  
+  {
+    try {
+      result = (char *)("1.4.0");
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = SWIG_csharp_string_callback((const char *)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_KDL_INLINE_get() {
+  int jresult ;
+  int result;
+  
+  {
+    try {
+      result = (int)(1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_KDL_FRAME_WIDTH_get() {
+  int jresult ;
+  int result;
+  
+  {
+    try {
+      result = (int)(12);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_KDL_INDEX_CHECK_get() {
+  int jresult ;
+  int result;
+  
+  {
+    try {
+      result = (int)(1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_KDL_USE_EQUAL_get() {
+  int jresult ;
+  int result;
+  
+  {
+    try {
+      result = (int)(1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_c_sin(double jarg1) {
+  double jresult ;
+  double arg1 ;
+  double result;
+  
+  arg1 = (double)jarg1; 
+  {
+    try {
+      result = (double)KDL::sin(arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_c_cos(double jarg1) {
+  double jresult ;
+  double arg1 ;
+  double result;
+  
+  arg1 = (double)jarg1; 
+  {
+    try {
+      result = (double)KDL::cos(arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_c_exp(double jarg1) {
+  double jresult ;
+  double arg1 ;
+  double result;
+  
+  arg1 = (double)jarg1; 
+  {
+    try {
+      result = (double)KDL::exp(arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_c_log(double jarg1) {
+  double jresult ;
+  double arg1 ;
+  double result;
+  
+  arg1 = (double)jarg1; 
+  {
+    try {
+      result = (double)KDL::log(arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_c_tan(double jarg1) {
+  double jresult ;
+  double arg1 ;
+  double result;
+  
+  arg1 = (double)jarg1; 
+  {
+    try {
+      result = (double)KDL::tan(arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_c_cosh(double jarg1) {
+  double jresult ;
+  double arg1 ;
+  double result;
+  
+  arg1 = (double)jarg1; 
+  {
+    try {
+      result = (double)KDL::cosh(arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_c_sinh(double jarg1) {
+  double jresult ;
+  double arg1 ;
+  double result;
+  
+  arg1 = (double)jarg1; 
+  {
+    try {
+      result = (double)KDL::sinh(arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_c_sqrt(double jarg1) {
+  double jresult ;
+  double arg1 ;
+  double result;
+  
+  arg1 = (double)jarg1; 
+  {
+    try {
+      result = (double)KDL::sqrt(arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_c_atan(double jarg1) {
+  double jresult ;
+  double arg1 ;
+  double result;
+  
+  arg1 = (double)jarg1; 
+  {
+    try {
+      result = (double)KDL::atan(arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_c_acos(double jarg1) {
+  double jresult ;
+  double arg1 ;
+  double result;
+  
+  arg1 = (double)jarg1; 
+  {
+    try {
+      result = (double)KDL::acos(arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_c_asin(double jarg1) {
+  double jresult ;
+  double arg1 ;
+  double result;
+  
+  arg1 = (double)jarg1; 
+  {
+    try {
+      result = (double)KDL::asin(arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_c_tanh(double jarg1) {
+  double jresult ;
+  double arg1 ;
+  double result;
+  
+  arg1 = (double)jarg1; 
+  {
+    try {
+      result = (double)KDL::tanh(arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_pow(double jarg1, double jarg2) {
+  double jresult ;
+  double arg1 ;
+  double arg2 ;
+  double result;
+  
+  arg1 = (double)jarg1; 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      result = (double)KDL::pow(arg1,arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_c_atan2(double jarg1, double jarg2) {
+  double jresult ;
+  double arg1 ;
+  double arg2 ;
+  double result;
+  
+  arg1 = (double)jarg1; 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      result = (double)KDL::atan2(arg1,arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_STREAMBUFFERSIZE_set(int jarg1) {
+  int arg1 ;
+  
+  arg1 = (int)jarg1; 
+  {
+    try {
+      KDL::STREAMBUFFERSIZE = arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_STREAMBUFFERSIZE_get() {
+  int jresult ;
+  int result;
+  
+  {
+    try {
+      result = (int)KDL::STREAMBUFFERSIZE;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_MAXLENFILENAME_set(int jarg1) {
+  int arg1 ;
+  
+  arg1 = (int)jarg1; 
+  {
+    try {
+      KDL::MAXLENFILENAME = arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_MAXLENFILENAME_get() {
+  int jresult ;
+  int result;
+  
+  {
+    try {
+      result = (int)KDL::MAXLENFILENAME;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_PI_get() {
+  double jresult ;
+  double result;
+  
+  {
+    try {
+      result = (double)(double)KDL::PI;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_deg2rad_get() {
+  double jresult ;
+  double result;
+  
+  {
+    try {
+      result = (double)(double)KDL::deg2rad;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_rad2deg_get() {
+  double jresult ;
+  double result;
+  
+  {
+    try {
+      result = (double)(double)KDL::rad2deg;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_epsilon_set(double jarg1) {
+  double arg1 ;
+  
+  arg1 = (double)jarg1; 
+  {
+    try {
+      KDL::epsilon = arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_epsilon_get() {
+  double jresult ;
+  double result;
+  
+  {
+    try {
+      result = (double)KDL::epsilon;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_VSIZE_set(int jarg1) {
+  int arg1 ;
+  
+  arg1 = (int)jarg1; 
+  {
+    try {
+      KDL::VSIZE = arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_VSIZE_get() {
+  int jresult ;
+  int result;
+  
+  {
+    try {
+      result = (int)KDL::VSIZE;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_max(double jarg1, double jarg2) {
+  double jresult ;
+  double arg1 ;
+  double arg2 ;
+  double result;
+  
+  arg1 = (double)jarg1; 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      result = (double)KDL::max(arg1,arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_min(double jarg1, double jarg2) {
+  double jresult ;
+  double arg1 ;
+  double arg2 ;
+  double result;
+  
+  arg1 = (double)jarg1; 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      result = (double)KDL::min(arg1,arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_LinComb(double jarg1, double jarg2, double jarg3, double jarg4) {
+  double jresult ;
+  double arg1 ;
+  double arg2 ;
+  double arg3 ;
+  double arg4 ;
+  double result;
+  
+  arg1 = (double)jarg1; 
+  arg2 = (double)jarg2; 
+  arg3 = (double)jarg3; 
+  arg4 = (double)jarg4; 
+  {
+    try {
+      result = (double)KDL::LinComb(arg1,arg2,arg3,arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_LinCombR(double jarg1, double jarg2, double jarg3, double jarg4, void * jarg5) {
+  double arg1 ;
+  double arg2 ;
+  double arg3 ;
+  double arg4 ;
+  double *arg5 = 0 ;
+  
+  arg1 = (double)jarg1; 
+  arg2 = (double)jarg2; 
+  arg3 = (double)jarg3; 
+  arg4 = (double)jarg4; 
+  arg5 = (double *)jarg5;
+  if (!arg5) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "double & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::LinCombR(arg1,arg2,arg3,arg4,*arg5);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_SetToZero__SWIG_0(void * jarg1) {
+  double *arg1 = 0 ;
+  
+  arg1 = (double *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "double & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::SetToZero(*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_SetToIdentity(void * jarg1) {
+  double *arg1 = 0 ;
+  
+  arg1 = (double *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "double & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::SetToIdentity(*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_sign(double jarg1) {
+  double jresult ;
+  double arg1 ;
+  double result;
+  
+  arg1 = (double)jarg1; 
+  {
+    try {
+      result = (double)KDL::sign(arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_sqr(double jarg1) {
+  double jresult ;
+  double arg1 ;
+  double result;
+  
+  arg1 = (double)jarg1; 
+  {
+    try {
+      result = (double)KDL::sqr(arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_Norm(double jarg1) {
+  double jresult ;
+  double arg1 ;
+  double result;
+  
+  arg1 = (double)jarg1; 
+  {
+    try {
+      result = (double)KDL::Norm(arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_0(double jarg1, double jarg2, double jarg3) {
+  unsigned int jresult ;
+  double arg1 ;
+  double arg2 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (double)jarg1; 
+  arg2 = (double)jarg2; 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal(arg1,arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_1(double jarg1, double jarg2) {
+  unsigned int jresult ;
+  double arg1 ;
+  double arg2 ;
+  bool result;
+  
+  arg1 = (double)jarg1; 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      result = (bool)KDL::Equal(arg1,arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_random__SWIG_0(void * jarg1) {
+  double *arg1 = 0 ;
+  
+  arg1 = (double *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "double & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::random(*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_posrandom__SWIG_0(void * jarg1) {
+  double *arg1 = 0 ;
+  
+  arg1 = (double *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "double & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::posrandom(*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_diff__SWIG_0(double jarg1, double jarg2, double jarg3) {
+  double jresult ;
+  double arg1 ;
+  double arg2 ;
+  double arg3 ;
+  double result;
+  
+  arg1 = (double)jarg1; 
+  arg2 = (double)jarg2; 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (double)KDL::diff(arg1,arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_addDelta__SWIG_0(double jarg1, double jarg2, double jarg3) {
+  double jresult ;
+  double arg1 ;
+  double arg2 ;
+  double arg3 ;
+  double result;
+  
+  arg1 = (double)jarg1; 
+  arg2 = (double)jarg2; 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (double)KDL::addDelta(arg1,arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_2(void * jarg1, void * jarg2, double jarg3) {
+  unsigned int jresult ;
+  KDL::Vector *arg1 = 0 ;
+  KDL::Vector *arg2 = 0 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (KDL::Vector *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::Vector const &)*arg1,(KDL::Vector const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_3(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
+  KDL::Vector *arg1 = 0 ;
+  KDL::Vector *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::Vector *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::Vector const &)*arg1,(KDL::Vector const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_4(void * jarg1, void * jarg2, double jarg3) {
+  unsigned int jresult ;
+  KDL::Frame *arg1 = 0 ;
+  KDL::Frame *arg2 = 0 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (KDL::Frame *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Frame *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::Frame const &)*arg1,(KDL::Frame const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_5(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
+  KDL::Frame *arg1 = 0 ;
+  KDL::Frame *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::Frame *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Frame *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::Frame const &)*arg1,(KDL::Frame const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_6(void * jarg1, void * jarg2, double jarg3) {
+  unsigned int jresult ;
+  KDL::Twist *arg1 = 0 ;
+  KDL::Twist *arg2 = 0 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (KDL::Twist *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Twist *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::Twist const &)*arg1,(KDL::Twist const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_7(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
+  KDL::Twist *arg1 = 0 ;
+  KDL::Twist *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::Twist *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Twist *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::Twist const &)*arg1,(KDL::Twist const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_8(void * jarg1, void * jarg2, double jarg3) {
+  unsigned int jresult ;
+  KDL::Wrench *arg1 = 0 ;
+  KDL::Wrench *arg2 = 0 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (KDL::Wrench *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Wrench const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Wrench *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Wrench const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::Wrench const &)*arg1,(KDL::Wrench const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_9(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
+  KDL::Wrench *arg1 = 0 ;
+  KDL::Wrench *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::Wrench *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Wrench const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Wrench *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Wrench const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::Wrench const &)*arg1,(KDL::Wrench const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_10(void * jarg1, void * jarg2, double jarg3) {
+  unsigned int jresult ;
+  KDL::Vector2 *arg1 = 0 ;
+  KDL::Vector2 *arg2 = 0 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (KDL::Vector2 *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector2 const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Vector2 *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector2 const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::Vector2 const &)*arg1,(KDL::Vector2 const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_11(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
+  KDL::Vector2 *arg1 = 0 ;
+  KDL::Vector2 *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::Vector2 *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector2 const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Vector2 *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector2 const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::Vector2 const &)*arg1,(KDL::Vector2 const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_12(void * jarg1, void * jarg2, double jarg3) {
+  unsigned int jresult ;
+  KDL::Rotation2 *arg1 = 0 ;
+  KDL::Rotation2 *arg2 = 0 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (KDL::Rotation2 *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Rotation2 const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Rotation2 *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Rotation2 const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::Rotation2 const &)*arg1,(KDL::Rotation2 const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_13(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
+  KDL::Rotation2 *arg1 = 0 ;
+  KDL::Rotation2 *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::Rotation2 *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Rotation2 const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Rotation2 *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Rotation2 const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::Rotation2 const &)*arg1,(KDL::Rotation2 const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_14(void * jarg1, void * jarg2, double jarg3) {
+  unsigned int jresult ;
+  KDL::Frame2 *arg1 = 0 ;
+  KDL::Frame2 *arg2 = 0 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (KDL::Frame2 *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame2 const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Frame2 *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame2 const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::Frame2 const &)*arg1,(KDL::Frame2 const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_15(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
+  KDL::Frame2 *arg1 = 0 ;
+  KDL::Frame2 *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::Frame2 *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame2 const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Frame2 *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame2 const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::Frame2 const &)*arg1,(KDL::Frame2 const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Vector_data_set(void * jarg1, void * jarg2) {
+  KDL::Vector *arg1 = (KDL::Vector *) 0 ;
+  double *arg2 ;
+  
+  arg1 = (KDL::Vector *)jarg1; 
+  arg2 = (double *)jarg2; 
+  {
+    try {
+      {
+        size_t ii;
+        double *b = (double *) arg1->data;
+        for (ii = 0; ii < (size_t)3; ii++) b[ii] = *((double *) arg2 + ii);
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Vector_data_get(void * jarg1) {
+  void * jresult ;
+  KDL::Vector *arg1 = (KDL::Vector *) 0 ;
+  double *result = 0 ;
+  
+  arg1 = (KDL::Vector *)jarg1; 
+  {
+    try {
+      result = (double *)(double *) ((arg1)->data);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Vector__SWIG_0() {
+  void * jresult ;
+  KDL::Vector *result = 0 ;
+  
+  {
+    try {
+      result = (KDL::Vector *)new KDL::Vector();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Vector__SWIG_1(double jarg1, double jarg2, double jarg3) {
+  void * jresult ;
+  double arg1 ;
+  double arg2 ;
+  double arg3 ;
+  KDL::Vector *result = 0 ;
+  
+  arg1 = (double)jarg1; 
+  arg2 = (double)jarg2; 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (KDL::Vector *)new KDL::Vector(arg1,arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Vector__SWIG_2(void * jarg1) {
+  void * jresult ;
+  KDL::Vector *arg1 = 0 ;
+  KDL::Vector *result = 0 ;
+  
+  arg1 = (KDL::Vector *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::Vector *)new KDL::Vector((KDL::Vector const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_Vector_x__SWIG_0(void * jarg1) {
+  double jresult ;
+  KDL::Vector *arg1 = (KDL::Vector *) 0 ;
+  double result;
+  
+  arg1 = (KDL::Vector *)jarg1; 
+  {
+    try {
+      result = (double)((KDL::Vector const *)arg1)->x();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_Vector_y__SWIG_0(void * jarg1) {
+  double jresult ;
+  KDL::Vector *arg1 = (KDL::Vector *) 0 ;
+  double result;
+  
+  arg1 = (KDL::Vector *)jarg1; 
+  {
+    try {
+      result = (double)((KDL::Vector const *)arg1)->y();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_Vector_z__SWIG_0(void * jarg1) {
+  double jresult ;
+  KDL::Vector *arg1 = (KDL::Vector *) 0 ;
+  double result;
+  
+  arg1 = (KDL::Vector *)jarg1; 
+  {
+    try {
+      result = (double)((KDL::Vector const *)arg1)->z();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Vector_x__SWIG_1(void * jarg1, double jarg2) {
+  KDL::Vector *arg1 = (KDL::Vector *) 0 ;
+  double arg2 ;
+  
+  arg1 = (KDL::Vector *)jarg1; 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      (arg1)->x(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Vector_y__SWIG_1(void * jarg1, double jarg2) {
+  KDL::Vector *arg1 = (KDL::Vector *) 0 ;
+  double arg2 ;
+  
+  arg1 = (KDL::Vector *)jarg1; 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      (arg1)->y(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Vector_z__SWIG_1(void * jarg1, double jarg2) {
+  KDL::Vector *arg1 = (KDL::Vector *) 0 ;
+  double arg2 ;
+  
+  arg1 = (KDL::Vector *)jarg1; 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      (arg1)->z(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Vector_ReverseSign(void * jarg1) {
+  KDL::Vector *arg1 = (KDL::Vector *) 0 ;
+  
+  arg1 = (KDL::Vector *)jarg1; 
+  {
+    try {
+      (arg1)->ReverseSign();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Vector_Zero() {
+  void * jresult ;
+  KDL::Vector result;
+  
+  {
+    try {
+      result = KDL::Vector::Zero();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Vector((const KDL::Vector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_Vector_Normalize__SWIG_0(void * jarg1, double jarg2) {
+  double jresult ;
+  KDL::Vector *arg1 = (KDL::Vector *) 0 ;
+  double arg2 ;
+  double result;
+  
+  arg1 = (KDL::Vector *)jarg1; 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      result = (double)(arg1)->Normalize(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_Vector_Normalize__SWIG_1(void * jarg1) {
+  double jresult ;
+  KDL::Vector *arg1 = (KDL::Vector *) 0 ;
+  double result;
+  
+  arg1 = (KDL::Vector *)jarg1; 
+  {
+    try {
+      result = (double)(arg1)->Normalize();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_Vector_Norm(void * jarg1) {
+  double jresult ;
+  KDL::Vector *arg1 = (KDL::Vector *) 0 ;
+  double result;
+  
+  arg1 = (KDL::Vector *)jarg1; 
+  {
+    try {
+      result = (double)((KDL::Vector const *)arg1)->Norm();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Vector_Set2DXY(void * jarg1, void * jarg2) {
+  KDL::Vector *arg1 = (KDL::Vector *) 0 ;
+  KDL::Vector2 *arg2 = 0 ;
+  
+  arg1 = (KDL::Vector *)jarg1; 
+  arg2 = (KDL::Vector2 *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector2 const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      (arg1)->Set2DXY((KDL::Vector2 const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Vector_Set2DYZ(void * jarg1, void * jarg2) {
+  KDL::Vector *arg1 = (KDL::Vector *) 0 ;
+  KDL::Vector2 *arg2 = 0 ;
+  
+  arg1 = (KDL::Vector *)jarg1; 
+  arg2 = (KDL::Vector2 *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector2 const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      (arg1)->Set2DYZ((KDL::Vector2 const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Vector_Set2DZX(void * jarg1, void * jarg2) {
+  KDL::Vector *arg1 = (KDL::Vector *) 0 ;
+  KDL::Vector2 *arg2 = 0 ;
+  
+  arg1 = (KDL::Vector *)jarg1; 
+  arg2 = (KDL::Vector2 *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector2 const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      (arg1)->Set2DZX((KDL::Vector2 const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Vector_Set2DPlane(void * jarg1, void * jarg2, void * jarg3) {
+  KDL::Vector *arg1 = (KDL::Vector *) 0 ;
+  KDL::Frame *arg2 = 0 ;
+  KDL::Vector2 *arg3 = 0 ;
+  
+  arg1 = (KDL::Vector *)jarg1; 
+  arg2 = (KDL::Frame *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return ;
+  } 
+  arg3 = (KDL::Vector2 *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector2 const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      (arg1)->Set2DPlane((KDL::Frame const &)*arg2,(KDL::Vector2 const &)*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_Vector(void * jarg1) {
+  KDL::Vector *arg1 = (KDL::Vector *) 0 ;
+  
+  arg1 = (KDL::Vector *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Rotation_data_set(void * jarg1, void * jarg2) {
+  KDL::Rotation *arg1 = (KDL::Rotation *) 0 ;
+  double *arg2 ;
+  
+  arg1 = (KDL::Rotation *)jarg1; 
+  arg2 = (double *)jarg2; 
+  {
+    try {
+      {
+        size_t ii;
+        double *b = (double *) arg1->data;
+        for (ii = 0; ii < (size_t)9; ii++) b[ii] = *((double *) arg2 + ii);
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Rotation_data_get(void * jarg1) {
+  void * jresult ;
+  KDL::Rotation *arg1 = (KDL::Rotation *) 0 ;
+  double *result = 0 ;
+  
+  arg1 = (KDL::Rotation *)jarg1; 
+  {
+    try {
+      result = (double *)(double *) ((arg1)->data);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Rotation__SWIG_0() {
+  void * jresult ;
+  KDL::Rotation *result = 0 ;
+  
+  {
+    try {
+      result = (KDL::Rotation *)new KDL::Rotation();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Rotation__SWIG_1(double jarg1, double jarg2, double jarg3, double jarg4, double jarg5, double jarg6, double jarg7, double jarg8, double jarg9) {
+  void * jresult ;
+  double arg1 ;
+  double arg2 ;
+  double arg3 ;
+  double arg4 ;
+  double arg5 ;
+  double arg6 ;
+  double arg7 ;
+  double arg8 ;
+  double arg9 ;
+  KDL::Rotation *result = 0 ;
+  
+  arg1 = (double)jarg1; 
+  arg2 = (double)jarg2; 
+  arg3 = (double)jarg3; 
+  arg4 = (double)jarg4; 
+  arg5 = (double)jarg5; 
+  arg6 = (double)jarg6; 
+  arg7 = (double)jarg7; 
+  arg8 = (double)jarg8; 
+  arg9 = (double)jarg9; 
+  {
+    try {
+      result = (KDL::Rotation *)new KDL::Rotation(arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Rotation__SWIG_2(void * jarg1, void * jarg2, void * jarg3) {
+  void * jresult ;
+  KDL::Vector *arg1 = 0 ;
+  KDL::Vector *arg2 = 0 ;
+  KDL::Vector *arg3 = 0 ;
+  KDL::Rotation *result = 0 ;
+  
+  arg1 = (KDL::Vector *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::Vector *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::Rotation *)new KDL::Rotation((KDL::Vector const &)*arg1,(KDL::Vector const &)*arg2,(KDL::Vector const &)*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Rotation__SWIG_3(void * jarg1) {
+  void * jresult ;
+  KDL::Rotation *arg1 = 0 ;
+  KDL::Rotation *result = 0 ;
+  
+  arg1 = (KDL::Rotation *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Rotation const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::Rotation *)new KDL::Rotation((KDL::Rotation const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Rotation_SetInverse(void * jarg1) {
+  KDL::Rotation *arg1 = (KDL::Rotation *) 0 ;
+  
+  arg1 = (KDL::Rotation *)jarg1; 
+  {
+    try {
+      (arg1)->SetInverse();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Rotation_Inverse__SWIG_0(void * jarg1) {
+  void * jresult ;
+  KDL::Rotation *arg1 = (KDL::Rotation *) 0 ;
+  KDL::Rotation result;
+  
+  arg1 = (KDL::Rotation *)jarg1; 
+  {
+    try {
+      result = ((KDL::Rotation const *)arg1)->Inverse();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Rotation((const KDL::Rotation &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Rotation_Inverse__SWIG_1(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::Rotation *arg1 = (KDL::Rotation *) 0 ;
+  KDL::Vector *arg2 = 0 ;
+  KDL::Vector result;
+  
+  arg1 = (KDL::Rotation *)jarg1; 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = ((KDL::Rotation const *)arg1)->Inverse((KDL::Vector const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Vector((const KDL::Vector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Rotation_Inverse__SWIG_2(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::Rotation *arg1 = (KDL::Rotation *) 0 ;
+  KDL::Wrench *arg2 = 0 ;
+  KDL::Wrench result;
+  
+  arg1 = (KDL::Rotation *)jarg1; 
+  arg2 = (KDL::Wrench *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Wrench const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = ((KDL::Rotation const *)arg1)->Inverse((KDL::Wrench const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Wrench((const KDL::Wrench &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Rotation_Inverse__SWIG_3(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::Rotation *arg1 = (KDL::Rotation *) 0 ;
+  KDL::Twist *arg2 = 0 ;
+  KDL::Twist result;
+  
+  arg1 = (KDL::Rotation *)jarg1; 
+  arg2 = (KDL::Twist *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = ((KDL::Rotation const *)arg1)->Inverse((KDL::Twist const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Twist((const KDL::Twist &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Rotation_Identity() {
+  void * jresult ;
+  KDL::Rotation result;
+  
+  {
+    try {
+      result = KDL::Rotation::Identity();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Rotation((const KDL::Rotation &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Rotation_RotX(double jarg1) {
+  void * jresult ;
+  double arg1 ;
+  KDL::Rotation result;
+  
+  arg1 = (double)jarg1; 
+  {
+    try {
+      result = KDL::Rotation::RotX(arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Rotation((const KDL::Rotation &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Rotation_RotY(double jarg1) {
+  void * jresult ;
+  double arg1 ;
+  KDL::Rotation result;
+  
+  arg1 = (double)jarg1; 
+  {
+    try {
+      result = KDL::Rotation::RotY(arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Rotation((const KDL::Rotation &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Rotation_RotZ(double jarg1) {
+  void * jresult ;
+  double arg1 ;
+  KDL::Rotation result;
+  
+  arg1 = (double)jarg1; 
+  {
+    try {
+      result = KDL::Rotation::RotZ(arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Rotation((const KDL::Rotation &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Rotation_DoRotX(void * jarg1, double jarg2) {
+  KDL::Rotation *arg1 = (KDL::Rotation *) 0 ;
+  double arg2 ;
+  
+  arg1 = (KDL::Rotation *)jarg1; 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      (arg1)->DoRotX(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Rotation_DoRotY(void * jarg1, double jarg2) {
+  KDL::Rotation *arg1 = (KDL::Rotation *) 0 ;
+  double arg2 ;
+  
+  arg1 = (KDL::Rotation *)jarg1; 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      (arg1)->DoRotY(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Rotation_DoRotZ(void * jarg1, double jarg2) {
+  KDL::Rotation *arg1 = (KDL::Rotation *) 0 ;
+  double arg2 ;
+  
+  arg1 = (KDL::Rotation *)jarg1; 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      (arg1)->DoRotZ(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Rotation_Rot(void * jarg1, double jarg2) {
+  void * jresult ;
+  KDL::Vector *arg1 = 0 ;
+  double arg2 ;
+  KDL::Rotation result;
+  
+  arg1 = (KDL::Vector *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      result = KDL::Rotation::Rot((KDL::Vector const &)*arg1,arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Rotation((const KDL::Rotation &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Rotation_Rot2(void * jarg1, double jarg2) {
+  void * jresult ;
+  KDL::Vector *arg1 = 0 ;
+  double arg2 ;
+  KDL::Rotation result;
+  
+  arg1 = (KDL::Vector *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      result = KDL::Rotation::Rot2((KDL::Vector const &)*arg1,arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Rotation((const KDL::Rotation &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Rotation_GetRot(void * jarg1) {
+  void * jresult ;
+  KDL::Rotation *arg1 = (KDL::Rotation *) 0 ;
+  KDL::Vector result;
+  
+  arg1 = (KDL::Rotation *)jarg1; 
+  {
+    try {
+      result = ((KDL::Rotation const *)arg1)->GetRot();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Vector((const KDL::Vector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_Rotation_GetRotAngle__SWIG_0(void * jarg1, void * jarg2, double jarg3) {
+  double jresult ;
+  KDL::Rotation *arg1 = (KDL::Rotation *) 0 ;
+  KDL::Vector *arg2 = 0 ;
+  double arg3 ;
+  double result;
+  
+  arg1 = (KDL::Rotation *)jarg1; 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (double)((KDL::Rotation const *)arg1)->GetRotAngle(*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_Rotation_GetRotAngle__SWIG_1(void * jarg1, void * jarg2) {
+  double jresult ;
+  KDL::Rotation *arg1 = (KDL::Rotation *) 0 ;
+  KDL::Vector *arg2 = 0 ;
+  double result;
+  
+  arg1 = (KDL::Rotation *)jarg1; 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (double)((KDL::Rotation const *)arg1)->GetRotAngle(*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Rotation_EulerZYZ(double jarg1, double jarg2, double jarg3) {
+  void * jresult ;
+  double arg1 ;
+  double arg2 ;
+  double arg3 ;
+  KDL::Rotation result;
+  
+  arg1 = (double)jarg1; 
+  arg2 = (double)jarg2; 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = KDL::Rotation::EulerZYZ(arg1,arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Rotation((const KDL::Rotation &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Rotation_GetEulerZYZ(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
+  KDL::Rotation *arg1 = (KDL::Rotation *) 0 ;
+  double *arg2 = 0 ;
+  double *arg3 = 0 ;
+  double *arg4 = 0 ;
+  
+  arg1 = (KDL::Rotation *)jarg1; 
+  arg2 = (double *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "double & type is null", 0);
+    return ;
+  } 
+  arg3 = (double *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "double & type is null", 0);
+    return ;
+  } 
+  arg4 = (double *)jarg4;
+  if (!arg4) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "double & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      ((KDL::Rotation const *)arg1)->GetEulerZYZ(*arg2,*arg3,*arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Rotation_Quaternion(double jarg1, double jarg2, double jarg3, double jarg4) {
+  void * jresult ;
+  double arg1 ;
+  double arg2 ;
+  double arg3 ;
+  double arg4 ;
+  KDL::Rotation result;
+  
+  arg1 = (double)jarg1; 
+  arg2 = (double)jarg2; 
+  arg3 = (double)jarg3; 
+  arg4 = (double)jarg4; 
+  {
+    try {
+      result = KDL::Rotation::Quaternion(arg1,arg2,arg3,arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Rotation((const KDL::Rotation &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Rotation_GetQuaternion(void * jarg1, void * jarg2, void * jarg3, void * jarg4, void * jarg5) {
+  KDL::Rotation *arg1 = (KDL::Rotation *) 0 ;
+  double *arg2 = 0 ;
+  double *arg3 = 0 ;
+  double *arg4 = 0 ;
+  double *arg5 = 0 ;
+  
+  arg1 = (KDL::Rotation *)jarg1; 
+  arg2 = (double *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "double & type is null", 0);
+    return ;
+  } 
+  arg3 = (double *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "double & type is null", 0);
+    return ;
+  } 
+  arg4 = (double *)jarg4;
+  if (!arg4) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "double & type is null", 0);
+    return ;
+  } 
+  arg5 = (double *)jarg5;
+  if (!arg5) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "double & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      ((KDL::Rotation const *)arg1)->GetQuaternion(*arg2,*arg3,*arg4,*arg5);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Rotation_RPY(double jarg1, double jarg2, double jarg3) {
+  void * jresult ;
+  double arg1 ;
+  double arg2 ;
+  double arg3 ;
+  KDL::Rotation result;
+  
+  arg1 = (double)jarg1; 
+  arg2 = (double)jarg2; 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = KDL::Rotation::RPY(arg1,arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Rotation((const KDL::Rotation &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Rotation_GetRPY(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
+  KDL::Rotation *arg1 = (KDL::Rotation *) 0 ;
+  double *arg2 = 0 ;
+  double *arg3 = 0 ;
+  double *arg4 = 0 ;
+  
+  arg1 = (KDL::Rotation *)jarg1; 
+  arg2 = (double *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "double & type is null", 0);
+    return ;
+  } 
+  arg3 = (double *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "double & type is null", 0);
+    return ;
+  } 
+  arg4 = (double *)jarg4;
+  if (!arg4) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "double & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      ((KDL::Rotation const *)arg1)->GetRPY(*arg2,*arg3,*arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Rotation_EulerZYX(double jarg1, double jarg2, double jarg3) {
+  void * jresult ;
+  double arg1 ;
+  double arg2 ;
+  double arg3 ;
+  KDL::Rotation result;
+  
+  arg1 = (double)jarg1; 
+  arg2 = (double)jarg2; 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = KDL::Rotation::EulerZYX(arg1,arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Rotation((const KDL::Rotation &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Rotation_GetEulerZYX(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
+  KDL::Rotation *arg1 = (KDL::Rotation *) 0 ;
+  double *arg2 = 0 ;
+  double *arg3 = 0 ;
+  double *arg4 = 0 ;
+  
+  arg1 = (KDL::Rotation *)jarg1; 
+  arg2 = (double *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "double & type is null", 0);
+    return ;
+  } 
+  arg3 = (double *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "double & type is null", 0);
+    return ;
+  } 
+  arg4 = (double *)jarg4;
+  if (!arg4) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "double & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      ((KDL::Rotation const *)arg1)->GetEulerZYX(*arg2,*arg3,*arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Rotation_UnitX__SWIG_0(void * jarg1) {
+  void * jresult ;
+  KDL::Rotation *arg1 = (KDL::Rotation *) 0 ;
+  KDL::Vector result;
+  
+  arg1 = (KDL::Rotation *)jarg1; 
+  {
+    try {
+      result = ((KDL::Rotation const *)arg1)->UnitX();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Vector((const KDL::Vector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Rotation_UnitX__SWIG_1(void * jarg1, void * jarg2) {
+  KDL::Rotation *arg1 = (KDL::Rotation *) 0 ;
+  KDL::Vector *arg2 = 0 ;
+  
+  arg1 = (KDL::Rotation *)jarg1; 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      (arg1)->UnitX((KDL::Vector const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Rotation_UnitY__SWIG_0(void * jarg1) {
+  void * jresult ;
+  KDL::Rotation *arg1 = (KDL::Rotation *) 0 ;
+  KDL::Vector result;
+  
+  arg1 = (KDL::Rotation *)jarg1; 
+  {
+    try {
+      result = ((KDL::Rotation const *)arg1)->UnitY();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Vector((const KDL::Vector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Rotation_UnitY__SWIG_1(void * jarg1, void * jarg2) {
+  KDL::Rotation *arg1 = (KDL::Rotation *) 0 ;
+  KDL::Vector *arg2 = 0 ;
+  
+  arg1 = (KDL::Rotation *)jarg1; 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      (arg1)->UnitY((KDL::Vector const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Rotation_UnitZ__SWIG_0(void * jarg1) {
+  void * jresult ;
+  KDL::Rotation *arg1 = (KDL::Rotation *) 0 ;
+  KDL::Vector result;
+  
+  arg1 = (KDL::Rotation *)jarg1; 
+  {
+    try {
+      result = ((KDL::Rotation const *)arg1)->UnitZ();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Vector((const KDL::Vector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Rotation_UnitZ__SWIG_1(void * jarg1, void * jarg2) {
+  KDL::Rotation *arg1 = (KDL::Rotation *) 0 ;
+  KDL::Vector *arg2 = 0 ;
+  
+  arg1 = (KDL::Rotation *)jarg1; 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      (arg1)->UnitZ((KDL::Vector const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_Rotation(void * jarg1) {
+  KDL::Rotation *arg1 = (KDL::Rotation *) 0 ;
+  
+  arg1 = (KDL::Rotation *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_16(void * jarg1, void * jarg2, double jarg3) {
+  unsigned int jresult ;
+  KDL::Rotation *arg1 = 0 ;
+  KDL::Rotation *arg2 = 0 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (KDL::Rotation *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Rotation const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Rotation *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Rotation const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::Rotation const &)*arg1,(KDL::Rotation const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_17(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
+  KDL::Rotation *arg1 = 0 ;
+  KDL::Rotation *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::Rotation *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Rotation const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Rotation *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Rotation const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::Rotation const &)*arg1,(KDL::Rotation const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Frame_p_set(void * jarg1, void * jarg2) {
+  KDL::Frame *arg1 = (KDL::Frame *) 0 ;
+  KDL::Vector *arg2 = (KDL::Vector *) 0 ;
+  
+  arg1 = (KDL::Frame *)jarg1; 
+  arg2 = (KDL::Vector *)jarg2; 
+  {
+    try {
+      if (arg1) (arg1)->p = *arg2;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Frame_p_get(void * jarg1) {
+  void * jresult ;
+  KDL::Frame *arg1 = (KDL::Frame *) 0 ;
+  KDL::Vector *result = 0 ;
+  
+  arg1 = (KDL::Frame *)jarg1; 
+  {
+    try {
+      result = (KDL::Vector *)& ((arg1)->p);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Frame_M_set(void * jarg1, void * jarg2) {
+  KDL::Frame *arg1 = (KDL::Frame *) 0 ;
+  KDL::Rotation *arg2 = (KDL::Rotation *) 0 ;
+  
+  arg1 = (KDL::Frame *)jarg1; 
+  arg2 = (KDL::Rotation *)jarg2; 
+  {
+    try {
+      if (arg1) (arg1)->M = *arg2;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Frame_M_get(void * jarg1) {
+  void * jresult ;
+  KDL::Frame *arg1 = (KDL::Frame *) 0 ;
+  KDL::Rotation *result = 0 ;
+  
+  arg1 = (KDL::Frame *)jarg1; 
+  {
+    try {
+      result = (KDL::Rotation *)& ((arg1)->M);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Frame__SWIG_0(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::Rotation *arg1 = 0 ;
+  KDL::Vector *arg2 = 0 ;
+  KDL::Frame *result = 0 ;
+  
+  arg1 = (KDL::Rotation *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Rotation const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::Frame *)new KDL::Frame((KDL::Rotation const &)*arg1,(KDL::Vector const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Frame__SWIG_1(void * jarg1) {
+  void * jresult ;
+  KDL::Vector *arg1 = 0 ;
+  KDL::Frame *result = 0 ;
+  
+  arg1 = (KDL::Vector *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::Frame *)new KDL::Frame((KDL::Vector const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Frame__SWIG_2(void * jarg1) {
+  void * jresult ;
+  KDL::Rotation *arg1 = 0 ;
+  KDL::Frame *result = 0 ;
+  
+  arg1 = (KDL::Rotation *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Rotation const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::Frame *)new KDL::Frame((KDL::Rotation const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Frame__SWIG_3() {
+  void * jresult ;
+  KDL::Frame *result = 0 ;
+  
+  {
+    try {
+      result = (KDL::Frame *)new KDL::Frame();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Frame__SWIG_4(void * jarg1) {
+  void * jresult ;
+  KDL::Frame *arg1 = 0 ;
+  KDL::Frame *result = 0 ;
+  
+  arg1 = (KDL::Frame *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::Frame *)new KDL::Frame((KDL::Frame const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Frame_Make4x4(void * jarg1, void * jarg2) {
+  KDL::Frame *arg1 = (KDL::Frame *) 0 ;
+  double *arg2 = (double *) 0 ;
+  
+  arg1 = (KDL::Frame *)jarg1; 
+  arg2 = (double *)jarg2; 
+  {
+    try {
+      (arg1)->Make4x4(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Frame_Inverse__SWIG_0(void * jarg1) {
+  void * jresult ;
+  KDL::Frame *arg1 = (KDL::Frame *) 0 ;
+  KDL::Frame result;
+  
+  arg1 = (KDL::Frame *)jarg1; 
+  {
+    try {
+      result = ((KDL::Frame const *)arg1)->Inverse();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Frame((const KDL::Frame &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Frame_Inverse__SWIG_1(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::Frame *arg1 = (KDL::Frame *) 0 ;
+  KDL::Vector *arg2 = 0 ;
+  KDL::Vector result;
+  
+  arg1 = (KDL::Frame *)jarg1; 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = ((KDL::Frame const *)arg1)->Inverse((KDL::Vector const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Vector((const KDL::Vector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Frame_Inverse__SWIG_2(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::Frame *arg1 = (KDL::Frame *) 0 ;
+  KDL::Wrench *arg2 = 0 ;
+  KDL::Wrench result;
+  
+  arg1 = (KDL::Frame *)jarg1; 
+  arg2 = (KDL::Wrench *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Wrench const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = ((KDL::Frame const *)arg1)->Inverse((KDL::Wrench const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Wrench((const KDL::Wrench &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Frame_Inverse__SWIG_3(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::Frame *arg1 = (KDL::Frame *) 0 ;
+  KDL::Twist *arg2 = 0 ;
+  KDL::Twist result;
+  
+  arg1 = (KDL::Frame *)jarg1; 
+  arg2 = (KDL::Twist *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = ((KDL::Frame const *)arg1)->Inverse((KDL::Twist const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Twist((const KDL::Twist &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Frame_Identity() {
+  void * jresult ;
+  KDL::Frame result;
+  
+  {
+    try {
+      result = KDL::Frame::Identity();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Frame((const KDL::Frame &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Frame_Integrate(void * jarg1, void * jarg2, double jarg3) {
+  KDL::Frame *arg1 = (KDL::Frame *) 0 ;
+  KDL::Twist *arg2 = 0 ;
+  double arg3 ;
+  
+  arg1 = (KDL::Frame *)jarg1; 
+  arg2 = (KDL::Twist *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return ;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      (arg1)->Integrate((KDL::Twist const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Frame_DH_Craig1989(double jarg1, double jarg2, double jarg3, double jarg4) {
+  void * jresult ;
+  double arg1 ;
+  double arg2 ;
+  double arg3 ;
+  double arg4 ;
+  KDL::Frame result;
+  
+  arg1 = (double)jarg1; 
+  arg2 = (double)jarg2; 
+  arg3 = (double)jarg3; 
+  arg4 = (double)jarg4; 
+  {
+    try {
+      result = KDL::Frame::DH_Craig1989(arg1,arg2,arg3,arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Frame((const KDL::Frame &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Frame_DH(double jarg1, double jarg2, double jarg3, double jarg4) {
+  void * jresult ;
+  double arg1 ;
+  double arg2 ;
+  double arg3 ;
+  double arg4 ;
+  KDL::Frame result;
+  
+  arg1 = (double)jarg1; 
+  arg2 = (double)jarg2; 
+  arg3 = (double)jarg3; 
+  arg4 = (double)jarg4; 
+  {
+    try {
+      result = KDL::Frame::DH(arg1,arg2,arg3,arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Frame((const KDL::Frame &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_Frame(void * jarg1) {
+  KDL::Frame *arg1 = (KDL::Frame *) 0 ;
+  
+  arg1 = (KDL::Frame *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Twist_vel_set(void * jarg1, void * jarg2) {
+  KDL::Twist *arg1 = (KDL::Twist *) 0 ;
+  KDL::Vector *arg2 = (KDL::Vector *) 0 ;
+  
+  arg1 = (KDL::Twist *)jarg1; 
+  arg2 = (KDL::Vector *)jarg2; 
+  {
+    try {
+      if (arg1) (arg1)->vel = *arg2;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Twist_vel_get(void * jarg1) {
+  void * jresult ;
+  KDL::Twist *arg1 = (KDL::Twist *) 0 ;
+  KDL::Vector *result = 0 ;
+  
+  arg1 = (KDL::Twist *)jarg1; 
+  {
+    try {
+      result = (KDL::Vector *)& ((arg1)->vel);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Twist_rot_set(void * jarg1, void * jarg2) {
+  KDL::Twist *arg1 = (KDL::Twist *) 0 ;
+  KDL::Vector *arg2 = (KDL::Vector *) 0 ;
+  
+  arg1 = (KDL::Twist *)jarg1; 
+  arg2 = (KDL::Vector *)jarg2; 
+  {
+    try {
+      if (arg1) (arg1)->rot = *arg2;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Twist_rot_get(void * jarg1) {
+  void * jresult ;
+  KDL::Twist *arg1 = (KDL::Twist *) 0 ;
+  KDL::Vector *result = 0 ;
+  
+  arg1 = (KDL::Twist *)jarg1; 
+  {
+    try {
+      result = (KDL::Vector *)& ((arg1)->rot);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Twist__SWIG_0() {
+  void * jresult ;
+  KDL::Twist *result = 0 ;
+  
+  {
+    try {
+      result = (KDL::Twist *)new KDL::Twist();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Twist__SWIG_1(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::Vector *arg1 = 0 ;
+  KDL::Vector *arg2 = 0 ;
+  KDL::Twist *result = 0 ;
+  
+  arg1 = (KDL::Vector *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::Twist *)new KDL::Twist((KDL::Vector const &)*arg1,(KDL::Vector const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Twist_Zero() {
+  void * jresult ;
+  KDL::Twist result;
+  
+  {
+    try {
+      result = KDL::Twist::Zero();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Twist((const KDL::Twist &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Twist_ReverseSign(void * jarg1) {
+  KDL::Twist *arg1 = (KDL::Twist *) 0 ;
+  
+  arg1 = (KDL::Twist *)jarg1; 
+  {
+    try {
+      (arg1)->ReverseSign();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Twist_RefPoint(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::Twist *arg1 = (KDL::Twist *) 0 ;
+  KDL::Vector *arg2 = 0 ;
+  KDL::Twist result;
+  
+  arg1 = (KDL::Twist *)jarg1; 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = ((KDL::Twist const *)arg1)->RefPoint((KDL::Vector const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Twist((const KDL::Twist &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_Twist(void * jarg1) {
+  KDL::Twist *arg1 = (KDL::Twist *) 0 ;
+  
+  arg1 = (KDL::Twist *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Wrench_force_set(void * jarg1, void * jarg2) {
+  KDL::Wrench *arg1 = (KDL::Wrench *) 0 ;
+  KDL::Vector *arg2 = (KDL::Vector *) 0 ;
+  
+  arg1 = (KDL::Wrench *)jarg1; 
+  arg2 = (KDL::Vector *)jarg2; 
+  {
+    try {
+      if (arg1) (arg1)->force = *arg2;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Wrench_force_get(void * jarg1) {
+  void * jresult ;
+  KDL::Wrench *arg1 = (KDL::Wrench *) 0 ;
+  KDL::Vector *result = 0 ;
+  
+  arg1 = (KDL::Wrench *)jarg1; 
+  {
+    try {
+      result = (KDL::Vector *)& ((arg1)->force);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Wrench_torque_set(void * jarg1, void * jarg2) {
+  KDL::Wrench *arg1 = (KDL::Wrench *) 0 ;
+  KDL::Vector *arg2 = (KDL::Vector *) 0 ;
+  
+  arg1 = (KDL::Wrench *)jarg1; 
+  arg2 = (KDL::Vector *)jarg2; 
+  {
+    try {
+      if (arg1) (arg1)->torque = *arg2;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Wrench_torque_get(void * jarg1) {
+  void * jresult ;
+  KDL::Wrench *arg1 = (KDL::Wrench *) 0 ;
+  KDL::Vector *result = 0 ;
+  
+  arg1 = (KDL::Wrench *)jarg1; 
+  {
+    try {
+      result = (KDL::Vector *)& ((arg1)->torque);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Wrench__SWIG_0() {
+  void * jresult ;
+  KDL::Wrench *result = 0 ;
+  
+  {
+    try {
+      result = (KDL::Wrench *)new KDL::Wrench();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Wrench__SWIG_1(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::Vector *arg1 = 0 ;
+  KDL::Vector *arg2 = 0 ;
+  KDL::Wrench *result = 0 ;
+  
+  arg1 = (KDL::Vector *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::Wrench *)new KDL::Wrench((KDL::Vector const &)*arg1,(KDL::Vector const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Wrench_Zero() {
+  void * jresult ;
+  KDL::Wrench result;
+  
+  {
+    try {
+      result = KDL::Wrench::Zero();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Wrench((const KDL::Wrench &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Wrench_ReverseSign(void * jarg1) {
+  KDL::Wrench *arg1 = (KDL::Wrench *) 0 ;
+  
+  arg1 = (KDL::Wrench *)jarg1; 
+  {
+    try {
+      (arg1)->ReverseSign();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Wrench_RefPoint(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::Wrench *arg1 = (KDL::Wrench *) 0 ;
+  KDL::Vector *arg2 = 0 ;
+  KDL::Wrench result;
+  
+  arg1 = (KDL::Wrench *)jarg1; 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = ((KDL::Wrench const *)arg1)->RefPoint((KDL::Vector const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Wrench((const KDL::Wrench &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_Wrench(void * jarg1) {
+  KDL::Wrench *arg1 = (KDL::Wrench *) 0 ;
+  
+  arg1 = (KDL::Wrench *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Vector2__SWIG_0() {
+  void * jresult ;
+  KDL::Vector2 *result = 0 ;
+  
+  {
+    try {
+      result = (KDL::Vector2 *)new KDL::Vector2();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Vector2__SWIG_1(double jarg1, double jarg2) {
+  void * jresult ;
+  double arg1 ;
+  double arg2 ;
+  KDL::Vector2 *result = 0 ;
+  
+  arg1 = (double)jarg1; 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      result = (KDL::Vector2 *)new KDL::Vector2(arg1,arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Vector2__SWIG_2(void * jarg1) {
+  void * jresult ;
+  KDL::Vector2 *arg1 = 0 ;
+  KDL::Vector2 *result = 0 ;
+  
+  arg1 = (KDL::Vector2 *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector2 const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::Vector2 *)new KDL::Vector2((KDL::Vector2 const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_Vector2_x__SWIG_0(void * jarg1) {
+  double jresult ;
+  KDL::Vector2 *arg1 = (KDL::Vector2 *) 0 ;
+  double result;
+  
+  arg1 = (KDL::Vector2 *)jarg1; 
+  {
+    try {
+      result = (double)((KDL::Vector2 const *)arg1)->x();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_Vector2_y__SWIG_0(void * jarg1) {
+  double jresult ;
+  KDL::Vector2 *arg1 = (KDL::Vector2 *) 0 ;
+  double result;
+  
+  arg1 = (KDL::Vector2 *)jarg1; 
+  {
+    try {
+      result = (double)((KDL::Vector2 const *)arg1)->y();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Vector2_x__SWIG_1(void * jarg1, double jarg2) {
+  KDL::Vector2 *arg1 = (KDL::Vector2 *) 0 ;
+  double arg2 ;
+  
+  arg1 = (KDL::Vector2 *)jarg1; 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      (arg1)->x(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Vector2_y__SWIG_1(void * jarg1, double jarg2) {
+  KDL::Vector2 *arg1 = (KDL::Vector2 *) 0 ;
+  double arg2 ;
+  
+  arg1 = (KDL::Vector2 *)jarg1; 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      (arg1)->y(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Vector2_ReverseSign(void * jarg1) {
+  KDL::Vector2 *arg1 = (KDL::Vector2 *) 0 ;
+  
+  arg1 = (KDL::Vector2 *)jarg1; 
+  {
+    try {
+      (arg1)->ReverseSign();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Vector2_Zero() {
+  void * jresult ;
+  KDL::Vector2 result;
+  
+  {
+    try {
+      result = KDL::Vector2::Zero();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Vector2((const KDL::Vector2 &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_Vector2_Normalize__SWIG_0(void * jarg1, double jarg2) {
+  double jresult ;
+  KDL::Vector2 *arg1 = (KDL::Vector2 *) 0 ;
+  double arg2 ;
+  double result;
+  
+  arg1 = (KDL::Vector2 *)jarg1; 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      result = (double)(arg1)->Normalize(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_Vector2_Normalize__SWIG_1(void * jarg1) {
+  double jresult ;
+  KDL::Vector2 *arg1 = (KDL::Vector2 *) 0 ;
+  double result;
+  
+  arg1 = (KDL::Vector2 *)jarg1; 
+  {
+    try {
+      result = (double)(arg1)->Normalize();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_Vector2_Norm(void * jarg1) {
+  double jresult ;
+  KDL::Vector2 *arg1 = (KDL::Vector2 *) 0 ;
+  double result;
+  
+  arg1 = (KDL::Vector2 *)jarg1; 
+  {
+    try {
+      result = (double)((KDL::Vector2 const *)arg1)->Norm();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Vector2_Set3DXY(void * jarg1, void * jarg2) {
+  KDL::Vector2 *arg1 = (KDL::Vector2 *) 0 ;
+  KDL::Vector *arg2 = 0 ;
+  
+  arg1 = (KDL::Vector2 *)jarg1; 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      (arg1)->Set3DXY((KDL::Vector const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Vector2_Set3DYZ(void * jarg1, void * jarg2) {
+  KDL::Vector2 *arg1 = (KDL::Vector2 *) 0 ;
+  KDL::Vector *arg2 = 0 ;
+  
+  arg1 = (KDL::Vector2 *)jarg1; 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      (arg1)->Set3DYZ((KDL::Vector const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Vector2_Set3DZX(void * jarg1, void * jarg2) {
+  KDL::Vector2 *arg1 = (KDL::Vector2 *) 0 ;
+  KDL::Vector *arg2 = 0 ;
+  
+  arg1 = (KDL::Vector2 *)jarg1; 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      (arg1)->Set3DZX((KDL::Vector const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Vector2_Set3DPlane(void * jarg1, void * jarg2, void * jarg3) {
+  KDL::Vector2 *arg1 = (KDL::Vector2 *) 0 ;
+  KDL::Frame *arg2 = 0 ;
+  KDL::Vector *arg3 = 0 ;
+  
+  arg1 = (KDL::Vector2 *)jarg1; 
+  arg2 = (KDL::Frame *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return ;
+  } 
+  arg3 = (KDL::Vector *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      (arg1)->Set3DPlane((KDL::Frame const &)*arg2,(KDL::Vector const &)*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_Vector2(void * jarg1) {
+  KDL::Vector2 *arg1 = (KDL::Vector2 *) 0 ;
+  
+  arg1 = (KDL::Vector2 *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Rotation2__SWIG_0() {
+  void * jresult ;
+  KDL::Rotation2 *result = 0 ;
+  
+  {
+    try {
+      result = (KDL::Rotation2 *)new KDL::Rotation2();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Rotation2__SWIG_1(double jarg1) {
+  void * jresult ;
+  double arg1 ;
+  KDL::Rotation2 *result = 0 ;
+  
+  arg1 = (double)jarg1; 
+  {
+    try {
+      result = (KDL::Rotation2 *)new KDL::Rotation2(arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Rotation2__SWIG_2(double jarg1, double jarg2) {
+  void * jresult ;
+  double arg1 ;
+  double arg2 ;
+  KDL::Rotation2 *result = 0 ;
+  
+  arg1 = (double)jarg1; 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      result = (KDL::Rotation2 *)new KDL::Rotation2(arg1,arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Rotation2__SWIG_3(void * jarg1) {
+  void * jresult ;
+  KDL::Rotation2 *arg1 = 0 ;
+  KDL::Rotation2 *result = 0 ;
+  
+  arg1 = (KDL::Rotation2 *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Rotation2 const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::Rotation2 *)new KDL::Rotation2((KDL::Rotation2 const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Rotation2_SetInverse(void * jarg1) {
+  KDL::Rotation2 *arg1 = (KDL::Rotation2 *) 0 ;
+  
+  arg1 = (KDL::Rotation2 *)jarg1; 
+  {
+    try {
+      (arg1)->SetInverse();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Rotation2_Inverse__SWIG_0(void * jarg1) {
+  void * jresult ;
+  KDL::Rotation2 *arg1 = (KDL::Rotation2 *) 0 ;
+  KDL::Rotation2 result;
+  
+  arg1 = (KDL::Rotation2 *)jarg1; 
+  {
+    try {
+      result = ((KDL::Rotation2 const *)arg1)->Inverse();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Rotation2((const KDL::Rotation2 &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Rotation2_Inverse__SWIG_1(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::Rotation2 *arg1 = (KDL::Rotation2 *) 0 ;
+  KDL::Vector2 *arg2 = 0 ;
+  KDL::Vector2 result;
+  
+  arg1 = (KDL::Rotation2 *)jarg1; 
+  arg2 = (KDL::Vector2 *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector2 const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = ((KDL::Rotation2 const *)arg1)->Inverse((KDL::Vector2 const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Vector2((const KDL::Vector2 &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Rotation2_SetIdentity(void * jarg1) {
+  KDL::Rotation2 *arg1 = (KDL::Rotation2 *) 0 ;
+  
+  arg1 = (KDL::Rotation2 *)jarg1; 
+  {
+    try {
+      (arg1)->SetIdentity();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Rotation2_Identity() {
+  void * jresult ;
+  KDL::Rotation2 result;
+  
+  {
+    try {
+      result = KDL::Rotation2::Identity();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Rotation2((const KDL::Rotation2 &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Rotation2_SetRot(void * jarg1, double jarg2) {
+  KDL::Rotation2 *arg1 = (KDL::Rotation2 *) 0 ;
+  double arg2 ;
+  
+  arg1 = (KDL::Rotation2 *)jarg1; 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      (arg1)->SetRot(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Rotation2_Rot(double jarg1) {
+  void * jresult ;
+  double arg1 ;
+  KDL::Rotation2 result;
+  
+  arg1 = (double)jarg1; 
+  {
+    try {
+      result = KDL::Rotation2::Rot(arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Rotation2((const KDL::Rotation2 &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_Rotation2_GetRot(void * jarg1) {
+  double jresult ;
+  KDL::Rotation2 *arg1 = (KDL::Rotation2 *) 0 ;
+  double result;
+  
+  arg1 = (KDL::Rotation2 *)jarg1; 
+  {
+    try {
+      result = (double)((KDL::Rotation2 const *)arg1)->GetRot();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_Rotation2(void * jarg1) {
+  KDL::Rotation2 *arg1 = (KDL::Rotation2 *) 0 ;
+  
+  arg1 = (KDL::Rotation2 *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_diff__SWIG_1(void * jarg1, void * jarg2, double jarg3) {
+  void * jresult ;
+  KDL::Vector *arg1 = 0 ;
+  KDL::Vector *arg2 = 0 ;
+  double arg3 ;
+  KDL::Vector result;
+  
+  arg1 = (KDL::Vector *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = KDL::diff((KDL::Vector const &)*arg1,(KDL::Vector const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Vector((const KDL::Vector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_diff__SWIG_2(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::Vector *arg1 = 0 ;
+  KDL::Vector *arg2 = 0 ;
+  KDL::Vector result;
+  
+  arg1 = (KDL::Vector *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = KDL::diff((KDL::Vector const &)*arg1,(KDL::Vector const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Vector((const KDL::Vector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_diff__SWIG_3(void * jarg1, void * jarg2, double jarg3) {
+  void * jresult ;
+  KDL::Rotation *arg1 = 0 ;
+  KDL::Rotation *arg2 = 0 ;
+  double arg3 ;
+  KDL::Vector result;
+  
+  arg1 = (KDL::Rotation *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Rotation const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Rotation *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Rotation const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = KDL::diff((KDL::Rotation const &)*arg1,(KDL::Rotation const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Vector((const KDL::Vector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_diff__SWIG_4(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::Rotation *arg1 = 0 ;
+  KDL::Rotation *arg2 = 0 ;
+  KDL::Vector result;
+  
+  arg1 = (KDL::Rotation *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Rotation const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Rotation *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Rotation const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = KDL::diff((KDL::Rotation const &)*arg1,(KDL::Rotation const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Vector((const KDL::Vector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_diff__SWIG_5(void * jarg1, void * jarg2, double jarg3) {
+  void * jresult ;
+  KDL::Frame *arg1 = 0 ;
+  KDL::Frame *arg2 = 0 ;
+  double arg3 ;
+  KDL::Twist result;
+  
+  arg1 = (KDL::Frame *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Frame *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = KDL::diff((KDL::Frame const &)*arg1,(KDL::Frame const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Twist((const KDL::Twist &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_diff__SWIG_6(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::Frame *arg1 = 0 ;
+  KDL::Frame *arg2 = 0 ;
+  KDL::Twist result;
+  
+  arg1 = (KDL::Frame *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Frame *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = KDL::diff((KDL::Frame const &)*arg1,(KDL::Frame const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Twist((const KDL::Twist &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_diff__SWIG_7(void * jarg1, void * jarg2, double jarg3) {
+  void * jresult ;
+  KDL::Twist *arg1 = 0 ;
+  KDL::Twist *arg2 = 0 ;
+  double arg3 ;
+  KDL::Twist result;
+  
+  arg1 = (KDL::Twist *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Twist *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = KDL::diff((KDL::Twist const &)*arg1,(KDL::Twist const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Twist((const KDL::Twist &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_diff__SWIG_8(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::Twist *arg1 = 0 ;
+  KDL::Twist *arg2 = 0 ;
+  KDL::Twist result;
+  
+  arg1 = (KDL::Twist *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Twist *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = KDL::diff((KDL::Twist const &)*arg1,(KDL::Twist const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Twist((const KDL::Twist &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_diff__SWIG_9(void * jarg1, void * jarg2, double jarg3) {
+  void * jresult ;
+  KDL::Wrench *arg1 = 0 ;
+  KDL::Wrench *arg2 = 0 ;
+  double arg3 ;
+  KDL::Wrench result;
+  
+  arg1 = (KDL::Wrench *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Wrench const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Wrench *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Wrench const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = KDL::diff((KDL::Wrench const &)*arg1,(KDL::Wrench const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Wrench((const KDL::Wrench &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_diff__SWIG_10(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::Wrench *arg1 = 0 ;
+  KDL::Wrench *arg2 = 0 ;
+  KDL::Wrench result;
+  
+  arg1 = (KDL::Wrench *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Wrench const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Wrench *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Wrench const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = KDL::diff((KDL::Wrench const &)*arg1,(KDL::Wrench const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Wrench((const KDL::Wrench &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_addDelta__SWIG_1(void * jarg1, void * jarg2, double jarg3) {
+  void * jresult ;
+  KDL::Vector *arg1 = 0 ;
+  KDL::Vector *arg2 = 0 ;
+  double arg3 ;
+  KDL::Vector result;
+  
+  arg1 = (KDL::Vector *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = KDL::addDelta((KDL::Vector const &)*arg1,(KDL::Vector const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Vector((const KDL::Vector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_addDelta__SWIG_2(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::Vector *arg1 = 0 ;
+  KDL::Vector *arg2 = 0 ;
+  KDL::Vector result;
+  
+  arg1 = (KDL::Vector *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = KDL::addDelta((KDL::Vector const &)*arg1,(KDL::Vector const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Vector((const KDL::Vector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_addDelta__SWIG_3(void * jarg1, void * jarg2, double jarg3) {
+  void * jresult ;
+  KDL::Rotation *arg1 = 0 ;
+  KDL::Vector *arg2 = 0 ;
+  double arg3 ;
+  KDL::Rotation result;
+  
+  arg1 = (KDL::Rotation *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Rotation const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = KDL::addDelta((KDL::Rotation const &)*arg1,(KDL::Vector const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Rotation((const KDL::Rotation &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_addDelta__SWIG_4(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::Rotation *arg1 = 0 ;
+  KDL::Vector *arg2 = 0 ;
+  KDL::Rotation result;
+  
+  arg1 = (KDL::Rotation *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Rotation const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = KDL::addDelta((KDL::Rotation const &)*arg1,(KDL::Vector const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Rotation((const KDL::Rotation &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_addDelta__SWIG_5(void * jarg1, void * jarg2, double jarg3) {
+  void * jresult ;
+  KDL::Frame *arg1 = 0 ;
+  KDL::Twist *arg2 = 0 ;
+  double arg3 ;
+  KDL::Frame result;
+  
+  arg1 = (KDL::Frame *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Twist *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = KDL::addDelta((KDL::Frame const &)*arg1,(KDL::Twist const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Frame((const KDL::Frame &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_addDelta__SWIG_6(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::Frame *arg1 = 0 ;
+  KDL::Twist *arg2 = 0 ;
+  KDL::Frame result;
+  
+  arg1 = (KDL::Frame *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Twist *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = KDL::addDelta((KDL::Frame const &)*arg1,(KDL::Twist const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Frame((const KDL::Frame &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_addDelta__SWIG_7(void * jarg1, void * jarg2, double jarg3) {
+  void * jresult ;
+  KDL::Twist *arg1 = 0 ;
+  KDL::Twist *arg2 = 0 ;
+  double arg3 ;
+  KDL::Twist result;
+  
+  arg1 = (KDL::Twist *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Twist *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = KDL::addDelta((KDL::Twist const &)*arg1,(KDL::Twist const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Twist((const KDL::Twist &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_addDelta__SWIG_8(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::Twist *arg1 = 0 ;
+  KDL::Twist *arg2 = 0 ;
+  KDL::Twist result;
+  
+  arg1 = (KDL::Twist *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Twist *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = KDL::addDelta((KDL::Twist const &)*arg1,(KDL::Twist const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Twist((const KDL::Twist &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_addDelta__SWIG_9(void * jarg1, void * jarg2, double jarg3) {
+  void * jresult ;
+  KDL::Wrench *arg1 = 0 ;
+  KDL::Wrench *arg2 = 0 ;
+  double arg3 ;
+  KDL::Wrench result;
+  
+  arg1 = (KDL::Wrench *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Wrench const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Wrench *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Wrench const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = KDL::addDelta((KDL::Wrench const &)*arg1,(KDL::Wrench const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Wrench((const KDL::Wrench &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_addDelta__SWIG_10(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::Wrench *arg1 = 0 ;
+  KDL::Wrench *arg2 = 0 ;
+  KDL::Wrench result;
+  
+  arg1 = (KDL::Wrench *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Wrench const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Wrench *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Wrench const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = KDL::addDelta((KDL::Wrench const &)*arg1,(KDL::Wrench const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Wrench((const KDL::Wrench &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_Property_get__SWIG_0(void * jarg1, int jarg2, int jarg3) {
+  double jresult ;
+  KDL::Frame *arg1 = 0 ;
+  int arg2 ;
+  int arg3 ;
+  double result;
+  
+  arg1 = (KDL::Frame *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame & type is null", 0);
+    return 0;
+  } 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  {
+    try {
+      result = (double)KDL::Property::get(*arg1,arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Property_set(void * jarg1, int jarg2, int jarg3, double jarg4) {
+  KDL::Rotation *arg1 = 0 ;
+  int arg2 ;
+  int arg3 ;
+  double arg4 ;
+  
+  arg1 = (KDL::Rotation *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Rotation & type is null", 0);
+    return ;
+  } 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  arg4 = (double)jarg4; 
+  {
+    try {
+      KDL::Property::set(*arg1,arg2,arg3,arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_Property_get__SWIG_1(void * jarg1, int jarg2, int jarg3) {
+  double jresult ;
+  KDL::Rotation *arg1 = 0 ;
+  int arg2 ;
+  int arg3 ;
+  double result;
+  
+  arg1 = (KDL::Rotation *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Rotation & type is null", 0);
+    return 0;
+  } 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  {
+    try {
+      result = (double)KDL::Property::get(*arg1,arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Property() {
+  void * jresult ;
+  KDL::Property *result = 0 ;
+  
+  {
+    try {
+      result = (KDL::Property *)new KDL::Property();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_Property(void * jarg1) {
+  KDL::Property *arg1 = (KDL::Property *) 0 ;
+  
+  arg1 = (KDL::Property *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_diff__SWIG_11(void * jarg1, void * jarg2, double jarg3) {
+  void * jresult ;
+  KDL::doubleVel *arg1 = 0 ;
+  KDL::doubleVel *arg2 = 0 ;
+  double arg3 ;
+  KDL::doubleVel result;
+  
+  arg1 = (KDL::doubleVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::doubleVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::doubleVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::doubleVel const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = KDL::diff((Rall1d< double > const &)*arg1,(Rall1d< double > const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::doubleVel((const KDL::doubleVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_diff__SWIG_12(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::doubleVel *arg1 = 0 ;
+  KDL::doubleVel *arg2 = 0 ;
+  KDL::doubleVel result;
+  
+  arg1 = (KDL::doubleVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::doubleVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::doubleVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::doubleVel const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = KDL::diff((Rall1d< double > const &)*arg1,(Rall1d< double > const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::doubleVel((const KDL::doubleVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_addDelta__SWIG_11(void * jarg1, void * jarg2, double jarg3) {
+  void * jresult ;
+  KDL::doubleVel *arg1 = 0 ;
+  KDL::doubleVel *arg2 = 0 ;
+  double arg3 ;
+  KDL::doubleVel result;
+  
+  arg1 = (KDL::doubleVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::doubleVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::doubleVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::doubleVel const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = KDL::addDelta((Rall1d< double > const &)*arg1,(Rall1d< double > const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::doubleVel((const KDL::doubleVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_addDelta__SWIG_12(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::doubleVel *arg1 = 0 ;
+  KDL::doubleVel *arg2 = 0 ;
+  KDL::doubleVel result;
+  
+  arg1 = (KDL::doubleVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::doubleVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::doubleVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::doubleVel const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = KDL::addDelta((Rall1d< double > const &)*arg1,(Rall1d< double > const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::doubleVel((const KDL::doubleVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_random__SWIG_1(void * jarg1) {
+  KDL::doubleVel *arg1 = 0 ;
+  
+  arg1 = (KDL::doubleVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::doubleVel & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::random(*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_posrandom__SWIG_1(void * jarg1) {
+  KDL::doubleVel *arg1 = 0 ;
+  
+  arg1 = (KDL::doubleVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::doubleVel & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::posrandom(*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_18(void * jarg1, void * jarg2, double jarg3) {
+  unsigned int jresult ;
+  KDL::VectorVel *arg1 = 0 ;
+  KDL::VectorVel *arg2 = 0 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (KDL::VectorVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::VectorVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorVel const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::VectorVel const &)*arg1,(KDL::VectorVel const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_19(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
+  KDL::VectorVel *arg1 = 0 ;
+  KDL::VectorVel *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::VectorVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::VectorVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorVel const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::VectorVel const &)*arg1,(KDL::VectorVel const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_20(void * jarg1, void * jarg2, double jarg3) {
+  unsigned int jresult ;
+  KDL::Vector *arg1 = 0 ;
+  KDL::VectorVel *arg2 = 0 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (KDL::Vector *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::VectorVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorVel const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::Vector const &)*arg1,(KDL::VectorVel const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_21(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
+  KDL::Vector *arg1 = 0 ;
+  KDL::VectorVel *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::Vector *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::VectorVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorVel const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::Vector const &)*arg1,(KDL::VectorVel const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_22(void * jarg1, void * jarg2, double jarg3) {
+  unsigned int jresult ;
+  KDL::VectorVel *arg1 = 0 ;
+  KDL::Vector *arg2 = 0 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (KDL::VectorVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::VectorVel const &)*arg1,(KDL::Vector const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_23(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
+  KDL::VectorVel *arg1 = 0 ;
+  KDL::Vector *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::VectorVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::VectorVel const &)*arg1,(KDL::Vector const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_24(void * jarg1, void * jarg2, double jarg3) {
+  unsigned int jresult ;
+  KDL::RotationVel *arg1 = 0 ;
+  KDL::RotationVel *arg2 = 0 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (KDL::RotationVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::RotationVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::RotationVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::RotationVel const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::RotationVel const &)*arg1,(KDL::RotationVel const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_25(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
+  KDL::RotationVel *arg1 = 0 ;
+  KDL::RotationVel *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::RotationVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::RotationVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::RotationVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::RotationVel const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::RotationVel const &)*arg1,(KDL::RotationVel const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_26(void * jarg1, void * jarg2, double jarg3) {
+  unsigned int jresult ;
+  KDL::Rotation *arg1 = 0 ;
+  KDL::RotationVel *arg2 = 0 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (KDL::Rotation *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Rotation const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::RotationVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::RotationVel const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::Rotation const &)*arg1,(KDL::RotationVel const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_27(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
+  KDL::Rotation *arg1 = 0 ;
+  KDL::RotationVel *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::Rotation *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Rotation const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::RotationVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::RotationVel const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::Rotation const &)*arg1,(KDL::RotationVel const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_28(void * jarg1, void * jarg2, double jarg3) {
+  unsigned int jresult ;
+  KDL::RotationVel *arg1 = 0 ;
+  KDL::Rotation *arg2 = 0 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (KDL::RotationVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::RotationVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Rotation *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Rotation const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::RotationVel const &)*arg1,(KDL::Rotation const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_29(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
+  KDL::RotationVel *arg1 = 0 ;
+  KDL::Rotation *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::RotationVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::RotationVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Rotation *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Rotation const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::RotationVel const &)*arg1,(KDL::Rotation const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_30(void * jarg1, void * jarg2, double jarg3) {
+  unsigned int jresult ;
+  KDL::FrameVel *arg1 = 0 ;
+  KDL::FrameVel *arg2 = 0 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (KDL::FrameVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::FrameVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameVel const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::FrameVel const &)*arg1,(KDL::FrameVel const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_31(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
+  KDL::FrameVel *arg1 = 0 ;
+  KDL::FrameVel *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::FrameVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::FrameVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameVel const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::FrameVel const &)*arg1,(KDL::FrameVel const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_32(void * jarg1, void * jarg2, double jarg3) {
+  unsigned int jresult ;
+  KDL::Frame *arg1 = 0 ;
+  KDL::FrameVel *arg2 = 0 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (KDL::Frame *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::FrameVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameVel const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::Frame const &)*arg1,(KDL::FrameVel const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_33(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
+  KDL::Frame *arg1 = 0 ;
+  KDL::FrameVel *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::Frame *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::FrameVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameVel const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::Frame const &)*arg1,(KDL::FrameVel const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_34(void * jarg1, void * jarg2, double jarg3) {
+  unsigned int jresult ;
+  KDL::FrameVel *arg1 = 0 ;
+  KDL::Frame *arg2 = 0 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (KDL::FrameVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Frame *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::FrameVel const &)*arg1,(KDL::Frame const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_35(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
+  KDL::FrameVel *arg1 = 0 ;
+  KDL::Frame *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::FrameVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Frame *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::FrameVel const &)*arg1,(KDL::Frame const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_36(void * jarg1, void * jarg2, double jarg3) {
+  unsigned int jresult ;
+  KDL::TwistVel *arg1 = 0 ;
+  KDL::TwistVel *arg2 = 0 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (KDL::TwistVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::TwistVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::TwistVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::TwistVel const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::TwistVel const &)*arg1,(KDL::TwistVel const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_37(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
+  KDL::TwistVel *arg1 = 0 ;
+  KDL::TwistVel *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::TwistVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::TwistVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::TwistVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::TwistVel const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::TwistVel const &)*arg1,(KDL::TwistVel const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_38(void * jarg1, void * jarg2, double jarg3) {
+  unsigned int jresult ;
+  KDL::Twist *arg1 = 0 ;
+  KDL::TwistVel *arg2 = 0 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (KDL::Twist *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::TwistVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::TwistVel const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::Twist const &)*arg1,(KDL::TwistVel const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_39(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
+  KDL::Twist *arg1 = 0 ;
+  KDL::TwistVel *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::Twist *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::TwistVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::TwistVel const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::Twist const &)*arg1,(KDL::TwistVel const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_40(void * jarg1, void * jarg2, double jarg3) {
+  unsigned int jresult ;
+  KDL::TwistVel *arg1 = 0 ;
+  KDL::Twist *arg2 = 0 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (KDL::TwistVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::TwistVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Twist *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::TwistVel const &)*arg1,(KDL::Twist const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_41(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
+  KDL::TwistVel *arg1 = 0 ;
+  KDL::Twist *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::TwistVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::TwistVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Twist *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::TwistVel const &)*arg1,(KDL::Twist const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_VectorVel_p_set(void * jarg1, void * jarg2) {
+  KDL::VectorVel *arg1 = (KDL::VectorVel *) 0 ;
+  KDL::Vector *arg2 = (KDL::Vector *) 0 ;
+  
+  arg1 = (KDL::VectorVel *)jarg1; 
+  arg2 = (KDL::Vector *)jarg2; 
+  {
+    try {
+      if (arg1) (arg1)->p = *arg2;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_VectorVel_p_get(void * jarg1) {
+  void * jresult ;
+  KDL::VectorVel *arg1 = (KDL::VectorVel *) 0 ;
+  KDL::Vector *result = 0 ;
+  
+  arg1 = (KDL::VectorVel *)jarg1; 
+  {
+    try {
+      result = (KDL::Vector *)& ((arg1)->p);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_VectorVel_v_set(void * jarg1, void * jarg2) {
+  KDL::VectorVel *arg1 = (KDL::VectorVel *) 0 ;
+  KDL::Vector *arg2 = (KDL::Vector *) 0 ;
+  
+  arg1 = (KDL::VectorVel *)jarg1; 
+  arg2 = (KDL::Vector *)jarg2; 
+  {
+    try {
+      if (arg1) (arg1)->v = *arg2;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_VectorVel_v_get(void * jarg1) {
+  void * jresult ;
+  KDL::VectorVel *arg1 = (KDL::VectorVel *) 0 ;
+  KDL::Vector *result = 0 ;
+  
+  arg1 = (KDL::VectorVel *)jarg1; 
+  {
+    try {
+      result = (KDL::Vector *)& ((arg1)->v);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_VectorVel__SWIG_0() {
+  void * jresult ;
+  KDL::VectorVel *result = 0 ;
+  
+  {
+    try {
+      result = (KDL::VectorVel *)new KDL::VectorVel();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_VectorVel__SWIG_1(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::Vector *arg1 = 0 ;
+  KDL::Vector *arg2 = 0 ;
+  KDL::VectorVel *result = 0 ;
+  
+  arg1 = (KDL::Vector *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::VectorVel *)new KDL::VectorVel((KDL::Vector const &)*arg1,(KDL::Vector const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_VectorVel__SWIG_2(void * jarg1) {
+  void * jresult ;
+  KDL::Vector *arg1 = 0 ;
+  KDL::VectorVel *result = 0 ;
+  
+  arg1 = (KDL::Vector *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::VectorVel *)new KDL::VectorVel((KDL::Vector const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_VectorVel_value(void * jarg1) {
+  void * jresult ;
+  KDL::VectorVel *arg1 = (KDL::VectorVel *) 0 ;
+  KDL::Vector result;
+  
+  arg1 = (KDL::VectorVel *)jarg1; 
+  {
+    try {
+      result = ((KDL::VectorVel const *)arg1)->value();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Vector((const KDL::Vector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_VectorVel_deriv(void * jarg1) {
+  void * jresult ;
+  KDL::VectorVel *arg1 = (KDL::VectorVel *) 0 ;
+  KDL::Vector result;
+  
+  arg1 = (KDL::VectorVel *)jarg1; 
+  {
+    try {
+      result = ((KDL::VectorVel const *)arg1)->deriv();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Vector((const KDL::Vector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_VectorVel_Zero() {
+  void * jresult ;
+  KDL::VectorVel result;
+  
+  {
+    try {
+      result = KDL::VectorVel::Zero();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::VectorVel((const KDL::VectorVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_VectorVel_ReverseSign(void * jarg1) {
+  KDL::VectorVel *arg1 = (KDL::VectorVel *) 0 ;
+  
+  arg1 = (KDL::VectorVel *)jarg1; 
+  {
+    try {
+      (arg1)->ReverseSign();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_VectorVel_Norm(void * jarg1) {
+  void * jresult ;
+  KDL::VectorVel *arg1 = (KDL::VectorVel *) 0 ;
+  KDL::doubleVel result;
+  
+  arg1 = (KDL::VectorVel *)jarg1; 
+  {
+    try {
+      result = ((KDL::VectorVel const *)arg1)->Norm();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::doubleVel((const KDL::doubleVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_VectorVel(void * jarg1) {
+  KDL::VectorVel *arg1 = (KDL::VectorVel *) 0 ;
+  
+  arg1 = (KDL::VectorVel *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_RotationVel_R_set(void * jarg1, void * jarg2) {
+  KDL::RotationVel *arg1 = (KDL::RotationVel *) 0 ;
+  KDL::Rotation *arg2 = (KDL::Rotation *) 0 ;
+  
+  arg1 = (KDL::RotationVel *)jarg1; 
+  arg2 = (KDL::Rotation *)jarg2; 
+  {
+    try {
+      if (arg1) (arg1)->R = *arg2;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_RotationVel_R_get(void * jarg1) {
+  void * jresult ;
+  KDL::RotationVel *arg1 = (KDL::RotationVel *) 0 ;
+  KDL::Rotation *result = 0 ;
+  
+  arg1 = (KDL::RotationVel *)jarg1; 
+  {
+    try {
+      result = (KDL::Rotation *)& ((arg1)->R);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_RotationVel_w_set(void * jarg1, void * jarg2) {
+  KDL::RotationVel *arg1 = (KDL::RotationVel *) 0 ;
+  KDL::Vector *arg2 = (KDL::Vector *) 0 ;
+  
+  arg1 = (KDL::RotationVel *)jarg1; 
+  arg2 = (KDL::Vector *)jarg2; 
+  {
+    try {
+      if (arg1) (arg1)->w = *arg2;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_RotationVel_w_get(void * jarg1) {
+  void * jresult ;
+  KDL::RotationVel *arg1 = (KDL::RotationVel *) 0 ;
+  KDL::Vector *result = 0 ;
+  
+  arg1 = (KDL::RotationVel *)jarg1; 
+  {
+    try {
+      result = (KDL::Vector *)& ((arg1)->w);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_RotationVel__SWIG_0() {
+  void * jresult ;
+  KDL::RotationVel *result = 0 ;
+  
+  {
+    try {
+      result = (KDL::RotationVel *)new KDL::RotationVel();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_RotationVel__SWIG_1(void * jarg1) {
+  void * jresult ;
+  KDL::Rotation *arg1 = 0 ;
+  KDL::RotationVel *result = 0 ;
+  
+  arg1 = (KDL::Rotation *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Rotation const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::RotationVel *)new KDL::RotationVel((KDL::Rotation const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_RotationVel__SWIG_2(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::Rotation *arg1 = 0 ;
+  KDL::Vector *arg2 = 0 ;
+  KDL::RotationVel *result = 0 ;
+  
+  arg1 = (KDL::Rotation *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Rotation const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::RotationVel *)new KDL::RotationVel((KDL::Rotation const &)*arg1,(KDL::Vector const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_RotationVel_value(void * jarg1) {
+  void * jresult ;
+  KDL::RotationVel *arg1 = (KDL::RotationVel *) 0 ;
+  KDL::Rotation result;
+  
+  arg1 = (KDL::RotationVel *)jarg1; 
+  {
+    try {
+      result = ((KDL::RotationVel const *)arg1)->value();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Rotation((const KDL::Rotation &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_RotationVel_deriv(void * jarg1) {
+  void * jresult ;
+  KDL::RotationVel *arg1 = (KDL::RotationVel *) 0 ;
+  KDL::Vector result;
+  
+  arg1 = (KDL::RotationVel *)jarg1; 
+  {
+    try {
+      result = ((KDL::RotationVel const *)arg1)->deriv();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Vector((const KDL::Vector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_RotationVel_UnitX(void * jarg1) {
+  void * jresult ;
+  KDL::RotationVel *arg1 = (KDL::RotationVel *) 0 ;
+  KDL::VectorVel result;
+  
+  arg1 = (KDL::RotationVel *)jarg1; 
+  {
+    try {
+      result = ((KDL::RotationVel const *)arg1)->UnitX();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::VectorVel((const KDL::VectorVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_RotationVel_UnitY(void * jarg1) {
+  void * jresult ;
+  KDL::RotationVel *arg1 = (KDL::RotationVel *) 0 ;
+  KDL::VectorVel result;
+  
+  arg1 = (KDL::RotationVel *)jarg1; 
+  {
+    try {
+      result = ((KDL::RotationVel const *)arg1)->UnitY();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::VectorVel((const KDL::VectorVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_RotationVel_UnitZ(void * jarg1) {
+  void * jresult ;
+  KDL::RotationVel *arg1 = (KDL::RotationVel *) 0 ;
+  KDL::VectorVel result;
+  
+  arg1 = (KDL::RotationVel *)jarg1; 
+  {
+    try {
+      result = ((KDL::RotationVel const *)arg1)->UnitZ();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::VectorVel((const KDL::VectorVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_RotationVel_Identity() {
+  void * jresult ;
+  KDL::RotationVel result;
+  
+  {
+    try {
+      result = KDL::RotationVel::Identity();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::RotationVel((const KDL::RotationVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_RotationVel_Inverse__SWIG_0(void * jarg1) {
+  void * jresult ;
+  KDL::RotationVel *arg1 = (KDL::RotationVel *) 0 ;
+  KDL::RotationVel result;
+  
+  arg1 = (KDL::RotationVel *)jarg1; 
+  {
+    try {
+      result = ((KDL::RotationVel const *)arg1)->Inverse();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::RotationVel((const KDL::RotationVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_RotationVel_Inverse__SWIG_1(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::RotationVel *arg1 = (KDL::RotationVel *) 0 ;
+  KDL::VectorVel *arg2 = 0 ;
+  KDL::VectorVel result;
+  
+  arg1 = (KDL::RotationVel *)jarg1; 
+  arg2 = (KDL::VectorVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorVel const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = ((KDL::RotationVel const *)arg1)->Inverse((KDL::VectorVel const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::VectorVel((const KDL::VectorVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_RotationVel_Inverse__SWIG_2(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::RotationVel *arg1 = (KDL::RotationVel *) 0 ;
+  KDL::Vector *arg2 = 0 ;
+  KDL::VectorVel result;
+  
+  arg1 = (KDL::RotationVel *)jarg1; 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = ((KDL::RotationVel const *)arg1)->Inverse((KDL::Vector const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::VectorVel((const KDL::VectorVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_RotationVel_DoRotX(void * jarg1, void * jarg2) {
+  KDL::RotationVel *arg1 = (KDL::RotationVel *) 0 ;
+  KDL::doubleVel *arg2 = 0 ;
+  
+  arg1 = (KDL::RotationVel *)jarg1; 
+  arg2 = (KDL::doubleVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::doubleVel const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      (arg1)->DoRotX((KDL::doubleVel const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_RotationVel_DoRotY(void * jarg1, void * jarg2) {
+  KDL::RotationVel *arg1 = (KDL::RotationVel *) 0 ;
+  KDL::doubleVel *arg2 = 0 ;
+  
+  arg1 = (KDL::RotationVel *)jarg1; 
+  arg2 = (KDL::doubleVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::doubleVel const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      (arg1)->DoRotY((KDL::doubleVel const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_RotationVel_DoRotZ(void * jarg1, void * jarg2) {
+  KDL::RotationVel *arg1 = (KDL::RotationVel *) 0 ;
+  KDL::doubleVel *arg2 = 0 ;
+  
+  arg1 = (KDL::RotationVel *)jarg1; 
+  arg2 = (KDL::doubleVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::doubleVel const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      (arg1)->DoRotZ((KDL::doubleVel const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_RotationVel_RotX(void * jarg1) {
+  void * jresult ;
+  KDL::doubleVel *arg1 = 0 ;
+  KDL::RotationVel result;
+  
+  arg1 = (KDL::doubleVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::doubleVel const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = KDL::RotationVel::RotX((Rall1d< double > const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::RotationVel((const KDL::RotationVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_RotationVel_RotY(void * jarg1) {
+  void * jresult ;
+  KDL::doubleVel *arg1 = 0 ;
+  KDL::RotationVel result;
+  
+  arg1 = (KDL::doubleVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::doubleVel const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = KDL::RotationVel::RotY((Rall1d< double > const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::RotationVel((const KDL::RotationVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_RotationVel_RotZ(void * jarg1) {
+  void * jresult ;
+  KDL::doubleVel *arg1 = 0 ;
+  KDL::RotationVel result;
+  
+  arg1 = (KDL::doubleVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::doubleVel const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = KDL::RotationVel::RotZ((Rall1d< double > const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::RotationVel((const KDL::RotationVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_RotationVel_Rot(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::Vector *arg1 = 0 ;
+  KDL::doubleVel *arg2 = 0 ;
+  KDL::RotationVel result;
+  
+  arg1 = (KDL::Vector *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::doubleVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::doubleVel const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = KDL::RotationVel::Rot((KDL::Vector const &)*arg1,(Rall1d< double > const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::RotationVel((const KDL::RotationVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_RotationVel_Rot2(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::Vector *arg1 = 0 ;
+  KDL::doubleVel *arg2 = 0 ;
+  KDL::RotationVel result;
+  
+  arg1 = (KDL::Vector *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::doubleVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::doubleVel const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = KDL::RotationVel::Rot2((KDL::Vector const &)*arg1,(Rall1d< double > const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::RotationVel((const KDL::RotationVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_RotationVel_Inverse__SWIG_3(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::RotationVel *arg1 = (KDL::RotationVel *) 0 ;
+  KDL::TwistVel *arg2 = 0 ;
+  KDL::TwistVel result;
+  
+  arg1 = (KDL::RotationVel *)jarg1; 
+  arg2 = (KDL::TwistVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::TwistVel const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = ((KDL::RotationVel const *)arg1)->Inverse((KDL::TwistVel const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::TwistVel((const KDL::TwistVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_RotationVel_Inverse__SWIG_4(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::RotationVel *arg1 = (KDL::RotationVel *) 0 ;
+  KDL::Twist *arg2 = 0 ;
+  KDL::TwistVel result;
+  
+  arg1 = (KDL::RotationVel *)jarg1; 
+  arg2 = (KDL::Twist *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = ((KDL::RotationVel const *)arg1)->Inverse((KDL::Twist const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::TwistVel((const KDL::TwistVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_RotationVel(void * jarg1) {
+  KDL::RotationVel *arg1 = (KDL::RotationVel *) 0 ;
+  
+  arg1 = (KDL::RotationVel *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameVel_M_set(void * jarg1, void * jarg2) {
+  KDL::FrameVel *arg1 = (KDL::FrameVel *) 0 ;
+  KDL::RotationVel *arg2 = (KDL::RotationVel *) 0 ;
+  
+  arg1 = (KDL::FrameVel *)jarg1; 
+  arg2 = (KDL::RotationVel *)jarg2; 
+  {
+    try {
+      if (arg1) (arg1)->M = *arg2;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_FrameVel_M_get(void * jarg1) {
+  void * jresult ;
+  KDL::FrameVel *arg1 = (KDL::FrameVel *) 0 ;
+  KDL::RotationVel *result = 0 ;
+  
+  arg1 = (KDL::FrameVel *)jarg1; 
+  {
+    try {
+      result = (KDL::RotationVel *)& ((arg1)->M);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameVel_p_set(void * jarg1, void * jarg2) {
+  KDL::FrameVel *arg1 = (KDL::FrameVel *) 0 ;
+  KDL::VectorVel *arg2 = (KDL::VectorVel *) 0 ;
+  
+  arg1 = (KDL::FrameVel *)jarg1; 
+  arg2 = (KDL::VectorVel *)jarg2; 
+  {
+    try {
+      if (arg1) (arg1)->p = *arg2;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_FrameVel_p_get(void * jarg1) {
+  void * jresult ;
+  KDL::FrameVel *arg1 = (KDL::FrameVel *) 0 ;
+  KDL::VectorVel *result = 0 ;
+  
+  arg1 = (KDL::FrameVel *)jarg1; 
+  {
+    try {
+      result = (KDL::VectorVel *)& ((arg1)->p);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_FrameVel__SWIG_0() {
+  void * jresult ;
+  KDL::FrameVel *result = 0 ;
+  
+  {
+    try {
+      result = (KDL::FrameVel *)new KDL::FrameVel();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_FrameVel__SWIG_1(void * jarg1) {
+  void * jresult ;
+  KDL::Frame *arg1 = 0 ;
+  KDL::FrameVel *result = 0 ;
+  
+  arg1 = (KDL::Frame *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::FrameVel *)new KDL::FrameVel((KDL::Frame const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_FrameVel__SWIG_2(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::Frame *arg1 = 0 ;
+  KDL::Twist *arg2 = 0 ;
+  KDL::FrameVel *result = 0 ;
+  
+  arg1 = (KDL::Frame *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Twist *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::FrameVel *)new KDL::FrameVel((KDL::Frame const &)*arg1,(KDL::Twist const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_FrameVel__SWIG_3(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::RotationVel *arg1 = 0 ;
+  KDL::VectorVel *arg2 = 0 ;
+  KDL::FrameVel *result = 0 ;
+  
+  arg1 = (KDL::RotationVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::RotationVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::VectorVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorVel const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::FrameVel *)new KDL::FrameVel((KDL::RotationVel const &)*arg1,(KDL::VectorVel const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_FrameVel_value(void * jarg1) {
+  void * jresult ;
+  KDL::FrameVel *arg1 = (KDL::FrameVel *) 0 ;
+  KDL::Frame result;
+  
+  arg1 = (KDL::FrameVel *)jarg1; 
+  {
+    try {
+      result = ((KDL::FrameVel const *)arg1)->value();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Frame((const KDL::Frame &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_FrameVel_deriv(void * jarg1) {
+  void * jresult ;
+  KDL::FrameVel *arg1 = (KDL::FrameVel *) 0 ;
+  KDL::Twist result;
+  
+  arg1 = (KDL::FrameVel *)jarg1; 
+  {
+    try {
+      result = ((KDL::FrameVel const *)arg1)->deriv();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Twist((const KDL::Twist &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_FrameVel_Identity() {
+  void * jresult ;
+  KDL::FrameVel result;
+  
+  {
+    try {
+      result = KDL::FrameVel::Identity();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::FrameVel((const KDL::FrameVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_FrameVel_Inverse__SWIG_0(void * jarg1) {
+  void * jresult ;
+  KDL::FrameVel *arg1 = (KDL::FrameVel *) 0 ;
+  KDL::FrameVel result;
+  
+  arg1 = (KDL::FrameVel *)jarg1; 
+  {
+    try {
+      result = ((KDL::FrameVel const *)arg1)->Inverse();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::FrameVel((const KDL::FrameVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_FrameVel_Inverse__SWIG_1(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::FrameVel *arg1 = (KDL::FrameVel *) 0 ;
+  KDL::VectorVel *arg2 = 0 ;
+  KDL::VectorVel result;
+  
+  arg1 = (KDL::FrameVel *)jarg1; 
+  arg2 = (KDL::VectorVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorVel const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = ((KDL::FrameVel const *)arg1)->Inverse((KDL::VectorVel const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::VectorVel((const KDL::VectorVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_FrameVel_Inverse__SWIG_2(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::FrameVel *arg1 = (KDL::FrameVel *) 0 ;
+  KDL::Vector *arg2 = 0 ;
+  KDL::VectorVel result;
+  
+  arg1 = (KDL::FrameVel *)jarg1; 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = ((KDL::FrameVel const *)arg1)->Inverse((KDL::Vector const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::VectorVel((const KDL::VectorVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_FrameVel_GetFrame(void * jarg1) {
+  void * jresult ;
+  KDL::FrameVel *arg1 = (KDL::FrameVel *) 0 ;
+  KDL::Frame result;
+  
+  arg1 = (KDL::FrameVel *)jarg1; 
+  {
+    try {
+      result = ((KDL::FrameVel const *)arg1)->GetFrame();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Frame((const KDL::Frame &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_FrameVel_GetTwist(void * jarg1) {
+  void * jresult ;
+  KDL::FrameVel *arg1 = (KDL::FrameVel *) 0 ;
+  KDL::Twist result;
+  
+  arg1 = (KDL::FrameVel *)jarg1; 
+  {
+    try {
+      result = ((KDL::FrameVel const *)arg1)->GetTwist();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Twist((const KDL::Twist &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_FrameVel_Inverse__SWIG_3(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::FrameVel *arg1 = (KDL::FrameVel *) 0 ;
+  KDL::TwistVel *arg2 = 0 ;
+  KDL::TwistVel result;
+  
+  arg1 = (KDL::FrameVel *)jarg1; 
+  arg2 = (KDL::TwistVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::TwistVel const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = ((KDL::FrameVel const *)arg1)->Inverse((KDL::TwistVel const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::TwistVel((const KDL::TwistVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_FrameVel_Inverse__SWIG_4(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::FrameVel *arg1 = (KDL::FrameVel *) 0 ;
+  KDL::Twist *arg2 = 0 ;
+  KDL::TwistVel result;
+  
+  arg1 = (KDL::FrameVel *)jarg1; 
+  arg2 = (KDL::Twist *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = ((KDL::FrameVel const *)arg1)->Inverse((KDL::Twist const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::TwistVel((const KDL::TwistVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_FrameVel(void * jarg1) {
+  KDL::FrameVel *arg1 = (KDL::FrameVel *) 0 ;
+  
+  arg1 = (KDL::FrameVel *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_TwistVel_vel_set(void * jarg1, void * jarg2) {
+  KDL::TwistVel *arg1 = (KDL::TwistVel *) 0 ;
+  KDL::VectorVel *arg2 = (KDL::VectorVel *) 0 ;
+  
+  arg1 = (KDL::TwistVel *)jarg1; 
+  arg2 = (KDL::VectorVel *)jarg2; 
+  {
+    try {
+      if (arg1) (arg1)->vel = *arg2;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_TwistVel_vel_get(void * jarg1) {
+  void * jresult ;
+  KDL::TwistVel *arg1 = (KDL::TwistVel *) 0 ;
+  KDL::VectorVel *result = 0 ;
+  
+  arg1 = (KDL::TwistVel *)jarg1; 
+  {
+    try {
+      result = (KDL::VectorVel *)& ((arg1)->vel);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_TwistVel_rot_set(void * jarg1, void * jarg2) {
+  KDL::TwistVel *arg1 = (KDL::TwistVel *) 0 ;
+  KDL::VectorVel *arg2 = (KDL::VectorVel *) 0 ;
+  
+  arg1 = (KDL::TwistVel *)jarg1; 
+  arg2 = (KDL::VectorVel *)jarg2; 
+  {
+    try {
+      if (arg1) (arg1)->rot = *arg2;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_TwistVel_rot_get(void * jarg1) {
+  void * jresult ;
+  KDL::TwistVel *arg1 = (KDL::TwistVel *) 0 ;
+  KDL::VectorVel *result = 0 ;
+  
+  arg1 = (KDL::TwistVel *)jarg1; 
+  {
+    try {
+      result = (KDL::VectorVel *)& ((arg1)->rot);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_TwistVel__SWIG_0() {
+  void * jresult ;
+  KDL::TwistVel *result = 0 ;
+  
+  {
+    try {
+      result = (KDL::TwistVel *)new KDL::TwistVel();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_TwistVel__SWIG_1(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::VectorVel *arg1 = 0 ;
+  KDL::VectorVel *arg2 = 0 ;
+  KDL::TwistVel *result = 0 ;
+  
+  arg1 = (KDL::VectorVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::VectorVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorVel const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::TwistVel *)new KDL::TwistVel((KDL::VectorVel const &)*arg1,(KDL::VectorVel const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_TwistVel__SWIG_2(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::Twist *arg1 = 0 ;
+  KDL::Twist *arg2 = 0 ;
+  KDL::TwistVel *result = 0 ;
+  
+  arg1 = (KDL::Twist *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Twist *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::TwistVel *)new KDL::TwistVel((KDL::Twist const &)*arg1,(KDL::Twist const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_TwistVel__SWIG_3(void * jarg1) {
+  void * jresult ;
+  KDL::Twist *arg1 = 0 ;
+  KDL::TwistVel *result = 0 ;
+  
+  arg1 = (KDL::Twist *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::TwistVel *)new KDL::TwistVel((KDL::Twist const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_TwistVel_value(void * jarg1) {
+  void * jresult ;
+  KDL::TwistVel *arg1 = (KDL::TwistVel *) 0 ;
+  KDL::Twist result;
+  
+  arg1 = (KDL::TwistVel *)jarg1; 
+  {
+    try {
+      result = ((KDL::TwistVel const *)arg1)->value();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Twist((const KDL::Twist &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_TwistVel_deriv(void * jarg1) {
+  void * jresult ;
+  KDL::TwistVel *arg1 = (KDL::TwistVel *) 0 ;
+  KDL::Twist result;
+  
+  arg1 = (KDL::TwistVel *)jarg1; 
+  {
+    try {
+      result = ((KDL::TwistVel const *)arg1)->deriv();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Twist((const KDL::Twist &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_TwistVel_Zero() {
+  void * jresult ;
+  KDL::TwistVel result;
+  
+  {
+    try {
+      result = KDL::TwistVel::Zero();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::TwistVel((const KDL::TwistVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_TwistVel_ReverseSign(void * jarg1) {
+  KDL::TwistVel *arg1 = (KDL::TwistVel *) 0 ;
+  
+  arg1 = (KDL::TwistVel *)jarg1; 
+  {
+    try {
+      (arg1)->ReverseSign();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_TwistVel_RefPoint(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::TwistVel *arg1 = (KDL::TwistVel *) 0 ;
+  KDL::VectorVel *arg2 = 0 ;
+  KDL::TwistVel result;
+  
+  arg1 = (KDL::TwistVel *)jarg1; 
+  arg2 = (KDL::VectorVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorVel const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (arg1)->RefPoint((KDL::VectorVel const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::TwistVel((const KDL::TwistVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_TwistVel_GetTwist(void * jarg1) {
+  void * jresult ;
+  KDL::TwistVel *arg1 = (KDL::TwistVel *) 0 ;
+  KDL::Twist result;
+  
+  arg1 = (KDL::TwistVel *)jarg1; 
+  {
+    try {
+      result = ((KDL::TwistVel const *)arg1)->GetTwist();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Twist((const KDL::Twist &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_TwistVel_GetTwistDot(void * jarg1) {
+  void * jresult ;
+  KDL::TwistVel *arg1 = (KDL::TwistVel *) 0 ;
+  KDL::Twist result;
+  
+  arg1 = (KDL::TwistVel *)jarg1; 
+  {
+    try {
+      result = ((KDL::TwistVel const *)arg1)->GetTwistDot();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Twist((const KDL::Twist &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_TwistVel(void * jarg1) {
+  KDL::TwistVel *arg1 = (KDL::TwistVel *) 0 ;
+  
+  arg1 = (KDL::TwistVel *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_diff__SWIG_13(void * jarg1, void * jarg2, double jarg3) {
+  void * jresult ;
+  KDL::VectorVel *arg1 = 0 ;
+  KDL::VectorVel *arg2 = 0 ;
+  double arg3 ;
+  KDL::VectorVel result;
+  
+  arg1 = (KDL::VectorVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::VectorVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorVel const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = KDL::diff((KDL::VectorVel const &)*arg1,(KDL::VectorVel const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::VectorVel((const KDL::VectorVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_diff__SWIG_14(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::VectorVel *arg1 = 0 ;
+  KDL::VectorVel *arg2 = 0 ;
+  KDL::VectorVel result;
+  
+  arg1 = (KDL::VectorVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::VectorVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorVel const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = KDL::diff((KDL::VectorVel const &)*arg1,(KDL::VectorVel const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::VectorVel((const KDL::VectorVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_addDelta__SWIG_13(void * jarg1, void * jarg2, double jarg3) {
+  void * jresult ;
+  KDL::VectorVel *arg1 = 0 ;
+  KDL::VectorVel *arg2 = 0 ;
+  double arg3 ;
+  KDL::VectorVel result;
+  
+  arg1 = (KDL::VectorVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::VectorVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorVel const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = KDL::addDelta((KDL::VectorVel const &)*arg1,(KDL::VectorVel const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::VectorVel((const KDL::VectorVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_addDelta__SWIG_14(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::VectorVel *arg1 = 0 ;
+  KDL::VectorVel *arg2 = 0 ;
+  KDL::VectorVel result;
+  
+  arg1 = (KDL::VectorVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::VectorVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorVel const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = KDL::addDelta((KDL::VectorVel const &)*arg1,(KDL::VectorVel const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::VectorVel((const KDL::VectorVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_diff__SWIG_15(void * jarg1, void * jarg2, double jarg3) {
+  void * jresult ;
+  KDL::RotationVel *arg1 = 0 ;
+  KDL::RotationVel *arg2 = 0 ;
+  double arg3 ;
+  KDL::VectorVel result;
+  
+  arg1 = (KDL::RotationVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::RotationVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::RotationVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::RotationVel const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = KDL::diff((KDL::RotationVel const &)*arg1,(KDL::RotationVel const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::VectorVel((const KDL::VectorVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_diff__SWIG_16(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::RotationVel *arg1 = 0 ;
+  KDL::RotationVel *arg2 = 0 ;
+  KDL::VectorVel result;
+  
+  arg1 = (KDL::RotationVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::RotationVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::RotationVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::RotationVel const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = KDL::diff((KDL::RotationVel const &)*arg1,(KDL::RotationVel const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::VectorVel((const KDL::VectorVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_addDelta__SWIG_15(void * jarg1, void * jarg2, double jarg3) {
+  void * jresult ;
+  KDL::RotationVel *arg1 = 0 ;
+  KDL::VectorVel *arg2 = 0 ;
+  double arg3 ;
+  KDL::RotationVel result;
+  
+  arg1 = (KDL::RotationVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::RotationVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::VectorVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorVel const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = KDL::addDelta((KDL::RotationVel const &)*arg1,(KDL::VectorVel const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::RotationVel((const KDL::RotationVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_addDelta__SWIG_16(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::RotationVel *arg1 = 0 ;
+  KDL::VectorVel *arg2 = 0 ;
+  KDL::RotationVel result;
+  
+  arg1 = (KDL::RotationVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::RotationVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::VectorVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorVel const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = KDL::addDelta((KDL::RotationVel const &)*arg1,(KDL::VectorVel const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::RotationVel((const KDL::RotationVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_diff__SWIG_17(void * jarg1, void * jarg2, double jarg3) {
+  void * jresult ;
+  KDL::FrameVel *arg1 = 0 ;
+  KDL::FrameVel *arg2 = 0 ;
+  double arg3 ;
+  KDL::TwistVel result;
+  
+  arg1 = (KDL::FrameVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::FrameVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameVel const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = KDL::diff((KDL::FrameVel const &)*arg1,(KDL::FrameVel const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::TwistVel((const KDL::TwistVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_diff__SWIG_18(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::FrameVel *arg1 = 0 ;
+  KDL::FrameVel *arg2 = 0 ;
+  KDL::TwistVel result;
+  
+  arg1 = (KDL::FrameVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::FrameVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameVel const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = KDL::diff((KDL::FrameVel const &)*arg1,(KDL::FrameVel const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::TwistVel((const KDL::TwistVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_addDelta__SWIG_17(void * jarg1, void * jarg2, double jarg3) {
+  void * jresult ;
+  KDL::FrameVel *arg1 = 0 ;
+  KDL::TwistVel *arg2 = 0 ;
+  double arg3 ;
+  KDL::FrameVel result;
+  
+  arg1 = (KDL::FrameVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::TwistVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::TwistVel const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = KDL::addDelta((KDL::FrameVel const &)*arg1,(KDL::TwistVel const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::FrameVel((const KDL::FrameVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_addDelta__SWIG_18(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::FrameVel *arg1 = 0 ;
+  KDL::TwistVel *arg2 = 0 ;
+  KDL::FrameVel result;
+  
+  arg1 = (KDL::FrameVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::TwistVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::TwistVel const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = KDL::addDelta((KDL::FrameVel const &)*arg1,(KDL::TwistVel const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::FrameVel((const KDL::FrameVel &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_random__SWIG_2(void * jarg1) {
+  KDL::VectorVel *arg1 = 0 ;
+  
+  arg1 = (KDL::VectorVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorVel & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::random(*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_random__SWIG_3(void * jarg1) {
+  KDL::TwistVel *arg1 = 0 ;
+  
+  arg1 = (KDL::TwistVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::TwistVel & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::random(*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_random__SWIG_4(void * jarg1) {
+  KDL::RotationVel *arg1 = 0 ;
+  
+  arg1 = (KDL::RotationVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::RotationVel & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::random(*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_random__SWIG_5(void * jarg1) {
+  KDL::FrameVel *arg1 = 0 ;
+  
+  arg1 = (KDL::FrameVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameVel & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::random(*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_posrandom__SWIG_2(void * jarg1) {
+  KDL::VectorVel *arg1 = 0 ;
+  
+  arg1 = (KDL::VectorVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorVel & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::posrandom(*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_posrandom__SWIG_3(void * jarg1) {
+  KDL::TwistVel *arg1 = 0 ;
+  
+  arg1 = (KDL::TwistVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::TwistVel & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::posrandom(*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_posrandom__SWIG_4(void * jarg1) {
+  KDL::RotationVel *arg1 = 0 ;
+  
+  arg1 = (KDL::RotationVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::RotationVel & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::posrandom(*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_posrandom__SWIG_5(void * jarg1) {
+  KDL::FrameVel *arg1 = 0 ;
+  
+  arg1 = (KDL::FrameVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameVel & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::posrandom(*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_42(void * jarg1, void * jarg2, double jarg3) {
+  unsigned int jresult ;
+  KDL::FrameAcc *arg1 = 0 ;
+  KDL::FrameAcc *arg2 = 0 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (KDL::FrameAcc *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameAcc const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::FrameAcc *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameAcc const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::FrameAcc const &)*arg1,(KDL::FrameAcc const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_43(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
+  KDL::FrameAcc *arg1 = 0 ;
+  KDL::FrameAcc *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::FrameAcc *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameAcc const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::FrameAcc *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameAcc const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::FrameAcc const &)*arg1,(KDL::FrameAcc const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_44(void * jarg1, void * jarg2, double jarg3) {
+  unsigned int jresult ;
+  KDL::Frame *arg1 = 0 ;
+  KDL::FrameAcc *arg2 = 0 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (KDL::Frame *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::FrameAcc *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameAcc const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::Frame const &)*arg1,(KDL::FrameAcc const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_45(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
+  KDL::Frame *arg1 = 0 ;
+  KDL::FrameAcc *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::Frame *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::FrameAcc *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameAcc const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::Frame const &)*arg1,(KDL::FrameAcc const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_46(void * jarg1, void * jarg2, double jarg3) {
+  unsigned int jresult ;
+  KDL::FrameAcc *arg1 = 0 ;
+  KDL::Frame *arg2 = 0 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (KDL::FrameAcc *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameAcc const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Frame *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::FrameAcc const &)*arg1,(KDL::Frame const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_47(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
+  KDL::FrameAcc *arg1 = 0 ;
+  KDL::Frame *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::FrameAcc *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameAcc const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Frame *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::FrameAcc const &)*arg1,(KDL::Frame const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_48(void * jarg1, void * jarg2, double jarg3) {
+  unsigned int jresult ;
+  KDL::RotationAcc *arg1 = 0 ;
+  KDL::RotationAcc *arg2 = 0 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (KDL::RotationAcc *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::RotationAcc const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::RotationAcc *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::RotationAcc const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::RotationAcc const &)*arg1,(KDL::RotationAcc const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_49(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
+  KDL::RotationAcc *arg1 = 0 ;
+  KDL::RotationAcc *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::RotationAcc *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::RotationAcc const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::RotationAcc *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::RotationAcc const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::RotationAcc const &)*arg1,(KDL::RotationAcc const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_50(void * jarg1, void * jarg2, double jarg3) {
+  unsigned int jresult ;
+  KDL::Rotation *arg1 = 0 ;
+  KDL::RotationAcc *arg2 = 0 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (KDL::Rotation *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Rotation const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::RotationAcc *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::RotationAcc const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::Rotation const &)*arg1,(KDL::RotationAcc const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_51(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
+  KDL::Rotation *arg1 = 0 ;
+  KDL::RotationAcc *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::Rotation *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Rotation const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::RotationAcc *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::RotationAcc const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::Rotation const &)*arg1,(KDL::RotationAcc const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_52(void * jarg1, void * jarg2, double jarg3) {
+  unsigned int jresult ;
+  KDL::RotationAcc *arg1 = 0 ;
+  KDL::Rotation *arg2 = 0 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (KDL::RotationAcc *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::RotationAcc const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Rotation *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Rotation const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::RotationAcc const &)*arg1,(KDL::Rotation const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_53(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
+  KDL::RotationAcc *arg1 = 0 ;
+  KDL::Rotation *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::RotationAcc *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::RotationAcc const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Rotation *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Rotation const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::RotationAcc const &)*arg1,(KDL::Rotation const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_54(void * jarg1, void * jarg2, double jarg3) {
+  unsigned int jresult ;
+  KDL::TwistAcc *arg1 = 0 ;
+  KDL::TwistAcc *arg2 = 0 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (KDL::TwistAcc *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::TwistAcc const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::TwistAcc *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::TwistAcc const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::TwistAcc const &)*arg1,(KDL::TwistAcc const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_55(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
+  KDL::TwistAcc *arg1 = 0 ;
+  KDL::TwistAcc *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::TwistAcc *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::TwistAcc const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::TwistAcc *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::TwistAcc const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::TwistAcc const &)*arg1,(KDL::TwistAcc const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_56(void * jarg1, void * jarg2, double jarg3) {
+  unsigned int jresult ;
+  KDL::Twist *arg1 = 0 ;
+  KDL::TwistAcc *arg2 = 0 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (KDL::Twist *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::TwistAcc *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::TwistAcc const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::Twist const &)*arg1,(KDL::TwistAcc const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_57(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
+  KDL::Twist *arg1 = 0 ;
+  KDL::TwistAcc *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::Twist *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::TwistAcc *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::TwistAcc const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::Twist const &)*arg1,(KDL::TwistAcc const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_58(void * jarg1, void * jarg2, double jarg3) {
+  unsigned int jresult ;
+  KDL::TwistAcc *arg1 = 0 ;
+  KDL::Twist *arg2 = 0 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (KDL::TwistAcc *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::TwistAcc const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Twist *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::TwistAcc const &)*arg1,(KDL::Twist const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_59(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
+  KDL::TwistAcc *arg1 = 0 ;
+  KDL::Twist *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::TwistAcc *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::TwistAcc const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Twist *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::TwistAcc const &)*arg1,(KDL::Twist const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_60(void * jarg1, void * jarg2, double jarg3) {
+  unsigned int jresult ;
+  KDL::VectorAcc *arg1 = 0 ;
+  KDL::VectorAcc *arg2 = 0 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (KDL::VectorAcc *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorAcc const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::VectorAcc *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorAcc const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::VectorAcc const &)*arg1,(KDL::VectorAcc const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_61(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
+  KDL::VectorAcc *arg1 = 0 ;
+  KDL::VectorAcc *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::VectorAcc *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorAcc const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::VectorAcc *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorAcc const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::VectorAcc const &)*arg1,(KDL::VectorAcc const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_62(void * jarg1, void * jarg2, double jarg3) {
+  unsigned int jresult ;
+  KDL::Vector *arg1 = 0 ;
+  KDL::VectorAcc *arg2 = 0 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (KDL::Vector *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::VectorAcc *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorAcc const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::Vector const &)*arg1,(KDL::VectorAcc const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_63(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
+  KDL::Vector *arg1 = 0 ;
+  KDL::VectorAcc *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::Vector *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::VectorAcc *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorAcc const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::Vector const &)*arg1,(KDL::VectorAcc const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_64(void * jarg1, void * jarg2, double jarg3) {
+  unsigned int jresult ;
+  KDL::VectorAcc *arg1 = 0 ;
+  KDL::Vector *arg2 = 0 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (KDL::VectorAcc *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorAcc const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::VectorAcc const &)*arg1,(KDL::Vector const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_65(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
+  KDL::VectorAcc *arg1 = 0 ;
+  KDL::Vector *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::VectorAcc *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorAcc const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::VectorAcc const &)*arg1,(KDL::Vector const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_VectorAcc_p_set(void * jarg1, void * jarg2) {
+  KDL::VectorAcc *arg1 = (KDL::VectorAcc *) 0 ;
+  KDL::Vector *arg2 = (KDL::Vector *) 0 ;
+  
+  arg1 = (KDL::VectorAcc *)jarg1; 
+  arg2 = (KDL::Vector *)jarg2; 
+  {
+    try {
+      if (arg1) (arg1)->p = *arg2;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_VectorAcc_p_get(void * jarg1) {
+  void * jresult ;
+  KDL::VectorAcc *arg1 = (KDL::VectorAcc *) 0 ;
+  KDL::Vector *result = 0 ;
+  
+  arg1 = (KDL::VectorAcc *)jarg1; 
+  {
+    try {
+      result = (KDL::Vector *)& ((arg1)->p);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_VectorAcc_v_set(void * jarg1, void * jarg2) {
+  KDL::VectorAcc *arg1 = (KDL::VectorAcc *) 0 ;
+  KDL::Vector *arg2 = (KDL::Vector *) 0 ;
+  
+  arg1 = (KDL::VectorAcc *)jarg1; 
+  arg2 = (KDL::Vector *)jarg2; 
+  {
+    try {
+      if (arg1) (arg1)->v = *arg2;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_VectorAcc_v_get(void * jarg1) {
+  void * jresult ;
+  KDL::VectorAcc *arg1 = (KDL::VectorAcc *) 0 ;
+  KDL::Vector *result = 0 ;
+  
+  arg1 = (KDL::VectorAcc *)jarg1; 
+  {
+    try {
+      result = (KDL::Vector *)& ((arg1)->v);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_VectorAcc_dv_set(void * jarg1, void * jarg2) {
+  KDL::VectorAcc *arg1 = (KDL::VectorAcc *) 0 ;
+  KDL::Vector *arg2 = (KDL::Vector *) 0 ;
+  
+  arg1 = (KDL::VectorAcc *)jarg1; 
+  arg2 = (KDL::Vector *)jarg2; 
+  {
+    try {
+      if (arg1) (arg1)->dv = *arg2;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_VectorAcc_dv_get(void * jarg1) {
+  void * jresult ;
+  KDL::VectorAcc *arg1 = (KDL::VectorAcc *) 0 ;
+  KDL::Vector *result = 0 ;
+  
+  arg1 = (KDL::VectorAcc *)jarg1; 
+  {
+    try {
+      result = (KDL::Vector *)& ((arg1)->dv);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_VectorAcc__SWIG_0() {
+  void * jresult ;
+  KDL::VectorAcc *result = 0 ;
+  
+  {
+    try {
+      result = (KDL::VectorAcc *)new KDL::VectorAcc();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_VectorAcc__SWIG_1(void * jarg1) {
+  void * jresult ;
+  KDL::Vector *arg1 = 0 ;
+  KDL::VectorAcc *result = 0 ;
+  
+  arg1 = (KDL::Vector *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::VectorAcc *)new KDL::VectorAcc((KDL::Vector const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_VectorAcc__SWIG_2(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::Vector *arg1 = 0 ;
+  KDL::Vector *arg2 = 0 ;
+  KDL::VectorAcc *result = 0 ;
+  
+  arg1 = (KDL::Vector *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::VectorAcc *)new KDL::VectorAcc((KDL::Vector const &)*arg1,(KDL::Vector const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_VectorAcc__SWIG_3(void * jarg1, void * jarg2, void * jarg3) {
+  void * jresult ;
+  KDL::Vector *arg1 = 0 ;
+  KDL::Vector *arg2 = 0 ;
+  KDL::Vector *arg3 = 0 ;
+  KDL::VectorAcc *result = 0 ;
+  
+  arg1 = (KDL::Vector *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::Vector *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::VectorAcc *)new KDL::VectorAcc((KDL::Vector const &)*arg1,(KDL::Vector const &)*arg2,(KDL::Vector const &)*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_VectorAcc_Zero() {
+  void * jresult ;
+  KDL::VectorAcc result;
+  
+  {
+    try {
+      result = KDL::VectorAcc::Zero();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::VectorAcc((const KDL::VectorAcc &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_VectorAcc_ReverseSign(void * jarg1) {
+  KDL::VectorAcc *arg1 = (KDL::VectorAcc *) 0 ;
+  
+  arg1 = (KDL::VectorAcc *)jarg1; 
+  {
+    try {
+      (arg1)->ReverseSign();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_VectorAcc_Norm(void * jarg1) {
+  void * jresult ;
+  KDL::VectorAcc *arg1 = (KDL::VectorAcc *) 0 ;
+  KDL::doubleAcc result;
+  
+  arg1 = (KDL::VectorAcc *)jarg1; 
+  {
+    try {
+      result = (arg1)->Norm();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::doubleAcc((const KDL::doubleAcc &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_VectorAcc(void * jarg1) {
+  KDL::VectorAcc *arg1 = (KDL::VectorAcc *) 0 ;
+  
+  arg1 = (KDL::VectorAcc *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_RotationAcc_R_set(void * jarg1, void * jarg2) {
+  KDL::RotationAcc *arg1 = (KDL::RotationAcc *) 0 ;
+  KDL::Rotation *arg2 = (KDL::Rotation *) 0 ;
+  
+  arg1 = (KDL::RotationAcc *)jarg1; 
+  arg2 = (KDL::Rotation *)jarg2; 
+  {
+    try {
+      if (arg1) (arg1)->R = *arg2;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_RotationAcc_R_get(void * jarg1) {
+  void * jresult ;
+  KDL::RotationAcc *arg1 = (KDL::RotationAcc *) 0 ;
+  KDL::Rotation *result = 0 ;
+  
+  arg1 = (KDL::RotationAcc *)jarg1; 
+  {
+    try {
+      result = (KDL::Rotation *)& ((arg1)->R);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_RotationAcc_w_set(void * jarg1, void * jarg2) {
+  KDL::RotationAcc *arg1 = (KDL::RotationAcc *) 0 ;
+  KDL::Vector *arg2 = (KDL::Vector *) 0 ;
+  
+  arg1 = (KDL::RotationAcc *)jarg1; 
+  arg2 = (KDL::Vector *)jarg2; 
+  {
+    try {
+      if (arg1) (arg1)->w = *arg2;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_RotationAcc_w_get(void * jarg1) {
+  void * jresult ;
+  KDL::RotationAcc *arg1 = (KDL::RotationAcc *) 0 ;
+  KDL::Vector *result = 0 ;
+  
+  arg1 = (KDL::RotationAcc *)jarg1; 
+  {
+    try {
+      result = (KDL::Vector *)& ((arg1)->w);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_RotationAcc_dw_set(void * jarg1, void * jarg2) {
+  KDL::RotationAcc *arg1 = (KDL::RotationAcc *) 0 ;
+  KDL::Vector *arg2 = (KDL::Vector *) 0 ;
+  
+  arg1 = (KDL::RotationAcc *)jarg1; 
+  arg2 = (KDL::Vector *)jarg2; 
+  {
+    try {
+      if (arg1) (arg1)->dw = *arg2;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_RotationAcc_dw_get(void * jarg1) {
+  void * jresult ;
+  KDL::RotationAcc *arg1 = (KDL::RotationAcc *) 0 ;
+  KDL::Vector *result = 0 ;
+  
+  arg1 = (KDL::RotationAcc *)jarg1; 
+  {
+    try {
+      result = (KDL::Vector *)& ((arg1)->dw);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_RotationAcc__SWIG_0() {
+  void * jresult ;
+  KDL::RotationAcc *result = 0 ;
+  
+  {
+    try {
+      result = (KDL::RotationAcc *)new KDL::RotationAcc();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_RotationAcc__SWIG_1(void * jarg1) {
+  void * jresult ;
+  KDL::Rotation *arg1 = 0 ;
+  KDL::RotationAcc *result = 0 ;
+  
+  arg1 = (KDL::Rotation *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Rotation const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::RotationAcc *)new KDL::RotationAcc((KDL::Rotation const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_RotationAcc__SWIG_2(void * jarg1, void * jarg2, void * jarg3) {
+  void * jresult ;
+  KDL::Rotation *arg1 = 0 ;
+  KDL::Vector *arg2 = 0 ;
+  KDL::Vector *arg3 = 0 ;
+  KDL::RotationAcc *result = 0 ;
+  
+  arg1 = (KDL::Rotation *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Rotation const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::Vector *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::RotationAcc *)new KDL::RotationAcc((KDL::Rotation const &)*arg1,(KDL::Vector const &)*arg2,(KDL::Vector const &)*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_RotationAcc_Identity() {
+  void * jresult ;
+  KDL::RotationAcc result;
+  
+  {
+    try {
+      result = KDL::RotationAcc::Identity();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::RotationAcc((const KDL::RotationAcc &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_RotationAcc_Inverse__SWIG_0(void * jarg1) {
+  void * jresult ;
+  KDL::RotationAcc *arg1 = (KDL::RotationAcc *) 0 ;
+  KDL::RotationAcc result;
+  
+  arg1 = (KDL::RotationAcc *)jarg1; 
+  {
+    try {
+      result = ((KDL::RotationAcc const *)arg1)->Inverse();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::RotationAcc((const KDL::RotationAcc &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_RotationAcc_Inverse__SWIG_1(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::RotationAcc *arg1 = (KDL::RotationAcc *) 0 ;
+  KDL::VectorAcc *arg2 = 0 ;
+  KDL::VectorAcc result;
+  
+  arg1 = (KDL::RotationAcc *)jarg1; 
+  arg2 = (KDL::VectorAcc *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorAcc const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = ((KDL::RotationAcc const *)arg1)->Inverse((KDL::VectorAcc const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::VectorAcc((const KDL::VectorAcc &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_RotationAcc_Inverse__SWIG_2(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::RotationAcc *arg1 = (KDL::RotationAcc *) 0 ;
+  KDL::Vector *arg2 = 0 ;
+  KDL::VectorAcc result;
+  
+  arg1 = (KDL::RotationAcc *)jarg1; 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = ((KDL::RotationAcc const *)arg1)->Inverse((KDL::Vector const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::VectorAcc((const KDL::VectorAcc &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_RotationAcc_Inverse__SWIG_3(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::RotationAcc *arg1 = (KDL::RotationAcc *) 0 ;
+  KDL::TwistAcc *arg2 = 0 ;
+  KDL::TwistAcc result;
+  
+  arg1 = (KDL::RotationAcc *)jarg1; 
+  arg2 = (KDL::TwistAcc *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::TwistAcc const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = ((KDL::RotationAcc const *)arg1)->Inverse((KDL::TwistAcc const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::TwistAcc((const KDL::TwistAcc &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_RotationAcc_Inverse__SWIG_4(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::RotationAcc *arg1 = (KDL::RotationAcc *) 0 ;
+  KDL::Twist *arg2 = 0 ;
+  KDL::TwistAcc result;
+  
+  arg1 = (KDL::RotationAcc *)jarg1; 
+  arg2 = (KDL::Twist *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = ((KDL::RotationAcc const *)arg1)->Inverse((KDL::Twist const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::TwistAcc((const KDL::TwistAcc &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_RotationAcc(void * jarg1) {
+  KDL::RotationAcc *arg1 = (KDL::RotationAcc *) 0 ;
+  
+  arg1 = (KDL::RotationAcc *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameAcc_M_set(void * jarg1, void * jarg2) {
+  KDL::FrameAcc *arg1 = (KDL::FrameAcc *) 0 ;
+  KDL::RotationAcc *arg2 = (KDL::RotationAcc *) 0 ;
+  
+  arg1 = (KDL::FrameAcc *)jarg1; 
+  arg2 = (KDL::RotationAcc *)jarg2; 
+  {
+    try {
+      if (arg1) (arg1)->M = *arg2;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_FrameAcc_M_get(void * jarg1) {
+  void * jresult ;
+  KDL::FrameAcc *arg1 = (KDL::FrameAcc *) 0 ;
+  KDL::RotationAcc *result = 0 ;
+  
+  arg1 = (KDL::FrameAcc *)jarg1; 
+  {
+    try {
+      result = (KDL::RotationAcc *)& ((arg1)->M);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_FrameAcc_p_set(void * jarg1, void * jarg2) {
+  KDL::FrameAcc *arg1 = (KDL::FrameAcc *) 0 ;
+  KDL::VectorAcc *arg2 = (KDL::VectorAcc *) 0 ;
+  
+  arg1 = (KDL::FrameAcc *)jarg1; 
+  arg2 = (KDL::VectorAcc *)jarg2; 
+  {
+    try {
+      if (arg1) (arg1)->p = *arg2;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_FrameAcc_p_get(void * jarg1) {
+  void * jresult ;
+  KDL::FrameAcc *arg1 = (KDL::FrameAcc *) 0 ;
+  KDL::VectorAcc *result = 0 ;
+  
+  arg1 = (KDL::FrameAcc *)jarg1; 
+  {
+    try {
+      result = (KDL::VectorAcc *)& ((arg1)->p);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_FrameAcc__SWIG_0() {
+  void * jresult ;
+  KDL::FrameAcc *result = 0 ;
+  
+  {
+    try {
+      result = (KDL::FrameAcc *)new KDL::FrameAcc();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_FrameAcc__SWIG_1(void * jarg1) {
+  void * jresult ;
+  KDL::Frame *arg1 = 0 ;
+  KDL::FrameAcc *result = 0 ;
+  
+  arg1 = (KDL::Frame *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::FrameAcc *)new KDL::FrameAcc((KDL::Frame const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_FrameAcc__SWIG_2(void * jarg1, void * jarg2, void * jarg3) {
+  void * jresult ;
+  KDL::Frame *arg1 = 0 ;
+  KDL::Twist *arg2 = 0 ;
+  KDL::Twist *arg3 = 0 ;
+  KDL::FrameAcc *result = 0 ;
+  
+  arg1 = (KDL::Frame *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Twist *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::Twist *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::FrameAcc *)new KDL::FrameAcc((KDL::Frame const &)*arg1,(KDL::Twist const &)*arg2,(KDL::Twist const &)*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_FrameAcc__SWIG_3(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::RotationAcc *arg1 = 0 ;
+  KDL::VectorAcc *arg2 = 0 ;
+  KDL::FrameAcc *result = 0 ;
+  
+  arg1 = (KDL::RotationAcc *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::RotationAcc const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::VectorAcc *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorAcc const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::FrameAcc *)new KDL::FrameAcc((KDL::RotationAcc const &)*arg1,(KDL::VectorAcc const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_FrameAcc_Identity() {
+  void * jresult ;
+  KDL::FrameAcc result;
+  
+  {
+    try {
+      result = KDL::FrameAcc::Identity();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::FrameAcc((const KDL::FrameAcc &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_FrameAcc_Inverse__SWIG_0(void * jarg1) {
+  void * jresult ;
+  KDL::FrameAcc *arg1 = (KDL::FrameAcc *) 0 ;
+  KDL::FrameAcc result;
+  
+  arg1 = (KDL::FrameAcc *)jarg1; 
+  {
+    try {
+      result = ((KDL::FrameAcc const *)arg1)->Inverse();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::FrameAcc((const KDL::FrameAcc &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_FrameAcc_Inverse__SWIG_1(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::FrameAcc *arg1 = (KDL::FrameAcc *) 0 ;
+  KDL::VectorAcc *arg2 = 0 ;
+  KDL::VectorAcc result;
+  
+  arg1 = (KDL::FrameAcc *)jarg1; 
+  arg2 = (KDL::VectorAcc *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorAcc const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = ((KDL::FrameAcc const *)arg1)->Inverse((KDL::VectorAcc const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::VectorAcc((const KDL::VectorAcc &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_FrameAcc_Inverse__SWIG_2(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::FrameAcc *arg1 = (KDL::FrameAcc *) 0 ;
+  KDL::Vector *arg2 = 0 ;
+  KDL::VectorAcc result;
+  
+  arg1 = (KDL::FrameAcc *)jarg1; 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = ((KDL::FrameAcc const *)arg1)->Inverse((KDL::Vector const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::VectorAcc((const KDL::VectorAcc &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_FrameAcc_GetFrame(void * jarg1) {
+  void * jresult ;
+  KDL::FrameAcc *arg1 = (KDL::FrameAcc *) 0 ;
+  KDL::Frame result;
+  
+  arg1 = (KDL::FrameAcc *)jarg1; 
+  {
+    try {
+      result = ((KDL::FrameAcc const *)arg1)->GetFrame();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Frame((const KDL::Frame &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_FrameAcc_GetTwist(void * jarg1) {
+  void * jresult ;
+  KDL::FrameAcc *arg1 = (KDL::FrameAcc *) 0 ;
+  KDL::Twist result;
+  
+  arg1 = (KDL::FrameAcc *)jarg1; 
+  {
+    try {
+      result = ((KDL::FrameAcc const *)arg1)->GetTwist();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Twist((const KDL::Twist &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_FrameAcc_GetAccTwist(void * jarg1) {
+  void * jresult ;
+  KDL::FrameAcc *arg1 = (KDL::FrameAcc *) 0 ;
+  KDL::Twist result;
+  
+  arg1 = (KDL::FrameAcc *)jarg1; 
+  {
+    try {
+      result = ((KDL::FrameAcc const *)arg1)->GetAccTwist();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Twist((const KDL::Twist &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_FrameAcc_Inverse__SWIG_3(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::FrameAcc *arg1 = (KDL::FrameAcc *) 0 ;
+  KDL::TwistAcc *arg2 = 0 ;
+  KDL::TwistAcc result;
+  
+  arg1 = (KDL::FrameAcc *)jarg1; 
+  arg2 = (KDL::TwistAcc *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::TwistAcc const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = ((KDL::FrameAcc const *)arg1)->Inverse((KDL::TwistAcc const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::TwistAcc((const KDL::TwistAcc &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_FrameAcc_Inverse__SWIG_4(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::FrameAcc *arg1 = (KDL::FrameAcc *) 0 ;
+  KDL::Twist *arg2 = 0 ;
+  KDL::TwistAcc result;
+  
+  arg1 = (KDL::FrameAcc *)jarg1; 
+  arg2 = (KDL::Twist *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = ((KDL::FrameAcc const *)arg1)->Inverse((KDL::Twist const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::TwistAcc((const KDL::TwistAcc &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_FrameAcc(void * jarg1) {
+  KDL::FrameAcc *arg1 = (KDL::FrameAcc *) 0 ;
+  
+  arg1 = (KDL::FrameAcc *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_TwistAcc_vel_set(void * jarg1, void * jarg2) {
+  KDL::TwistAcc *arg1 = (KDL::TwistAcc *) 0 ;
+  KDL::VectorAcc *arg2 = (KDL::VectorAcc *) 0 ;
+  
+  arg1 = (KDL::TwistAcc *)jarg1; 
+  arg2 = (KDL::VectorAcc *)jarg2; 
+  {
+    try {
+      if (arg1) (arg1)->vel = *arg2;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_TwistAcc_vel_get(void * jarg1) {
+  void * jresult ;
+  KDL::TwistAcc *arg1 = (KDL::TwistAcc *) 0 ;
+  KDL::VectorAcc *result = 0 ;
+  
+  arg1 = (KDL::TwistAcc *)jarg1; 
+  {
+    try {
+      result = (KDL::VectorAcc *)& ((arg1)->vel);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_TwistAcc_rot_set(void * jarg1, void * jarg2) {
+  KDL::TwistAcc *arg1 = (KDL::TwistAcc *) 0 ;
+  KDL::VectorAcc *arg2 = (KDL::VectorAcc *) 0 ;
+  
+  arg1 = (KDL::TwistAcc *)jarg1; 
+  arg2 = (KDL::VectorAcc *)jarg2; 
+  {
+    try {
+      if (arg1) (arg1)->rot = *arg2;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_TwistAcc_rot_get(void * jarg1) {
+  void * jresult ;
+  KDL::TwistAcc *arg1 = (KDL::TwistAcc *) 0 ;
+  KDL::VectorAcc *result = 0 ;
+  
+  arg1 = (KDL::TwistAcc *)jarg1; 
+  {
+    try {
+      result = (KDL::VectorAcc *)& ((arg1)->rot);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_TwistAcc__SWIG_0() {
+  void * jresult ;
+  KDL::TwistAcc *result = 0 ;
+  
+  {
+    try {
+      result = (KDL::TwistAcc *)new KDL::TwistAcc();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_TwistAcc__SWIG_1(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::VectorAcc *arg1 = 0 ;
+  KDL::VectorAcc *arg2 = 0 ;
+  KDL::TwistAcc *result = 0 ;
+  
+  arg1 = (KDL::VectorAcc *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorAcc const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::VectorAcc *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorAcc const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::TwistAcc *)new KDL::TwistAcc((KDL::VectorAcc const &)*arg1,(KDL::VectorAcc const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_TwistAcc_Zero() {
+  void * jresult ;
+  KDL::TwistAcc result;
+  
+  {
+    try {
+      result = KDL::TwistAcc::Zero();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::TwistAcc((const KDL::TwistAcc &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_TwistAcc_ReverseSign(void * jarg1) {
+  KDL::TwistAcc *arg1 = (KDL::TwistAcc *) 0 ;
+  
+  arg1 = (KDL::TwistAcc *)jarg1; 
+  {
+    try {
+      (arg1)->ReverseSign();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_TwistAcc_RefPoint(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::TwistAcc *arg1 = (KDL::TwistAcc *) 0 ;
+  KDL::VectorAcc *arg2 = 0 ;
+  KDL::TwistAcc result;
+  
+  arg1 = (KDL::TwistAcc *)jarg1; 
+  arg2 = (KDL::VectorAcc *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VectorAcc const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (arg1)->RefPoint((KDL::VectorAcc const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::TwistAcc((const KDL::TwistAcc &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_TwistAcc_GetTwist(void * jarg1) {
+  void * jresult ;
+  KDL::TwistAcc *arg1 = (KDL::TwistAcc *) 0 ;
+  KDL::Twist result;
+  
+  arg1 = (KDL::TwistAcc *)jarg1; 
+  {
+    try {
+      result = ((KDL::TwistAcc const *)arg1)->GetTwist();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Twist((const KDL::Twist &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_TwistAcc_GetTwistDot(void * jarg1) {
+  void * jresult ;
+  KDL::TwistAcc *arg1 = (KDL::TwistAcc *) 0 ;
+  KDL::Twist result;
+  
+  arg1 = (KDL::TwistAcc *)jarg1; 
+  {
+    try {
+      result = ((KDL::TwistAcc const *)arg1)->GetTwistDot();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Twist((const KDL::Twist &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_TwistAcc(void * jarg1) {
+  KDL::TwistAcc *arg1 = (KDL::TwistAcc *) 0 ;
+  
+  arg1 = (KDL::TwistAcc *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Joint__SWIG_0(char * jarg1, int jarg2, double jarg3, double jarg4, double jarg5, double jarg6, double jarg7) {
+  void * jresult ;
+  std::string *arg1 = 0 ;
+  KDL::Joint::JointType *arg2 = 0 ;
+  double *arg3 = 0 ;
+  double *arg4 = 0 ;
+  double *arg5 = 0 ;
+  double *arg6 = 0 ;
+  double *arg7 = 0 ;
+  KDL::Joint::JointType temp2 ;
+  double temp3 ;
+  double temp4 ;
+  double temp5 ;
+  double temp6 ;
+  double temp7 ;
+  KDL::Joint *result = 0 ;
+  
+  if (!jarg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg1_str(jarg1);
+  arg1 = &arg1_str; 
+  temp2 = (KDL::Joint::JointType)jarg2; 
+  arg2 = &temp2; 
+  temp3 = (double)jarg3; 
+  arg3 = &temp3; 
+  temp4 = (double)jarg4; 
+  arg4 = &temp4; 
+  temp5 = (double)jarg5; 
+  arg5 = &temp5; 
+  temp6 = (double)jarg6; 
+  arg6 = &temp6; 
+  temp7 = (double)jarg7; 
+  arg7 = &temp7; 
+  {
+    try {
+      result = (KDL::Joint *)new KDL::Joint((std::string const &)*arg1,(KDL::Joint::JointType const &)*arg2,(double const &)*arg3,(double const &)*arg4,(double const &)*arg5,(double const &)*arg6,(double const &)*arg7);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Joint__SWIG_1(char * jarg1, int jarg2, double jarg3, double jarg4, double jarg5, double jarg6) {
+  void * jresult ;
+  std::string *arg1 = 0 ;
+  KDL::Joint::JointType *arg2 = 0 ;
+  double *arg3 = 0 ;
+  double *arg4 = 0 ;
+  double *arg5 = 0 ;
+  double *arg6 = 0 ;
+  KDL::Joint::JointType temp2 ;
+  double temp3 ;
+  double temp4 ;
+  double temp5 ;
+  double temp6 ;
+  KDL::Joint *result = 0 ;
+  
+  if (!jarg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg1_str(jarg1);
+  arg1 = &arg1_str; 
+  temp2 = (KDL::Joint::JointType)jarg2; 
+  arg2 = &temp2; 
+  temp3 = (double)jarg3; 
+  arg3 = &temp3; 
+  temp4 = (double)jarg4; 
+  arg4 = &temp4; 
+  temp5 = (double)jarg5; 
+  arg5 = &temp5; 
+  temp6 = (double)jarg6; 
+  arg6 = &temp6; 
+  {
+    try {
+      result = (KDL::Joint *)new KDL::Joint((std::string const &)*arg1,(KDL::Joint::JointType const &)*arg2,(double const &)*arg3,(double const &)*arg4,(double const &)*arg5,(double const &)*arg6);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Joint__SWIG_2(char * jarg1, int jarg2, double jarg3, double jarg4, double jarg5) {
+  void * jresult ;
+  std::string *arg1 = 0 ;
+  KDL::Joint::JointType *arg2 = 0 ;
+  double *arg3 = 0 ;
+  double *arg4 = 0 ;
+  double *arg5 = 0 ;
+  KDL::Joint::JointType temp2 ;
+  double temp3 ;
+  double temp4 ;
+  double temp5 ;
+  KDL::Joint *result = 0 ;
+  
+  if (!jarg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg1_str(jarg1);
+  arg1 = &arg1_str; 
+  temp2 = (KDL::Joint::JointType)jarg2; 
+  arg2 = &temp2; 
+  temp3 = (double)jarg3; 
+  arg3 = &temp3; 
+  temp4 = (double)jarg4; 
+  arg4 = &temp4; 
+  temp5 = (double)jarg5; 
+  arg5 = &temp5; 
+  {
+    try {
+      result = (KDL::Joint *)new KDL::Joint((std::string const &)*arg1,(KDL::Joint::JointType const &)*arg2,(double const &)*arg3,(double const &)*arg4,(double const &)*arg5);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Joint__SWIG_3(char * jarg1, int jarg2, double jarg3, double jarg4) {
+  void * jresult ;
+  std::string *arg1 = 0 ;
+  KDL::Joint::JointType *arg2 = 0 ;
+  double *arg3 = 0 ;
+  double *arg4 = 0 ;
+  KDL::Joint::JointType temp2 ;
+  double temp3 ;
+  double temp4 ;
+  KDL::Joint *result = 0 ;
+  
+  if (!jarg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg1_str(jarg1);
+  arg1 = &arg1_str; 
+  temp2 = (KDL::Joint::JointType)jarg2; 
+  arg2 = &temp2; 
+  temp3 = (double)jarg3; 
+  arg3 = &temp3; 
+  temp4 = (double)jarg4; 
+  arg4 = &temp4; 
+  {
+    try {
+      result = (KDL::Joint *)new KDL::Joint((std::string const &)*arg1,(KDL::Joint::JointType const &)*arg2,(double const &)*arg3,(double const &)*arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Joint__SWIG_4(char * jarg1, int jarg2, double jarg3) {
+  void * jresult ;
+  std::string *arg1 = 0 ;
+  KDL::Joint::JointType *arg2 = 0 ;
+  double *arg3 = 0 ;
+  KDL::Joint::JointType temp2 ;
+  double temp3 ;
+  KDL::Joint *result = 0 ;
+  
+  if (!jarg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg1_str(jarg1);
+  arg1 = &arg1_str; 
+  temp2 = (KDL::Joint::JointType)jarg2; 
+  arg2 = &temp2; 
+  temp3 = (double)jarg3; 
+  arg3 = &temp3; 
+  {
+    try {
+      result = (KDL::Joint *)new KDL::Joint((std::string const &)*arg1,(KDL::Joint::JointType const &)*arg2,(double const &)*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Joint__SWIG_5(char * jarg1, int jarg2) {
+  void * jresult ;
+  std::string *arg1 = 0 ;
+  KDL::Joint::JointType *arg2 = 0 ;
+  KDL::Joint::JointType temp2 ;
+  KDL::Joint *result = 0 ;
+  
+  if (!jarg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg1_str(jarg1);
+  arg1 = &arg1_str; 
+  temp2 = (KDL::Joint::JointType)jarg2; 
+  arg2 = &temp2; 
+  {
+    try {
+      result = (KDL::Joint *)new KDL::Joint((std::string const &)*arg1,(KDL::Joint::JointType const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Joint__SWIG_6(char * jarg1) {
+  void * jresult ;
+  std::string *arg1 = 0 ;
+  KDL::Joint *result = 0 ;
+  
+  if (!jarg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg1_str(jarg1);
+  arg1 = &arg1_str; 
+  {
+    try {
+      result = (KDL::Joint *)new KDL::Joint((std::string const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Joint__SWIG_7(int jarg1, double jarg2, double jarg3, double jarg4, double jarg5, double jarg6) {
+  void * jresult ;
+  KDL::Joint::JointType *arg1 = 0 ;
+  double *arg2 = 0 ;
+  double *arg3 = 0 ;
+  double *arg4 = 0 ;
+  double *arg5 = 0 ;
+  double *arg6 = 0 ;
+  KDL::Joint::JointType temp1 ;
+  double temp2 ;
+  double temp3 ;
+  double temp4 ;
+  double temp5 ;
+  double temp6 ;
+  KDL::Joint *result = 0 ;
+  
+  temp1 = (KDL::Joint::JointType)jarg1; 
+  arg1 = &temp1; 
+  temp2 = (double)jarg2; 
+  arg2 = &temp2; 
+  temp3 = (double)jarg3; 
+  arg3 = &temp3; 
+  temp4 = (double)jarg4; 
+  arg4 = &temp4; 
+  temp5 = (double)jarg5; 
+  arg5 = &temp5; 
+  temp6 = (double)jarg6; 
+  arg6 = &temp6; 
+  {
+    try {
+      result = (KDL::Joint *)new KDL::Joint((KDL::Joint::JointType const &)*arg1,(double const &)*arg2,(double const &)*arg3,(double const &)*arg4,(double const &)*arg5,(double const &)*arg6);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Joint__SWIG_8(int jarg1, double jarg2, double jarg3, double jarg4, double jarg5) {
+  void * jresult ;
+  KDL::Joint::JointType *arg1 = 0 ;
+  double *arg2 = 0 ;
+  double *arg3 = 0 ;
+  double *arg4 = 0 ;
+  double *arg5 = 0 ;
+  KDL::Joint::JointType temp1 ;
+  double temp2 ;
+  double temp3 ;
+  double temp4 ;
+  double temp5 ;
+  KDL::Joint *result = 0 ;
+  
+  temp1 = (KDL::Joint::JointType)jarg1; 
+  arg1 = &temp1; 
+  temp2 = (double)jarg2; 
+  arg2 = &temp2; 
+  temp3 = (double)jarg3; 
+  arg3 = &temp3; 
+  temp4 = (double)jarg4; 
+  arg4 = &temp4; 
+  temp5 = (double)jarg5; 
+  arg5 = &temp5; 
+  {
+    try {
+      result = (KDL::Joint *)new KDL::Joint((KDL::Joint::JointType const &)*arg1,(double const &)*arg2,(double const &)*arg3,(double const &)*arg4,(double const &)*arg5);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Joint__SWIG_9(int jarg1, double jarg2, double jarg3, double jarg4) {
+  void * jresult ;
+  KDL::Joint::JointType *arg1 = 0 ;
+  double *arg2 = 0 ;
+  double *arg3 = 0 ;
+  double *arg4 = 0 ;
+  KDL::Joint::JointType temp1 ;
+  double temp2 ;
+  double temp3 ;
+  double temp4 ;
+  KDL::Joint *result = 0 ;
+  
+  temp1 = (KDL::Joint::JointType)jarg1; 
+  arg1 = &temp1; 
+  temp2 = (double)jarg2; 
+  arg2 = &temp2; 
+  temp3 = (double)jarg3; 
+  arg3 = &temp3; 
+  temp4 = (double)jarg4; 
+  arg4 = &temp4; 
+  {
+    try {
+      result = (KDL::Joint *)new KDL::Joint((KDL::Joint::JointType const &)*arg1,(double const &)*arg2,(double const &)*arg3,(double const &)*arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Joint__SWIG_10(int jarg1, double jarg2, double jarg3) {
+  void * jresult ;
+  KDL::Joint::JointType *arg1 = 0 ;
+  double *arg2 = 0 ;
+  double *arg3 = 0 ;
+  KDL::Joint::JointType temp1 ;
+  double temp2 ;
+  double temp3 ;
+  KDL::Joint *result = 0 ;
+  
+  temp1 = (KDL::Joint::JointType)jarg1; 
+  arg1 = &temp1; 
+  temp2 = (double)jarg2; 
+  arg2 = &temp2; 
+  temp3 = (double)jarg3; 
+  arg3 = &temp3; 
+  {
+    try {
+      result = (KDL::Joint *)new KDL::Joint((KDL::Joint::JointType const &)*arg1,(double const &)*arg2,(double const &)*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Joint__SWIG_11(int jarg1, double jarg2) {
+  void * jresult ;
+  KDL::Joint::JointType *arg1 = 0 ;
+  double *arg2 = 0 ;
+  KDL::Joint::JointType temp1 ;
+  double temp2 ;
+  KDL::Joint *result = 0 ;
+  
+  temp1 = (KDL::Joint::JointType)jarg1; 
+  arg1 = &temp1; 
+  temp2 = (double)jarg2; 
+  arg2 = &temp2; 
+  {
+    try {
+      result = (KDL::Joint *)new KDL::Joint((KDL::Joint::JointType const &)*arg1,(double const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Joint__SWIG_12(int jarg1) {
+  void * jresult ;
+  KDL::Joint::JointType *arg1 = 0 ;
+  KDL::Joint::JointType temp1 ;
+  KDL::Joint *result = 0 ;
+  
+  temp1 = (KDL::Joint::JointType)jarg1; 
+  arg1 = &temp1; 
+  {
+    try {
+      result = (KDL::Joint *)new KDL::Joint((KDL::Joint::JointType const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Joint__SWIG_13() {
+  void * jresult ;
+  KDL::Joint *result = 0 ;
+  
+  {
+    try {
+      result = (KDL::Joint *)new KDL::Joint();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Joint__SWIG_14(char * jarg1, void * jarg2, void * jarg3, int jarg4, double jarg5, double jarg6, double jarg7, double jarg8, double jarg9) {
+  void * jresult ;
+  std::string *arg1 = 0 ;
+  KDL::Vector *arg2 = 0 ;
+  KDL::Vector *arg3 = 0 ;
+  KDL::Joint::JointType *arg4 = 0 ;
+  double *arg5 = 0 ;
+  double *arg6 = 0 ;
+  double *arg7 = 0 ;
+  double *arg8 = 0 ;
+  double *arg9 = 0 ;
+  KDL::Joint::JointType temp4 ;
+  double temp5 ;
+  double temp6 ;
+  double temp7 ;
+  double temp8 ;
+  double temp9 ;
+  KDL::Joint *result = 0 ;
+  
+  if (!jarg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg1_str(jarg1);
+  arg1 = &arg1_str; 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::Vector *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  temp4 = (KDL::Joint::JointType)jarg4; 
+  arg4 = &temp4; 
+  temp5 = (double)jarg5; 
+  arg5 = &temp5; 
+  temp6 = (double)jarg6; 
+  arg6 = &temp6; 
+  temp7 = (double)jarg7; 
+  arg7 = &temp7; 
+  temp8 = (double)jarg8; 
+  arg8 = &temp8; 
+  temp9 = (double)jarg9; 
+  arg9 = &temp9; 
+  {
+    try {
+      result = (KDL::Joint *)new KDL::Joint((std::string const &)*arg1,(KDL::Vector const &)*arg2,(KDL::Vector const &)*arg3,(KDL::Joint::JointType const &)*arg4,(double const &)*arg5,(double const &)*arg6,(double const &)*arg7,(double const &)*arg8,(double const &)*arg9);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Joint__SWIG_15(char * jarg1, void * jarg2, void * jarg3, int jarg4, double jarg5, double jarg6, double jarg7, double jarg8) {
+  void * jresult ;
+  std::string *arg1 = 0 ;
+  KDL::Vector *arg2 = 0 ;
+  KDL::Vector *arg3 = 0 ;
+  KDL::Joint::JointType *arg4 = 0 ;
+  double *arg5 = 0 ;
+  double *arg6 = 0 ;
+  double *arg7 = 0 ;
+  double *arg8 = 0 ;
+  KDL::Joint::JointType temp4 ;
+  double temp5 ;
+  double temp6 ;
+  double temp7 ;
+  double temp8 ;
+  KDL::Joint *result = 0 ;
+  
+  if (!jarg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg1_str(jarg1);
+  arg1 = &arg1_str; 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::Vector *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  temp4 = (KDL::Joint::JointType)jarg4; 
+  arg4 = &temp4; 
+  temp5 = (double)jarg5; 
+  arg5 = &temp5; 
+  temp6 = (double)jarg6; 
+  arg6 = &temp6; 
+  temp7 = (double)jarg7; 
+  arg7 = &temp7; 
+  temp8 = (double)jarg8; 
+  arg8 = &temp8; 
+  {
+    try {
+      result = (KDL::Joint *)new KDL::Joint((std::string const &)*arg1,(KDL::Vector const &)*arg2,(KDL::Vector const &)*arg3,(KDL::Joint::JointType const &)*arg4,(double const &)*arg5,(double const &)*arg6,(double const &)*arg7,(double const &)*arg8);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Joint__SWIG_16(char * jarg1, void * jarg2, void * jarg3, int jarg4, double jarg5, double jarg6, double jarg7) {
+  void * jresult ;
+  std::string *arg1 = 0 ;
+  KDL::Vector *arg2 = 0 ;
+  KDL::Vector *arg3 = 0 ;
+  KDL::Joint::JointType *arg4 = 0 ;
+  double *arg5 = 0 ;
+  double *arg6 = 0 ;
+  double *arg7 = 0 ;
+  KDL::Joint::JointType temp4 ;
+  double temp5 ;
+  double temp6 ;
+  double temp7 ;
+  KDL::Joint *result = 0 ;
+  
+  if (!jarg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg1_str(jarg1);
+  arg1 = &arg1_str; 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::Vector *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  temp4 = (KDL::Joint::JointType)jarg4; 
+  arg4 = &temp4; 
+  temp5 = (double)jarg5; 
+  arg5 = &temp5; 
+  temp6 = (double)jarg6; 
+  arg6 = &temp6; 
+  temp7 = (double)jarg7; 
+  arg7 = &temp7; 
+  {
+    try {
+      result = (KDL::Joint *)new KDL::Joint((std::string const &)*arg1,(KDL::Vector const &)*arg2,(KDL::Vector const &)*arg3,(KDL::Joint::JointType const &)*arg4,(double const &)*arg5,(double const &)*arg6,(double const &)*arg7);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Joint__SWIG_17(char * jarg1, void * jarg2, void * jarg3, int jarg4, double jarg5, double jarg6) {
+  void * jresult ;
+  std::string *arg1 = 0 ;
+  KDL::Vector *arg2 = 0 ;
+  KDL::Vector *arg3 = 0 ;
+  KDL::Joint::JointType *arg4 = 0 ;
+  double *arg5 = 0 ;
+  double *arg6 = 0 ;
+  KDL::Joint::JointType temp4 ;
+  double temp5 ;
+  double temp6 ;
+  KDL::Joint *result = 0 ;
+  
+  if (!jarg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg1_str(jarg1);
+  arg1 = &arg1_str; 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::Vector *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  temp4 = (KDL::Joint::JointType)jarg4; 
+  arg4 = &temp4; 
+  temp5 = (double)jarg5; 
+  arg5 = &temp5; 
+  temp6 = (double)jarg6; 
+  arg6 = &temp6; 
+  {
+    try {
+      result = (KDL::Joint *)new KDL::Joint((std::string const &)*arg1,(KDL::Vector const &)*arg2,(KDL::Vector const &)*arg3,(KDL::Joint::JointType const &)*arg4,(double const &)*arg5,(double const &)*arg6);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Joint__SWIG_18(char * jarg1, void * jarg2, void * jarg3, int jarg4, double jarg5) {
+  void * jresult ;
+  std::string *arg1 = 0 ;
+  KDL::Vector *arg2 = 0 ;
+  KDL::Vector *arg3 = 0 ;
+  KDL::Joint::JointType *arg4 = 0 ;
+  double *arg5 = 0 ;
+  KDL::Joint::JointType temp4 ;
+  double temp5 ;
+  KDL::Joint *result = 0 ;
+  
+  if (!jarg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg1_str(jarg1);
+  arg1 = &arg1_str; 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::Vector *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  temp4 = (KDL::Joint::JointType)jarg4; 
+  arg4 = &temp4; 
+  temp5 = (double)jarg5; 
+  arg5 = &temp5; 
+  {
+    try {
+      result = (KDL::Joint *)new KDL::Joint((std::string const &)*arg1,(KDL::Vector const &)*arg2,(KDL::Vector const &)*arg3,(KDL::Joint::JointType const &)*arg4,(double const &)*arg5);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Joint__SWIG_19(char * jarg1, void * jarg2, void * jarg3, int jarg4) {
+  void * jresult ;
+  std::string *arg1 = 0 ;
+  KDL::Vector *arg2 = 0 ;
+  KDL::Vector *arg3 = 0 ;
+  KDL::Joint::JointType *arg4 = 0 ;
+  KDL::Joint::JointType temp4 ;
+  KDL::Joint *result = 0 ;
+  
+  if (!jarg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg1_str(jarg1);
+  arg1 = &arg1_str; 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::Vector *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  temp4 = (KDL::Joint::JointType)jarg4; 
+  arg4 = &temp4; 
+  {
+    try {
+      result = (KDL::Joint *)new KDL::Joint((std::string const &)*arg1,(KDL::Vector const &)*arg2,(KDL::Vector const &)*arg3,(KDL::Joint::JointType const &)*arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Joint__SWIG_20(void * jarg1, void * jarg2, int jarg3, double jarg4, double jarg5, double jarg6, double jarg7, double jarg8) {
+  void * jresult ;
+  KDL::Vector *arg1 = 0 ;
+  KDL::Vector *arg2 = 0 ;
+  KDL::Joint::JointType *arg3 = 0 ;
+  double *arg4 = 0 ;
+  double *arg5 = 0 ;
+  double *arg6 = 0 ;
+  double *arg7 = 0 ;
+  double *arg8 = 0 ;
+  KDL::Joint::JointType temp3 ;
+  double temp4 ;
+  double temp5 ;
+  double temp6 ;
+  double temp7 ;
+  double temp8 ;
+  KDL::Joint *result = 0 ;
+  
+  arg1 = (KDL::Vector *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  temp3 = (KDL::Joint::JointType)jarg3; 
+  arg3 = &temp3; 
+  temp4 = (double)jarg4; 
+  arg4 = &temp4; 
+  temp5 = (double)jarg5; 
+  arg5 = &temp5; 
+  temp6 = (double)jarg6; 
+  arg6 = &temp6; 
+  temp7 = (double)jarg7; 
+  arg7 = &temp7; 
+  temp8 = (double)jarg8; 
+  arg8 = &temp8; 
+  {
+    try {
+      result = (KDL::Joint *)new KDL::Joint((KDL::Vector const &)*arg1,(KDL::Vector const &)*arg2,(KDL::Joint::JointType const &)*arg3,(double const &)*arg4,(double const &)*arg5,(double const &)*arg6,(double const &)*arg7,(double const &)*arg8);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Joint__SWIG_21(void * jarg1, void * jarg2, int jarg3, double jarg4, double jarg5, double jarg6, double jarg7) {
+  void * jresult ;
+  KDL::Vector *arg1 = 0 ;
+  KDL::Vector *arg2 = 0 ;
+  KDL::Joint::JointType *arg3 = 0 ;
+  double *arg4 = 0 ;
+  double *arg5 = 0 ;
+  double *arg6 = 0 ;
+  double *arg7 = 0 ;
+  KDL::Joint::JointType temp3 ;
+  double temp4 ;
+  double temp5 ;
+  double temp6 ;
+  double temp7 ;
+  KDL::Joint *result = 0 ;
+  
+  arg1 = (KDL::Vector *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  temp3 = (KDL::Joint::JointType)jarg3; 
+  arg3 = &temp3; 
+  temp4 = (double)jarg4; 
+  arg4 = &temp4; 
+  temp5 = (double)jarg5; 
+  arg5 = &temp5; 
+  temp6 = (double)jarg6; 
+  arg6 = &temp6; 
+  temp7 = (double)jarg7; 
+  arg7 = &temp7; 
+  {
+    try {
+      result = (KDL::Joint *)new KDL::Joint((KDL::Vector const &)*arg1,(KDL::Vector const &)*arg2,(KDL::Joint::JointType const &)*arg3,(double const &)*arg4,(double const &)*arg5,(double const &)*arg6,(double const &)*arg7);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Joint__SWIG_22(void * jarg1, void * jarg2, int jarg3, double jarg4, double jarg5, double jarg6) {
+  void * jresult ;
+  KDL::Vector *arg1 = 0 ;
+  KDL::Vector *arg2 = 0 ;
+  KDL::Joint::JointType *arg3 = 0 ;
+  double *arg4 = 0 ;
+  double *arg5 = 0 ;
+  double *arg6 = 0 ;
+  KDL::Joint::JointType temp3 ;
+  double temp4 ;
+  double temp5 ;
+  double temp6 ;
+  KDL::Joint *result = 0 ;
+  
+  arg1 = (KDL::Vector *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  temp3 = (KDL::Joint::JointType)jarg3; 
+  arg3 = &temp3; 
+  temp4 = (double)jarg4; 
+  arg4 = &temp4; 
+  temp5 = (double)jarg5; 
+  arg5 = &temp5; 
+  temp6 = (double)jarg6; 
+  arg6 = &temp6; 
+  {
+    try {
+      result = (KDL::Joint *)new KDL::Joint((KDL::Vector const &)*arg1,(KDL::Vector const &)*arg2,(KDL::Joint::JointType const &)*arg3,(double const &)*arg4,(double const &)*arg5,(double const &)*arg6);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Joint__SWIG_23(void * jarg1, void * jarg2, int jarg3, double jarg4, double jarg5) {
+  void * jresult ;
+  KDL::Vector *arg1 = 0 ;
+  KDL::Vector *arg2 = 0 ;
+  KDL::Joint::JointType *arg3 = 0 ;
+  double *arg4 = 0 ;
+  double *arg5 = 0 ;
+  KDL::Joint::JointType temp3 ;
+  double temp4 ;
+  double temp5 ;
+  KDL::Joint *result = 0 ;
+  
+  arg1 = (KDL::Vector *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  temp3 = (KDL::Joint::JointType)jarg3; 
+  arg3 = &temp3; 
+  temp4 = (double)jarg4; 
+  arg4 = &temp4; 
+  temp5 = (double)jarg5; 
+  arg5 = &temp5; 
+  {
+    try {
+      result = (KDL::Joint *)new KDL::Joint((KDL::Vector const &)*arg1,(KDL::Vector const &)*arg2,(KDL::Joint::JointType const &)*arg3,(double const &)*arg4,(double const &)*arg5);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Joint__SWIG_24(void * jarg1, void * jarg2, int jarg3, double jarg4) {
+  void * jresult ;
+  KDL::Vector *arg1 = 0 ;
+  KDL::Vector *arg2 = 0 ;
+  KDL::Joint::JointType *arg3 = 0 ;
+  double *arg4 = 0 ;
+  KDL::Joint::JointType temp3 ;
+  double temp4 ;
+  KDL::Joint *result = 0 ;
+  
+  arg1 = (KDL::Vector *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  temp3 = (KDL::Joint::JointType)jarg3; 
+  arg3 = &temp3; 
+  temp4 = (double)jarg4; 
+  arg4 = &temp4; 
+  {
+    try {
+      result = (KDL::Joint *)new KDL::Joint((KDL::Vector const &)*arg1,(KDL::Vector const &)*arg2,(KDL::Joint::JointType const &)*arg3,(double const &)*arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Joint__SWIG_25(void * jarg1, void * jarg2, int jarg3) {
+  void * jresult ;
+  KDL::Vector *arg1 = 0 ;
+  KDL::Vector *arg2 = 0 ;
+  KDL::Joint::JointType *arg3 = 0 ;
+  KDL::Joint::JointType temp3 ;
+  KDL::Joint *result = 0 ;
+  
+  arg1 = (KDL::Vector *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  temp3 = (KDL::Joint::JointType)jarg3; 
+  arg3 = &temp3; 
+  {
+    try {
+      result = (KDL::Joint *)new KDL::Joint((KDL::Vector const &)*arg1,(KDL::Vector const &)*arg2,(KDL::Joint::JointType const &)*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Joint_pose(void * jarg1, double jarg2) {
+  void * jresult ;
+  KDL::Joint *arg1 = (KDL::Joint *) 0 ;
+  double *arg2 = 0 ;
+  double temp2 ;
+  KDL::Frame result;
+  
+  arg1 = (KDL::Joint *)jarg1; 
+  temp2 = (double)jarg2; 
+  arg2 = &temp2; 
+  {
+    try {
+      result = ((KDL::Joint const *)arg1)->pose((double const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Frame((const KDL::Frame &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Joint_twist(void * jarg1, double jarg2) {
+  void * jresult ;
+  KDL::Joint *arg1 = (KDL::Joint *) 0 ;
+  double *arg2 = 0 ;
+  double temp2 ;
+  KDL::Twist result;
+  
+  arg1 = (KDL::Joint *)jarg1; 
+  temp2 = (double)jarg2; 
+  arg2 = &temp2; 
+  {
+    try {
+      result = ((KDL::Joint const *)arg1)->twist((double const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Twist((const KDL::Twist &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Joint_JointAxis(void * jarg1) {
+  void * jresult ;
+  KDL::Joint *arg1 = (KDL::Joint *) 0 ;
+  KDL::Vector result;
+  
+  arg1 = (KDL::Joint *)jarg1; 
+  {
+    try {
+      result = ((KDL::Joint const *)arg1)->JointAxis();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Vector((const KDL::Vector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Joint_JointOrigin(void * jarg1) {
+  void * jresult ;
+  KDL::Joint *arg1 = (KDL::Joint *) 0 ;
+  KDL::Vector result;
+  
+  arg1 = (KDL::Joint *)jarg1; 
+  {
+    try {
+      result = ((KDL::Joint const *)arg1)->JointOrigin();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Vector((const KDL::Vector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT char * SWIGSTDCALL CSharp_Kdl_Joint_getName(void * jarg1) {
+  char * jresult ;
+  KDL::Joint *arg1 = (KDL::Joint *) 0 ;
+  std::string *result = 0 ;
+  
+  arg1 = (KDL::Joint *)jarg1; 
+  {
+    try {
+      result = (std::string *) &((KDL::Joint const *)arg1)->getName();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = SWIG_csharp_string_callback(result->c_str()); 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_Joint_getType(void * jarg1) {
+  int jresult ;
+  KDL::Joint *arg1 = (KDL::Joint *) 0 ;
+  KDL::Joint::JointType *result = 0 ;
+  
+  arg1 = (KDL::Joint *)jarg1; 
+  {
+    try {
+      result = (KDL::Joint::JointType *) &((KDL::Joint const *)arg1)->getType();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (int)*result; 
+  return jresult;
+}
+
+
+SWIGEXPORT char * SWIGSTDCALL CSharp_Kdl_Joint_getTypeName(void * jarg1) {
+  char * jresult ;
+  KDL::Joint *arg1 = (KDL::Joint *) 0 ;
+  std::string result;
+  
+  arg1 = (KDL::Joint *)jarg1; 
+  {
+    try {
+      result = ((KDL::Joint const *)arg1)->getTypeName();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = SWIG_csharp_string_callback((&result)->c_str()); 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_Joint_getInertia(void * jarg1) {
+  double jresult ;
+  KDL::Joint *arg1 = (KDL::Joint *) 0 ;
+  double *result = 0 ;
+  
+  arg1 = (KDL::Joint *)jarg1; 
+  {
+    try {
+      result = (double *) &((KDL::Joint const *)arg1)->getInertia();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = *result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_Joint_getDamping(void * jarg1) {
+  double jresult ;
+  KDL::Joint *arg1 = (KDL::Joint *) 0 ;
+  double *result = 0 ;
+  
+  arg1 = (KDL::Joint *)jarg1; 
+  {
+    try {
+      result = (double *) &((KDL::Joint const *)arg1)->getDamping();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = *result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_Joint_getStiffness(void * jarg1) {
+  double jresult ;
+  KDL::Joint *arg1 = (KDL::Joint *) 0 ;
+  double *result = 0 ;
+  
+  arg1 = (KDL::Joint *)jarg1; 
+  {
+    try {
+      result = (double *) &((KDL::Joint const *)arg1)->getStiffness();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = *result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_Joint(void * jarg1) {
+  KDL::Joint *arg1 = (KDL::Joint *) 0 ;
+  
+  arg1 = (KDL::Joint *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_66(void * jarg1, void * jarg2, double jarg3) {
+  unsigned int jresult ;
+  KDL::Jacobian *arg1 = 0 ;
+  KDL::Jacobian *arg2 = 0 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (KDL::Jacobian *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Jacobian const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Jacobian *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Jacobian const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::Jacobian const &)*arg1,(KDL::Jacobian const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_67(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
+  KDL::Jacobian *arg1 = 0 ;
+  KDL::Jacobian *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::Jacobian *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Jacobian const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Jacobian *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Jacobian const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::Jacobian const &)*arg1,(KDL::Jacobian const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_SetToZero__SWIG_1(void * jarg1) {
+  KDL::Jacobian *arg1 = 0 ;
+  
+  arg1 = (KDL::Jacobian *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Jacobian & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::SetToZero(*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Jacobian__SWIG_0() {
+  void * jresult ;
+  KDL::Jacobian *result = 0 ;
+  
+  {
+    try {
+      result = (KDL::Jacobian *)new KDL::Jacobian();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Jacobian__SWIG_1(unsigned int jarg1) {
+  void * jresult ;
+  unsigned int arg1 ;
+  KDL::Jacobian *result = 0 ;
+  
+  arg1 = (unsigned int)jarg1; 
+  {
+    try {
+      result = (KDL::Jacobian *)new KDL::Jacobian(arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Jacobian__SWIG_2(void * jarg1) {
+  void * jresult ;
+  KDL::Jacobian *arg1 = 0 ;
+  KDL::Jacobian *result = 0 ;
+  
+  arg1 = (KDL::Jacobian *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Jacobian const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::Jacobian *)new KDL::Jacobian((KDL::Jacobian const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Jacobian_resize(void * jarg1, unsigned int jarg2) {
+  KDL::Jacobian *arg1 = (KDL::Jacobian *) 0 ;
+  unsigned int arg2 ;
+  
+  arg1 = (KDL::Jacobian *)jarg1; 
+  arg2 = (unsigned int)jarg2; 
+  {
+    try {
+      (arg1)->resize(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_Jacobian(void * jarg1) {
+  KDL::Jacobian *arg1 = (KDL::Jacobian *) 0 ;
+  
+  arg1 = (KDL::Jacobian *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Jacobian_rows(void * jarg1) {
+  unsigned int jresult ;
+  KDL::Jacobian *arg1 = (KDL::Jacobian *) 0 ;
+  unsigned int result;
+  
+  arg1 = (KDL::Jacobian *)jarg1; 
+  {
+    try {
+      result = (unsigned int)((KDL::Jacobian const *)arg1)->rows();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Jacobian_columns(void * jarg1) {
+  unsigned int jresult ;
+  KDL::Jacobian *arg1 = (KDL::Jacobian *) 0 ;
+  unsigned int result;
+  
+  arg1 = (KDL::Jacobian *)jarg1; 
+  {
+    try {
+      result = (unsigned int)((KDL::Jacobian const *)arg1)->columns();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Jacobian_getColumn(void * jarg1, unsigned int jarg2) {
+  void * jresult ;
+  KDL::Jacobian *arg1 = (KDL::Jacobian *) 0 ;
+  unsigned int arg2 ;
+  KDL::Twist result;
+  
+  arg1 = (KDL::Jacobian *)jarg1; 
+  arg2 = (unsigned int)jarg2; 
+  {
+    try {
+      result = ((KDL::Jacobian const *)arg1)->getColumn(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Twist((const KDL::Twist &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Jacobian_setColumn(void * jarg1, unsigned int jarg2, void * jarg3) {
+  KDL::Jacobian *arg1 = (KDL::Jacobian *) 0 ;
+  unsigned int arg2 ;
+  KDL::Twist *arg3 = 0 ;
+  
+  arg1 = (KDL::Jacobian *)jarg1; 
+  arg2 = (unsigned int)jarg2; 
+  arg3 = (KDL::Twist *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      (arg1)->setColumn(arg2,(KDL::Twist const &)*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Jacobian_changeRefPoint(void * jarg1, void * jarg2) {
+  KDL::Jacobian *arg1 = (KDL::Jacobian *) 0 ;
+  KDL::Vector *arg2 = 0 ;
+  
+  arg1 = (KDL::Jacobian *)jarg1; 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      (arg1)->changeRefPoint((KDL::Vector const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Jacobian_changeBase(void * jarg1, void * jarg2) {
+  KDL::Jacobian *arg1 = (KDL::Jacobian *) 0 ;
+  KDL::Rotation *arg2 = 0 ;
+  
+  arg1 = (KDL::Jacobian *)jarg1; 
+  arg2 = (KDL::Rotation *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Rotation const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      (arg1)->changeBase((KDL::Rotation const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Jacobian_changeRefFrame(void * jarg1, void * jarg2) {
+  KDL::Jacobian *arg1 = (KDL::Jacobian *) 0 ;
+  KDL::Frame *arg2 = 0 ;
+  
+  arg1 = (KDL::Jacobian *)jarg1; 
+  arg2 = (KDL::Frame *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      (arg1)->changeRefFrame((KDL::Frame const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_changeRefPoint(void * jarg1, void * jarg2, void * jarg3) {
+  unsigned int jresult ;
+  KDL::Jacobian *arg1 = 0 ;
+  KDL::Vector *arg2 = 0 ;
+  KDL::Jacobian *arg3 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::Jacobian *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Jacobian const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::Jacobian *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Jacobian & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::changeRefPoint((KDL::Jacobian const &)*arg1,(KDL::Vector const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_changeBase(void * jarg1, void * jarg2, void * jarg3) {
+  unsigned int jresult ;
+  KDL::Jacobian *arg1 = 0 ;
+  KDL::Rotation *arg2 = 0 ;
+  KDL::Jacobian *arg3 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::Jacobian *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Jacobian const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Rotation *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Rotation const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::Jacobian *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Jacobian & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::changeBase((KDL::Jacobian const &)*arg1,(KDL::Rotation const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_changeRefFrame(void * jarg1, void * jarg2, void * jarg3) {
+  unsigned int jresult ;
+  KDL::Jacobian *arg1 = 0 ;
+  KDL::Frame *arg2 = 0 ;
+  KDL::Jacobian *arg3 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::Jacobian *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Jacobian const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Frame *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::Jacobian *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Jacobian & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::changeRefFrame((KDL::Jacobian const &)*arg1,(KDL::Frame const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_JntArray__SWIG_0() {
+  void * jresult ;
+  KDL::JntArray *result = 0 ;
+  
+  {
+    try {
+      result = (KDL::JntArray *)new KDL::JntArray();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_JntArray__SWIG_1(unsigned int jarg1) {
+  void * jresult ;
+  unsigned int arg1 ;
+  KDL::JntArray *result = 0 ;
+  
+  arg1 = (unsigned int)jarg1; 
+  {
+    try {
+      result = (KDL::JntArray *)new KDL::JntArray(arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_JntArray__SWIG_2(void * jarg1) {
+  void * jresult ;
+  KDL::JntArray *arg1 = 0 ;
+  KDL::JntArray *result = 0 ;
+  
+  arg1 = (KDL::JntArray *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::JntArray *)new KDL::JntArray((KDL::JntArray const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_JntArray(void * jarg1) {
+  KDL::JntArray *arg1 = (KDL::JntArray *) 0 ;
+  
+  arg1 = (KDL::JntArray *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_JntArray_resize(void * jarg1, unsigned int jarg2) {
+  KDL::JntArray *arg1 = (KDL::JntArray *) 0 ;
+  unsigned int arg2 ;
+  
+  arg1 = (KDL::JntArray *)jarg1; 
+  arg2 = (unsigned int)jarg2; 
+  {
+    try {
+      (arg1)->resize(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_JntArray_get__SWIG_0(void * jarg1, unsigned int jarg2, unsigned int jarg3) {
+  double jresult ;
+  KDL::JntArray *arg1 = (KDL::JntArray *) 0 ;
+  unsigned int arg2 ;
+  unsigned int arg3 ;
+  double result;
+  
+  arg1 = (KDL::JntArray *)jarg1; 
+  arg2 = (unsigned int)jarg2; 
+  arg3 = (unsigned int)jarg3; 
+  {
+    try {
+      result = (double)((KDL::JntArray const *)arg1)->operator ()(arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_JntArray_get__SWIG_1(void * jarg1, unsigned int jarg2) {
+  double jresult ;
+  KDL::JntArray *arg1 = (KDL::JntArray *) 0 ;
+  unsigned int arg2 ;
+  double result;
+  
+  arg1 = (KDL::JntArray *)jarg1; 
+  arg2 = (unsigned int)jarg2; 
+  {
+    try {
+      result = (double)((KDL::JntArray const *)arg1)->operator ()(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_JntArray_pointer__SWIG_0(void * jarg1, unsigned int jarg2, unsigned int jarg3) {
+  void * jresult ;
+  KDL::JntArray *arg1 = (KDL::JntArray *) 0 ;
+  unsigned int arg2 ;
+  unsigned int arg3 ;
+  double *result = 0 ;
+  
+  arg1 = (KDL::JntArray *)jarg1; 
+  arg2 = (unsigned int)jarg2; 
+  arg3 = (unsigned int)jarg3; 
+  {
+    try {
+      result = (double *) &(arg1)->operator ()(arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_JntArray_pointer__SWIG_1(void * jarg1, unsigned int jarg2) {
+  void * jresult ;
+  KDL::JntArray *arg1 = (KDL::JntArray *) 0 ;
+  unsigned int arg2 ;
+  double *result = 0 ;
+  
+  arg1 = (KDL::JntArray *)jarg1; 
+  arg2 = (unsigned int)jarg2; 
+  {
+    try {
+      result = (double *) &(arg1)->operator ()(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_JntArray_rows(void * jarg1) {
+  unsigned int jresult ;
+  KDL::JntArray *arg1 = (KDL::JntArray *) 0 ;
+  unsigned int result;
+  
+  arg1 = (KDL::JntArray *)jarg1; 
+  {
+    try {
+      result = (unsigned int)((KDL::JntArray const *)arg1)->rows();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_JntArray_columns(void * jarg1) {
+  unsigned int jresult ;
+  KDL::JntArray *arg1 = (KDL::JntArray *) 0 ;
+  unsigned int result;
+  
+  arg1 = (KDL::JntArray *)jarg1; 
+  {
+    try {
+      result = (unsigned int)((KDL::JntArray const *)arg1)->columns();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Add__SWIG_0(void * jarg1, void * jarg2, void * jarg3) {
+  KDL::JntArray *arg1 = 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  KDL::JntArray *arg3 = 0 ;
+  
+  arg1 = (KDL::JntArray *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return ;
+  } 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return ;
+  } 
+  arg3 = (KDL::JntArray *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::Add((KDL::JntArray const &)*arg1,(KDL::JntArray const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Subtract__SWIG_0(void * jarg1, void * jarg2, void * jarg3) {
+  KDL::JntArray *arg1 = 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  KDL::JntArray *arg3 = 0 ;
+  
+  arg1 = (KDL::JntArray *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return ;
+  } 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return ;
+  } 
+  arg3 = (KDL::JntArray *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::Subtract((KDL::JntArray const &)*arg1,(KDL::JntArray const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Multiply__SWIG_0(void * jarg1, double jarg2, void * jarg3) {
+  KDL::JntArray *arg1 = 0 ;
+  double *arg2 = 0 ;
+  KDL::JntArray *arg3 = 0 ;
+  double temp2 ;
+  
+  arg1 = (KDL::JntArray *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return ;
+  } 
+  temp2 = (double)jarg2; 
+  arg2 = &temp2; 
+  arg3 = (KDL::JntArray *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::Multiply((KDL::JntArray const &)*arg1,(double const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Divide__SWIG_0(void * jarg1, double jarg2, void * jarg3) {
+  KDL::JntArray *arg1 = 0 ;
+  double *arg2 = 0 ;
+  KDL::JntArray *arg3 = 0 ;
+  double temp2 ;
+  
+  arg1 = (KDL::JntArray *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return ;
+  } 
+  temp2 = (double)jarg2; 
+  arg2 = &temp2; 
+  arg3 = (KDL::JntArray *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::Divide((KDL::JntArray const &)*arg1,(double const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_MultiplyJacobian(void * jarg1, void * jarg2, void * jarg3) {
+  KDL::Jacobian *arg1 = 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  KDL::Twist *arg3 = 0 ;
+  
+  arg1 = (KDL::Jacobian *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Jacobian const & type is null", 0);
+    return ;
+  } 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return ;
+  } 
+  arg3 = (KDL::Twist *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::MultiplyJacobian((KDL::Jacobian const &)*arg1,(KDL::JntArray const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_SetToZero__SWIG_2(void * jarg1) {
+  KDL::JntArray *arg1 = 0 ;
+  
+  arg1 = (KDL::JntArray *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::SetToZero(*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_68(void * jarg1, void * jarg2, double jarg3) {
+  unsigned int jresult ;
+  KDL::JntArray *arg1 = 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (KDL::JntArray *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::JntArray const &)*arg1,(KDL::JntArray const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_69(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
+  KDL::JntArray *arg1 = 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::JntArray *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::JntArray const &)*arg1,(KDL::JntArray const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_70(void * jarg1, void * jarg2, double jarg3) {
+  unsigned int jresult ;
+  KDL::JntArrayVel *arg1 = 0 ;
+  KDL::JntArrayVel *arg2 = 0 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (KDL::JntArrayVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::JntArrayVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayVel const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::JntArrayVel const &)*arg1,(KDL::JntArrayVel const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_71(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
+  KDL::JntArrayVel *arg1 = 0 ;
+  KDL::JntArrayVel *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::JntArrayVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayVel const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::JntArrayVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayVel const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::JntArrayVel const &)*arg1,(KDL::JntArrayVel const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Add__SWIG_1(void * jarg1, void * jarg2, void * jarg3) {
+  KDL::JntArrayVel *arg1 = 0 ;
+  KDL::JntArrayVel *arg2 = 0 ;
+  KDL::JntArrayVel *arg3 = 0 ;
+  
+  arg1 = (KDL::JntArrayVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayVel const & type is null", 0);
+    return ;
+  } 
+  arg2 = (KDL::JntArrayVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayVel const & type is null", 0);
+    return ;
+  } 
+  arg3 = (KDL::JntArrayVel *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayVel & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::Add((KDL::JntArrayVel const &)*arg1,(KDL::JntArrayVel const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Add__SWIG_2(void * jarg1, void * jarg2, void * jarg3) {
+  KDL::JntArrayVel *arg1 = 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  KDL::JntArrayVel *arg3 = 0 ;
+  
+  arg1 = (KDL::JntArrayVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayVel const & type is null", 0);
+    return ;
+  } 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return ;
+  } 
+  arg3 = (KDL::JntArrayVel *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayVel & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::Add((KDL::JntArrayVel const &)*arg1,(KDL::JntArray const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Subtract__SWIG_1(void * jarg1, void * jarg2, void * jarg3) {
+  KDL::JntArrayVel *arg1 = 0 ;
+  KDL::JntArrayVel *arg2 = 0 ;
+  KDL::JntArrayVel *arg3 = 0 ;
+  
+  arg1 = (KDL::JntArrayVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayVel const & type is null", 0);
+    return ;
+  } 
+  arg2 = (KDL::JntArrayVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayVel const & type is null", 0);
+    return ;
+  } 
+  arg3 = (KDL::JntArrayVel *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayVel & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::Subtract((KDL::JntArrayVel const &)*arg1,(KDL::JntArrayVel const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Subtract__SWIG_2(void * jarg1, void * jarg2, void * jarg3) {
+  KDL::JntArrayVel *arg1 = 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  KDL::JntArrayVel *arg3 = 0 ;
+  
+  arg1 = (KDL::JntArrayVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayVel const & type is null", 0);
+    return ;
+  } 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return ;
+  } 
+  arg3 = (KDL::JntArrayVel *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayVel & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::Subtract((KDL::JntArrayVel const &)*arg1,(KDL::JntArray const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Multiply__SWIG_1(void * jarg1, double jarg2, void * jarg3) {
+  KDL::JntArrayVel *arg1 = 0 ;
+  double *arg2 = 0 ;
+  KDL::JntArrayVel *arg3 = 0 ;
+  double temp2 ;
+  
+  arg1 = (KDL::JntArrayVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayVel const & type is null", 0);
+    return ;
+  } 
+  temp2 = (double)jarg2; 
+  arg2 = &temp2; 
+  arg3 = (KDL::JntArrayVel *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayVel & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::Multiply((KDL::JntArrayVel const &)*arg1,(double const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Multiply__SWIG_2(void * jarg1, void * jarg2, void * jarg3) {
+  KDL::JntArrayVel *arg1 = 0 ;
+  KDL::doubleVel *arg2 = 0 ;
+  KDL::JntArrayVel *arg3 = 0 ;
+  
+  arg1 = (KDL::JntArrayVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayVel const & type is null", 0);
+    return ;
+  } 
+  arg2 = (KDL::doubleVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::doubleVel const & type is null", 0);
+    return ;
+  } 
+  arg3 = (KDL::JntArrayVel *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayVel & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::Multiply((KDL::JntArrayVel const &)*arg1,(Rall1d< double > const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Divide__SWIG_1(void * jarg1, double jarg2, void * jarg3) {
+  KDL::JntArrayVel *arg1 = 0 ;
+  double *arg2 = 0 ;
+  KDL::JntArrayVel *arg3 = 0 ;
+  double temp2 ;
+  
+  arg1 = (KDL::JntArrayVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayVel const & type is null", 0);
+    return ;
+  } 
+  temp2 = (double)jarg2; 
+  arg2 = &temp2; 
+  arg3 = (KDL::JntArrayVel *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayVel & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::Divide((KDL::JntArrayVel const &)*arg1,(double const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Divide__SWIG_2(void * jarg1, void * jarg2, void * jarg3) {
+  KDL::JntArrayVel *arg1 = 0 ;
+  KDL::doubleVel *arg2 = 0 ;
+  KDL::JntArrayVel *arg3 = 0 ;
+  
+  arg1 = (KDL::JntArrayVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayVel const & type is null", 0);
+    return ;
+  } 
+  arg2 = (KDL::doubleVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::doubleVel const & type is null", 0);
+    return ;
+  } 
+  arg3 = (KDL::JntArrayVel *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayVel & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::Divide((KDL::JntArrayVel const &)*arg1,(Rall1d< double > const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_SetToZero__SWIG_3(void * jarg1) {
+  KDL::JntArrayVel *arg1 = 0 ;
+  
+  arg1 = (KDL::JntArrayVel *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayVel & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::SetToZero(*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_JntArrayVel_q_set(void * jarg1, void * jarg2) {
+  KDL::JntArrayVel *arg1 = (KDL::JntArrayVel *) 0 ;
+  KDL::JntArray *arg2 = (KDL::JntArray *) 0 ;
+  
+  arg1 = (KDL::JntArrayVel *)jarg1; 
+  arg2 = (KDL::JntArray *)jarg2; 
+  {
+    try {
+      if (arg1) (arg1)->q = *arg2;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_JntArrayVel_q_get(void * jarg1) {
+  void * jresult ;
+  KDL::JntArrayVel *arg1 = (KDL::JntArrayVel *) 0 ;
+  KDL::JntArray *result = 0 ;
+  
+  arg1 = (KDL::JntArrayVel *)jarg1; 
+  {
+    try {
+      result = (KDL::JntArray *)& ((arg1)->q);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_JntArrayVel_qdot_set(void * jarg1, void * jarg2) {
+  KDL::JntArrayVel *arg1 = (KDL::JntArrayVel *) 0 ;
+  KDL::JntArray *arg2 = (KDL::JntArray *) 0 ;
+  
+  arg1 = (KDL::JntArrayVel *)jarg1; 
+  arg2 = (KDL::JntArray *)jarg2; 
+  {
+    try {
+      if (arg1) (arg1)->qdot = *arg2;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_JntArrayVel_qdot_get(void * jarg1) {
+  void * jresult ;
+  KDL::JntArrayVel *arg1 = (KDL::JntArrayVel *) 0 ;
+  KDL::JntArray *result = 0 ;
+  
+  arg1 = (KDL::JntArrayVel *)jarg1; 
+  {
+    try {
+      result = (KDL::JntArray *)& ((arg1)->qdot);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_JntArrayVel__SWIG_0() {
+  void * jresult ;
+  KDL::JntArrayVel *result = 0 ;
+  
+  {
+    try {
+      result = (KDL::JntArrayVel *)new KDL::JntArrayVel();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_JntArrayVel__SWIG_1(unsigned int jarg1) {
+  void * jresult ;
+  unsigned int arg1 ;
+  KDL::JntArrayVel *result = 0 ;
+  
+  arg1 = (unsigned int)jarg1; 
+  {
+    try {
+      result = (KDL::JntArrayVel *)new KDL::JntArrayVel(arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_JntArrayVel__SWIG_2(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::JntArray *arg1 = 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  KDL::JntArrayVel *result = 0 ;
+  
+  arg1 = (KDL::JntArray *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::JntArrayVel *)new KDL::JntArrayVel((KDL::JntArray const &)*arg1,(KDL::JntArray const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_JntArrayVel__SWIG_3(void * jarg1) {
+  void * jresult ;
+  KDL::JntArray *arg1 = 0 ;
+  KDL::JntArrayVel *result = 0 ;
+  
+  arg1 = (KDL::JntArray *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::JntArrayVel *)new KDL::JntArrayVel((KDL::JntArray const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_JntArrayVel_resize(void * jarg1, unsigned int jarg2) {
+  KDL::JntArrayVel *arg1 = (KDL::JntArrayVel *) 0 ;
+  unsigned int arg2 ;
+  
+  arg1 = (KDL::JntArrayVel *)jarg1; 
+  arg2 = (unsigned int)jarg2; 
+  {
+    try {
+      (arg1)->resize(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_JntArrayVel_value(void * jarg1) {
+  void * jresult ;
+  KDL::JntArrayVel *arg1 = (KDL::JntArrayVel *) 0 ;
+  KDL::JntArray result;
+  
+  arg1 = (KDL::JntArrayVel *)jarg1; 
+  {
+    try {
+      result = ((KDL::JntArrayVel const *)arg1)->value();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::JntArray((const KDL::JntArray &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_JntArrayVel_deriv(void * jarg1) {
+  void * jresult ;
+  KDL::JntArrayVel *arg1 = (KDL::JntArrayVel *) 0 ;
+  KDL::JntArray result;
+  
+  arg1 = (KDL::JntArrayVel *)jarg1; 
+  {
+    try {
+      result = ((KDL::JntArrayVel const *)arg1)->deriv();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::JntArray((const KDL::JntArray &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_JntArrayVel(void * jarg1) {
+  KDL::JntArrayVel *arg1 = (KDL::JntArrayVel *) 0 ;
+  
+  arg1 = (KDL::JntArrayVel *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_72(void * jarg1, void * jarg2, double jarg3) {
+  unsigned int jresult ;
+  KDL::JntArrayAcc *arg1 = 0 ;
+  KDL::JntArrayAcc *arg2 = 0 ;
+  double arg3 ;
+  bool result;
+  
+  arg1 = (KDL::JntArrayAcc *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayAcc const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::JntArrayAcc *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayAcc const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::JntArrayAcc const &)*arg1,(KDL::JntArrayAcc const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Equal__SWIG_73(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
+  KDL::JntArrayAcc *arg1 = 0 ;
+  KDL::JntArrayAcc *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (KDL::JntArrayAcc *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayAcc const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::JntArrayAcc *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayAcc const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (bool)KDL::Equal((KDL::JntArrayAcc const &)*arg1,(KDL::JntArrayAcc const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Add__SWIG_3(void * jarg1, void * jarg2, void * jarg3) {
+  KDL::JntArrayAcc *arg1 = 0 ;
+  KDL::JntArrayAcc *arg2 = 0 ;
+  KDL::JntArrayAcc *arg3 = 0 ;
+  
+  arg1 = (KDL::JntArrayAcc *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayAcc const & type is null", 0);
+    return ;
+  } 
+  arg2 = (KDL::JntArrayAcc *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayAcc const & type is null", 0);
+    return ;
+  } 
+  arg3 = (KDL::JntArrayAcc *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayAcc & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::Add((KDL::JntArrayAcc const &)*arg1,(KDL::JntArrayAcc const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Add__SWIG_4(void * jarg1, void * jarg2, void * jarg3) {
+  KDL::JntArrayAcc *arg1 = 0 ;
+  KDL::JntArrayVel *arg2 = 0 ;
+  KDL::JntArrayAcc *arg3 = 0 ;
+  
+  arg1 = (KDL::JntArrayAcc *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayAcc const & type is null", 0);
+    return ;
+  } 
+  arg2 = (KDL::JntArrayVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayVel const & type is null", 0);
+    return ;
+  } 
+  arg3 = (KDL::JntArrayAcc *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayAcc & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::Add((KDL::JntArrayAcc const &)*arg1,(KDL::JntArrayVel const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Add__SWIG_5(void * jarg1, void * jarg2, void * jarg3) {
+  KDL::JntArrayAcc *arg1 = 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  KDL::JntArrayAcc *arg3 = 0 ;
+  
+  arg1 = (KDL::JntArrayAcc *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayAcc const & type is null", 0);
+    return ;
+  } 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return ;
+  } 
+  arg3 = (KDL::JntArrayAcc *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayAcc & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::Add((KDL::JntArrayAcc const &)*arg1,(KDL::JntArray const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Subtract__SWIG_3(void * jarg1, void * jarg2, void * jarg3) {
+  KDL::JntArrayAcc *arg1 = 0 ;
+  KDL::JntArrayAcc *arg2 = 0 ;
+  KDL::JntArrayAcc *arg3 = 0 ;
+  
+  arg1 = (KDL::JntArrayAcc *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayAcc const & type is null", 0);
+    return ;
+  } 
+  arg2 = (KDL::JntArrayAcc *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayAcc const & type is null", 0);
+    return ;
+  } 
+  arg3 = (KDL::JntArrayAcc *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayAcc & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::Subtract((KDL::JntArrayAcc const &)*arg1,(KDL::JntArrayAcc const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Subtract__SWIG_4(void * jarg1, void * jarg2, void * jarg3) {
+  KDL::JntArrayAcc *arg1 = 0 ;
+  KDL::JntArrayVel *arg2 = 0 ;
+  KDL::JntArrayAcc *arg3 = 0 ;
+  
+  arg1 = (KDL::JntArrayAcc *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayAcc const & type is null", 0);
+    return ;
+  } 
+  arg2 = (KDL::JntArrayVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayVel const & type is null", 0);
+    return ;
+  } 
+  arg3 = (KDL::JntArrayAcc *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayAcc & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::Subtract((KDL::JntArrayAcc const &)*arg1,(KDL::JntArrayVel const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Subtract__SWIG_5(void * jarg1, void * jarg2, void * jarg3) {
+  KDL::JntArrayAcc *arg1 = 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  KDL::JntArrayAcc *arg3 = 0 ;
+  
+  arg1 = (KDL::JntArrayAcc *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayAcc const & type is null", 0);
+    return ;
+  } 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return ;
+  } 
+  arg3 = (KDL::JntArrayAcc *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayAcc & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::Subtract((KDL::JntArrayAcc const &)*arg1,(KDL::JntArray const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Multiply__SWIG_3(void * jarg1, double jarg2, void * jarg3) {
+  KDL::JntArrayAcc *arg1 = 0 ;
+  double *arg2 = 0 ;
+  KDL::JntArrayAcc *arg3 = 0 ;
+  double temp2 ;
+  
+  arg1 = (KDL::JntArrayAcc *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayAcc const & type is null", 0);
+    return ;
+  } 
+  temp2 = (double)jarg2; 
+  arg2 = &temp2; 
+  arg3 = (KDL::JntArrayAcc *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayAcc & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::Multiply((KDL::JntArrayAcc const &)*arg1,(double const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Multiply__SWIG_4(void * jarg1, void * jarg2, void * jarg3) {
+  KDL::JntArrayAcc *arg1 = 0 ;
+  KDL::doubleVel *arg2 = 0 ;
+  KDL::JntArrayAcc *arg3 = 0 ;
+  
+  arg1 = (KDL::JntArrayAcc *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayAcc const & type is null", 0);
+    return ;
+  } 
+  arg2 = (KDL::doubleVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::doubleVel const & type is null", 0);
+    return ;
+  } 
+  arg3 = (KDL::JntArrayAcc *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayAcc & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::Multiply((KDL::JntArrayAcc const &)*arg1,(Rall1d< double > const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Multiply__SWIG_5(void * jarg1, void * jarg2, void * jarg3) {
+  KDL::JntArrayAcc *arg1 = 0 ;
+  KDL::doubleAcc *arg2 = 0 ;
+  KDL::JntArrayAcc *arg3 = 0 ;
+  
+  arg1 = (KDL::JntArrayAcc *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayAcc const & type is null", 0);
+    return ;
+  } 
+  arg2 = (KDL::doubleAcc *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::doubleAcc const & type is null", 0);
+    return ;
+  } 
+  arg3 = (KDL::JntArrayAcc *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayAcc & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::Multiply((KDL::JntArrayAcc const &)*arg1,(Rall2d< double,double,double > const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Divide__SWIG_3(void * jarg1, double jarg2, void * jarg3) {
+  KDL::JntArrayAcc *arg1 = 0 ;
+  double *arg2 = 0 ;
+  KDL::JntArrayAcc *arg3 = 0 ;
+  double temp2 ;
+  
+  arg1 = (KDL::JntArrayAcc *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayAcc const & type is null", 0);
+    return ;
+  } 
+  temp2 = (double)jarg2; 
+  arg2 = &temp2; 
+  arg3 = (KDL::JntArrayAcc *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayAcc & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::Divide((KDL::JntArrayAcc const &)*arg1,(double const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Divide__SWIG_4(void * jarg1, void * jarg2, void * jarg3) {
+  KDL::JntArrayAcc *arg1 = 0 ;
+  KDL::doubleVel *arg2 = 0 ;
+  KDL::JntArrayAcc *arg3 = 0 ;
+  
+  arg1 = (KDL::JntArrayAcc *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayAcc const & type is null", 0);
+    return ;
+  } 
+  arg2 = (KDL::doubleVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::doubleVel const & type is null", 0);
+    return ;
+  } 
+  arg3 = (KDL::JntArrayAcc *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayAcc & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::Divide((KDL::JntArrayAcc const &)*arg1,(Rall1d< double > const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Divide__SWIG_5(void * jarg1, void * jarg2, void * jarg3) {
+  KDL::JntArrayAcc *arg1 = 0 ;
+  KDL::doubleAcc *arg2 = 0 ;
+  KDL::JntArrayAcc *arg3 = 0 ;
+  
+  arg1 = (KDL::JntArrayAcc *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayAcc const & type is null", 0);
+    return ;
+  } 
+  arg2 = (KDL::doubleAcc *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::doubleAcc const & type is null", 0);
+    return ;
+  } 
+  arg3 = (KDL::JntArrayAcc *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayAcc & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::Divide((KDL::JntArrayAcc const &)*arg1,(Rall2d< double,double,double > const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_SetToZero__SWIG_4(void * jarg1) {
+  KDL::JntArrayAcc *arg1 = 0 ;
+  
+  arg1 = (KDL::JntArrayAcc *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayAcc & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      KDL::SetToZero(*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_JntArrayAcc_q_set(void * jarg1, void * jarg2) {
+  KDL::JntArrayAcc *arg1 = (KDL::JntArrayAcc *) 0 ;
+  KDL::JntArray *arg2 = (KDL::JntArray *) 0 ;
+  
+  arg1 = (KDL::JntArrayAcc *)jarg1; 
+  arg2 = (KDL::JntArray *)jarg2; 
+  {
+    try {
+      if (arg1) (arg1)->q = *arg2;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_JntArrayAcc_q_get(void * jarg1) {
+  void * jresult ;
+  KDL::JntArrayAcc *arg1 = (KDL::JntArrayAcc *) 0 ;
+  KDL::JntArray *result = 0 ;
+  
+  arg1 = (KDL::JntArrayAcc *)jarg1; 
+  {
+    try {
+      result = (KDL::JntArray *)& ((arg1)->q);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_JntArrayAcc_qdot_set(void * jarg1, void * jarg2) {
+  KDL::JntArrayAcc *arg1 = (KDL::JntArrayAcc *) 0 ;
+  KDL::JntArray *arg2 = (KDL::JntArray *) 0 ;
+  
+  arg1 = (KDL::JntArrayAcc *)jarg1; 
+  arg2 = (KDL::JntArray *)jarg2; 
+  {
+    try {
+      if (arg1) (arg1)->qdot = *arg2;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_JntArrayAcc_qdot_get(void * jarg1) {
+  void * jresult ;
+  KDL::JntArrayAcc *arg1 = (KDL::JntArrayAcc *) 0 ;
+  KDL::JntArray *result = 0 ;
+  
+  arg1 = (KDL::JntArrayAcc *)jarg1; 
+  {
+    try {
+      result = (KDL::JntArray *)& ((arg1)->qdot);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_JntArrayAcc_qdotdot_set(void * jarg1, void * jarg2) {
+  KDL::JntArrayAcc *arg1 = (KDL::JntArrayAcc *) 0 ;
+  KDL::JntArray *arg2 = (KDL::JntArray *) 0 ;
+  
+  arg1 = (KDL::JntArrayAcc *)jarg1; 
+  arg2 = (KDL::JntArray *)jarg2; 
+  {
+    try {
+      if (arg1) (arg1)->qdotdot = *arg2;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_JntArrayAcc_qdotdot_get(void * jarg1) {
+  void * jresult ;
+  KDL::JntArrayAcc *arg1 = (KDL::JntArrayAcc *) 0 ;
+  KDL::JntArray *result = 0 ;
+  
+  arg1 = (KDL::JntArrayAcc *)jarg1; 
+  {
+    try {
+      result = (KDL::JntArray *)& ((arg1)->qdotdot);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_JntArrayAcc__SWIG_0() {
+  void * jresult ;
+  KDL::JntArrayAcc *result = 0 ;
+  
+  {
+    try {
+      result = (KDL::JntArrayAcc *)new KDL::JntArrayAcc();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_JntArrayAcc__SWIG_1(unsigned int jarg1) {
+  void * jresult ;
+  unsigned int arg1 ;
+  KDL::JntArrayAcc *result = 0 ;
+  
+  arg1 = (unsigned int)jarg1; 
+  {
+    try {
+      result = (KDL::JntArrayAcc *)new KDL::JntArrayAcc(arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_JntArrayAcc__SWIG_2(void * jarg1, void * jarg2, void * jarg3) {
+  void * jresult ;
+  KDL::JntArray *arg1 = 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  KDL::JntArray *arg3 = 0 ;
+  KDL::JntArrayAcc *result = 0 ;
+  
+  arg1 = (KDL::JntArray *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::JntArray *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::JntArrayAcc *)new KDL::JntArrayAcc((KDL::JntArray const &)*arg1,(KDL::JntArray const &)*arg2,(KDL::JntArray const &)*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_JntArrayAcc__SWIG_3(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::JntArray *arg1 = 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  KDL::JntArrayAcc *result = 0 ;
+  
+  arg1 = (KDL::JntArray *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::JntArrayAcc *)new KDL::JntArrayAcc((KDL::JntArray const &)*arg1,(KDL::JntArray const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_JntArrayAcc__SWIG_4(void * jarg1) {
+  void * jresult ;
+  KDL::JntArray *arg1 = 0 ;
+  KDL::JntArrayAcc *result = 0 ;
+  
+  arg1 = (KDL::JntArray *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::JntArrayAcc *)new KDL::JntArrayAcc((KDL::JntArray const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_JntArrayAcc_resize(void * jarg1, unsigned int jarg2) {
+  KDL::JntArrayAcc *arg1 = (KDL::JntArrayAcc *) 0 ;
+  unsigned int arg2 ;
+  
+  arg1 = (KDL::JntArrayAcc *)jarg1; 
+  arg2 = (unsigned int)jarg2; 
+  {
+    try {
+      (arg1)->resize(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_JntArrayAcc_value(void * jarg1) {
+  void * jresult ;
+  KDL::JntArrayAcc *arg1 = (KDL::JntArrayAcc *) 0 ;
+  KDL::JntArray result;
+  
+  arg1 = (KDL::JntArrayAcc *)jarg1; 
+  {
+    try {
+      result = ((KDL::JntArrayAcc const *)arg1)->value();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::JntArray((const KDL::JntArray &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_JntArrayAcc_deriv(void * jarg1) {
+  void * jresult ;
+  KDL::JntArrayAcc *arg1 = (KDL::JntArrayAcc *) 0 ;
+  KDL::JntArray result;
+  
+  arg1 = (KDL::JntArrayAcc *)jarg1; 
+  {
+    try {
+      result = ((KDL::JntArrayAcc const *)arg1)->deriv();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::JntArray((const KDL::JntArray &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_JntArrayAcc_dderiv(void * jarg1) {
+  void * jresult ;
+  KDL::JntArrayAcc *arg1 = (KDL::JntArrayAcc *) 0 ;
+  KDL::JntArray result;
+  
+  arg1 = (KDL::JntArrayAcc *)jarg1; 
+  {
+    try {
+      result = ((KDL::JntArrayAcc const *)arg1)->dderiv();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::JntArray((const KDL::JntArray &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_JntArrayAcc(void * jarg1) {
+  KDL::JntArrayAcc *arg1 = (KDL::JntArrayAcc *) 0 ;
+  
+  arg1 = (KDL::JntArrayAcc *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_RotationalInertia__SWIG_0(double jarg1, double jarg2, double jarg3, double jarg4, double jarg5, double jarg6) {
+  void * jresult ;
+  double arg1 ;
+  double arg2 ;
+  double arg3 ;
+  double arg4 ;
+  double arg5 ;
+  double arg6 ;
+  KDL::RotationalInertia *result = 0 ;
+  
+  arg1 = (double)jarg1; 
+  arg2 = (double)jarg2; 
+  arg3 = (double)jarg3; 
+  arg4 = (double)jarg4; 
+  arg5 = (double)jarg5; 
+  arg6 = (double)jarg6; 
+  {
+    try {
+      result = (KDL::RotationalInertia *)new KDL::RotationalInertia(arg1,arg2,arg3,arg4,arg5,arg6);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_RotationalInertia__SWIG_1(double jarg1, double jarg2, double jarg3, double jarg4, double jarg5) {
+  void * jresult ;
+  double arg1 ;
+  double arg2 ;
+  double arg3 ;
+  double arg4 ;
+  double arg5 ;
+  KDL::RotationalInertia *result = 0 ;
+  
+  arg1 = (double)jarg1; 
+  arg2 = (double)jarg2; 
+  arg3 = (double)jarg3; 
+  arg4 = (double)jarg4; 
+  arg5 = (double)jarg5; 
+  {
+    try {
+      result = (KDL::RotationalInertia *)new KDL::RotationalInertia(arg1,arg2,arg3,arg4,arg5);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_RotationalInertia__SWIG_2(double jarg1, double jarg2, double jarg3, double jarg4) {
+  void * jresult ;
+  double arg1 ;
+  double arg2 ;
+  double arg3 ;
+  double arg4 ;
+  KDL::RotationalInertia *result = 0 ;
+  
+  arg1 = (double)jarg1; 
+  arg2 = (double)jarg2; 
+  arg3 = (double)jarg3; 
+  arg4 = (double)jarg4; 
+  {
+    try {
+      result = (KDL::RotationalInertia *)new KDL::RotationalInertia(arg1,arg2,arg3,arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_RotationalInertia__SWIG_3(double jarg1, double jarg2, double jarg3) {
+  void * jresult ;
+  double arg1 ;
+  double arg2 ;
+  double arg3 ;
+  KDL::RotationalInertia *result = 0 ;
+  
+  arg1 = (double)jarg1; 
+  arg2 = (double)jarg2; 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (KDL::RotationalInertia *)new KDL::RotationalInertia(arg1,arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_RotationalInertia__SWIG_4(double jarg1, double jarg2) {
+  void * jresult ;
+  double arg1 ;
+  double arg2 ;
+  KDL::RotationalInertia *result = 0 ;
+  
+  arg1 = (double)jarg1; 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      result = (KDL::RotationalInertia *)new KDL::RotationalInertia(arg1,arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_RotationalInertia__SWIG_5(double jarg1) {
+  void * jresult ;
+  double arg1 ;
+  KDL::RotationalInertia *result = 0 ;
+  
+  arg1 = (double)jarg1; 
+  {
+    try {
+      result = (KDL::RotationalInertia *)new KDL::RotationalInertia(arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_RotationalInertia__SWIG_6() {
+  void * jresult ;
+  KDL::RotationalInertia *result = 0 ;
+  
+  {
+    try {
+      result = (KDL::RotationalInertia *)new KDL::RotationalInertia();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_RotationalInertia_Zero() {
+  void * jresult ;
+  KDL::RotationalInertia result;
+  
+  {
+    try {
+      result = KDL::RotationalInertia::Zero();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::RotationalInertia((const KDL::RotationalInertia &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_RotationalInertia(void * jarg1) {
+  KDL::RotationalInertia *arg1 = (KDL::RotationalInertia *) 0 ;
+  
+  arg1 = (KDL::RotationalInertia *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_RotationalInertia_data_set(void * jarg1, void * jarg2) {
+  KDL::RotationalInertia *arg1 = (KDL::RotationalInertia *) 0 ;
+  double *arg2 ;
+  
+  arg1 = (KDL::RotationalInertia *)jarg1; 
+  arg2 = (double *)jarg2; 
+  {
+    try {
+      {
+        size_t ii;
+        double *b = (double *) arg1->data;
+        for (ii = 0; ii < (size_t)9; ii++) b[ii] = *((double *) arg2 + ii);
+      }
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_RotationalInertia_data_get(void * jarg1) {
+  void * jresult ;
+  KDL::RotationalInertia *arg1 = (KDL::RotationalInertia *) 0 ;
+  double *result = 0 ;
+  
+  arg1 = (KDL::RotationalInertia *)jarg1; 
+  {
+    try {
+      result = (double *)(double *) ((arg1)->data);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_RigidBodyInertia__SWIG_0(double jarg1, void * jarg2, void * jarg3) {
+  void * jresult ;
+  double arg1 ;
+  KDL::Vector *arg2 = 0 ;
+  KDL::RotationalInertia *arg3 = 0 ;
+  KDL::RigidBodyInertia *result = 0 ;
+  
+  arg1 = (double)jarg1; 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::RotationalInertia *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::RotationalInertia const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::RigidBodyInertia *)new KDL::RigidBodyInertia(arg1,(KDL::Vector const &)*arg2,(KDL::RotationalInertia const &)*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_RigidBodyInertia__SWIG_1(double jarg1, void * jarg2) {
+  void * jresult ;
+  double arg1 ;
+  KDL::Vector *arg2 = 0 ;
+  KDL::RigidBodyInertia *result = 0 ;
+  
+  arg1 = (double)jarg1; 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::RigidBodyInertia *)new KDL::RigidBodyInertia(arg1,(KDL::Vector const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_RigidBodyInertia__SWIG_2(double jarg1) {
+  void * jresult ;
+  double arg1 ;
+  KDL::RigidBodyInertia *result = 0 ;
+  
+  arg1 = (double)jarg1; 
+  {
+    try {
+      result = (KDL::RigidBodyInertia *)new KDL::RigidBodyInertia(arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_RigidBodyInertia__SWIG_3() {
+  void * jresult ;
+  KDL::RigidBodyInertia *result = 0 ;
+  
+  {
+    try {
+      result = (KDL::RigidBodyInertia *)new KDL::RigidBodyInertia();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_RigidBodyInertia_Zero() {
+  void * jresult ;
+  KDL::RigidBodyInertia result;
+  
+  {
+    try {
+      result = KDL::RigidBodyInertia::Zero();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::RigidBodyInertia((const KDL::RigidBodyInertia &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_RigidBodyInertia(void * jarg1) {
+  KDL::RigidBodyInertia *arg1 = (KDL::RigidBodyInertia *) 0 ;
+  
+  arg1 = (KDL::RigidBodyInertia *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_RigidBodyInertia_RefPoint(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::RigidBodyInertia *arg1 = (KDL::RigidBodyInertia *) 0 ;
+  KDL::Vector *arg2 = 0 ;
+  KDL::RigidBodyInertia result;
+  
+  arg1 = (KDL::RigidBodyInertia *)jarg1; 
+  arg2 = (KDL::Vector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Vector const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (arg1)->RefPoint((KDL::Vector const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::RigidBodyInertia((const KDL::RigidBodyInertia &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_RigidBodyInertia_getMass(void * jarg1) {
+  double jresult ;
+  KDL::RigidBodyInertia *arg1 = (KDL::RigidBodyInertia *) 0 ;
+  double result;
+  
+  arg1 = (KDL::RigidBodyInertia *)jarg1; 
+  {
+    try {
+      result = (double)((KDL::RigidBodyInertia const *)arg1)->getMass();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_RigidBodyInertia_getCOG(void * jarg1) {
+  void * jresult ;
+  KDL::RigidBodyInertia *arg1 = (KDL::RigidBodyInertia *) 0 ;
+  KDL::Vector result;
+  
+  arg1 = (KDL::RigidBodyInertia *)jarg1; 
+  {
+    try {
+      result = ((KDL::RigidBodyInertia const *)arg1)->getCOG();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Vector((const KDL::Vector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_RigidBodyInertia_getRotationalInertia(void * jarg1) {
+  void * jresult ;
+  KDL::RigidBodyInertia *arg1 = (KDL::RigidBodyInertia *) 0 ;
+  KDL::RotationalInertia result;
+  
+  arg1 = (KDL::RigidBodyInertia *)jarg1; 
+  {
+    try {
+      result = ((KDL::RigidBodyInertia const *)arg1)->getRotationalInertia();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::RotationalInertia((const KDL::RotationalInertia &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Segment__SWIG_0(char * jarg1, void * jarg2, void * jarg3, void * jarg4) {
+  void * jresult ;
+  std::string *arg1 = 0 ;
+  KDL::Joint *arg2 = 0 ;
+  KDL::Frame *arg3 = 0 ;
+  KDL::RigidBodyInertia *arg4 = 0 ;
+  KDL::Segment *result = 0 ;
+  
+  if (!jarg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg1_str(jarg1);
+  arg1 = &arg1_str; 
+  arg2 = (KDL::Joint *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Joint const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::Frame *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return 0;
+  } 
+  arg4 = (KDL::RigidBodyInertia *)jarg4;
+  if (!arg4) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::RigidBodyInertia const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::Segment *)new KDL::Segment((std::string const &)*arg1,(KDL::Joint const &)*arg2,(KDL::Frame const &)*arg3,(KDL::RigidBodyInertia const &)*arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Segment__SWIG_1(char * jarg1, void * jarg2, void * jarg3) {
+  void * jresult ;
+  std::string *arg1 = 0 ;
+  KDL::Joint *arg2 = 0 ;
+  KDL::Frame *arg3 = 0 ;
+  KDL::Segment *result = 0 ;
+  
+  if (!jarg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg1_str(jarg1);
+  arg1 = &arg1_str; 
+  arg2 = (KDL::Joint *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Joint const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::Frame *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::Segment *)new KDL::Segment((std::string const &)*arg1,(KDL::Joint const &)*arg2,(KDL::Frame const &)*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Segment__SWIG_2(char * jarg1, void * jarg2) {
+  void * jresult ;
+  std::string *arg1 = 0 ;
+  KDL::Joint *arg2 = 0 ;
+  KDL::Segment *result = 0 ;
+  
+  if (!jarg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg1_str(jarg1);
+  arg1 = &arg1_str; 
+  arg2 = (KDL::Joint *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Joint const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::Segment *)new KDL::Segment((std::string const &)*arg1,(KDL::Joint const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Segment__SWIG_3(char * jarg1) {
+  void * jresult ;
+  std::string *arg1 = 0 ;
+  KDL::Segment *result = 0 ;
+  
+  if (!jarg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg1_str(jarg1);
+  arg1 = &arg1_str; 
+  {
+    try {
+      result = (KDL::Segment *)new KDL::Segment((std::string const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Segment__SWIG_4(void * jarg1, void * jarg2, void * jarg3) {
+  void * jresult ;
+  KDL::Joint *arg1 = 0 ;
+  KDL::Frame *arg2 = 0 ;
+  KDL::RigidBodyInertia *arg3 = 0 ;
+  KDL::Segment *result = 0 ;
+  
+  arg1 = (KDL::Joint *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Joint const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Frame *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::RigidBodyInertia *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::RigidBodyInertia const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::Segment *)new KDL::Segment((KDL::Joint const &)*arg1,(KDL::Frame const &)*arg2,(KDL::RigidBodyInertia const &)*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Segment__SWIG_5(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::Joint *arg1 = 0 ;
+  KDL::Frame *arg2 = 0 ;
+  KDL::Segment *result = 0 ;
+  
+  arg1 = (KDL::Joint *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Joint const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::Frame *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::Segment *)new KDL::Segment((KDL::Joint const &)*arg1,(KDL::Frame const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Segment__SWIG_6(void * jarg1) {
+  void * jresult ;
+  KDL::Joint *arg1 = 0 ;
+  KDL::Segment *result = 0 ;
+  
+  arg1 = (KDL::Joint *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Joint const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::Segment *)new KDL::Segment((KDL::Joint const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Segment__SWIG_7() {
+  void * jresult ;
+  KDL::Segment *result = 0 ;
+  
+  {
+    try {
+      result = (KDL::Segment *)new KDL::Segment();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Segment__SWIG_8(void * jarg1) {
+  void * jresult ;
+  KDL::Segment *arg1 = 0 ;
+  KDL::Segment *result = 0 ;
+  
+  arg1 = (KDL::Segment *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Segment const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::Segment *)new KDL::Segment((KDL::Segment const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_Segment(void * jarg1) {
+  KDL::Segment *arg1 = (KDL::Segment *) 0 ;
+  
+  arg1 = (KDL::Segment *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Segment_pose(void * jarg1, double jarg2) {
+  void * jresult ;
+  KDL::Segment *arg1 = (KDL::Segment *) 0 ;
+  double *arg2 = 0 ;
+  double temp2 ;
+  KDL::Frame result;
+  
+  arg1 = (KDL::Segment *)jarg1; 
+  temp2 = (double)jarg2; 
+  arg2 = &temp2; 
+  {
+    try {
+      result = ((KDL::Segment const *)arg1)->pose((double const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Frame((const KDL::Frame &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Segment_twist(void * jarg1, double jarg2, double jarg3) {
+  void * jresult ;
+  KDL::Segment *arg1 = (KDL::Segment *) 0 ;
+  double *arg2 = 0 ;
+  double *arg3 = 0 ;
+  double temp2 ;
+  double temp3 ;
+  KDL::Twist result;
+  
+  arg1 = (KDL::Segment *)jarg1; 
+  temp2 = (double)jarg2; 
+  arg2 = &temp2; 
+  temp3 = (double)jarg3; 
+  arg3 = &temp3; 
+  {
+    try {
+      result = ((KDL::Segment const *)arg1)->twist((double const &)*arg2,(double const &)*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Twist((const KDL::Twist &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT char * SWIGSTDCALL CSharp_Kdl_Segment_getName(void * jarg1) {
+  char * jresult ;
+  KDL::Segment *arg1 = (KDL::Segment *) 0 ;
+  std::string *result = 0 ;
+  
+  arg1 = (KDL::Segment *)jarg1; 
+  {
+    try {
+      result = (std::string *) &((KDL::Segment const *)arg1)->getName();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = SWIG_csharp_string_callback(result->c_str()); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Segment_getJoint(void * jarg1) {
+  void * jresult ;
+  KDL::Segment *arg1 = (KDL::Segment *) 0 ;
+  KDL::Joint *result = 0 ;
+  
+  arg1 = (KDL::Segment *)jarg1; 
+  {
+    try {
+      result = (KDL::Joint *) &((KDL::Segment const *)arg1)->getJoint();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Segment_getInertia(void * jarg1) {
+  void * jresult ;
+  KDL::Segment *arg1 = (KDL::Segment *) 0 ;
+  KDL::RigidBodyInertia *result = 0 ;
+  
+  arg1 = (KDL::Segment *)jarg1; 
+  {
+    try {
+      result = (KDL::RigidBodyInertia *) &((KDL::Segment const *)arg1)->getInertia();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Segment_setInertia(void * jarg1, void * jarg2) {
+  KDL::Segment *arg1 = (KDL::Segment *) 0 ;
+  KDL::RigidBodyInertia *arg2 = 0 ;
+  
+  arg1 = (KDL::Segment *)jarg1; 
+  arg2 = (KDL::RigidBodyInertia *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::RigidBodyInertia const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      (arg1)->setInertia((KDL::RigidBodyInertia const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Segment_getFrameToTip(void * jarg1) {
+  void * jresult ;
+  KDL::Segment *arg1 = (KDL::Segment *) 0 ;
+  KDL::Frame result;
+  
+  arg1 = (KDL::Segment *)jarg1; 
+  {
+    try {
+      result = ((KDL::Segment const *)arg1)->getFrameToTip();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = new KDL::Frame((const KDL::Frame &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Segment_setFrameToTip(void * jarg1, void * jarg2) {
+  KDL::Segment *arg1 = (KDL::Segment *) 0 ;
+  KDL::Frame *arg2 = 0 ;
+  
+  arg1 = (KDL::Segment *)jarg1; 
+  arg2 = (KDL::Frame *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      (arg1)->setFrameToTip((KDL::Frame const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Chain_segments_set(void * jarg1, void * jarg2) {
+  KDL::Chain *arg1 = (KDL::Chain *) 0 ;
+  std::vector< KDL::Segment > *arg2 = (std::vector< KDL::Segment > *) 0 ;
+  
+  arg1 = (KDL::Chain *)jarg1; 
+  arg2 = (std::vector< KDL::Segment > *)jarg2; 
+  {
+    try {
+      if (arg1) (arg1)->segments = *arg2;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Chain_segments_get(void * jarg1) {
+  void * jresult ;
+  KDL::Chain *arg1 = (KDL::Chain *) 0 ;
+  std::vector< KDL::Segment > *result = 0 ;
+  
+  arg1 = (KDL::Chain *)jarg1; 
+  {
+    try {
+      result = (std::vector< KDL::Segment > *)& ((arg1)->segments);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Chain__SWIG_0() {
+  void * jresult ;
+  KDL::Chain *result = 0 ;
+  
+  {
+    try {
+      result = (KDL::Chain *)new KDL::Chain();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_Chain__SWIG_1(void * jarg1) {
+  void * jresult ;
+  KDL::Chain *arg1 = 0 ;
+  KDL::Chain *result = 0 ;
+  
+  arg1 = (KDL::Chain *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Chain const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::Chain *)new KDL::Chain((KDL::Chain const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Chain_addSegment(void * jarg1, void * jarg2) {
+  KDL::Chain *arg1 = (KDL::Chain *) 0 ;
+  KDL::Segment *arg2 = 0 ;
+  
+  arg1 = (KDL::Chain *)jarg1; 
+  arg2 = (KDL::Segment *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Segment const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      (arg1)->addSegment((KDL::Segment const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_Chain_addChain(void * jarg1, void * jarg2) {
+  KDL::Chain *arg1 = (KDL::Chain *) 0 ;
+  KDL::Chain *arg2 = 0 ;
+  
+  arg1 = (KDL::Chain *)jarg1; 
+  arg2 = (KDL::Chain *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Chain const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      (arg1)->addChain((KDL::Chain const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Chain_getNrOfJoints(void * jarg1) {
+  unsigned int jresult ;
+  KDL::Chain *arg1 = (KDL::Chain *) 0 ;
+  unsigned int result;
+  
+  arg1 = (KDL::Chain *)jarg1; 
+  {
+    try {
+      result = (unsigned int)((KDL::Chain const *)arg1)->getNrOfJoints();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_Chain_getNrOfSegments(void * jarg1) {
+  unsigned int jresult ;
+  KDL::Chain *arg1 = (KDL::Chain *) 0 ;
+  unsigned int result;
+  
+  arg1 = (KDL::Chain *)jarg1; 
+  {
+    try {
+      result = (unsigned int)((KDL::Chain const *)arg1)->getNrOfSegments();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_Chain_getSegment__SWIG_0(void * jarg1, unsigned int jarg2) {
+  void * jresult ;
+  KDL::Chain *arg1 = (KDL::Chain *) 0 ;
+  unsigned int arg2 ;
+  KDL::Segment *result = 0 ;
+  
+  arg1 = (KDL::Chain *)jarg1; 
+  arg2 = (unsigned int)jarg2; 
+  {
+    try {
+      result = (KDL::Segment *) &((KDL::Chain const *)arg1)->getSegment(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_Chain(void * jarg1) {
+  KDL::Chain *arg1 = (KDL::Chain *) 0 ;
+  
+  arg1 = (KDL::Chain *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_SolverI_E_DEGRADED_get() {
+  int jresult ;
+  int result;
+  
+  {
+    try {
+      result = (int)KDL::SolverI::E_DEGRADED;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (int)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_SolverI_E_NOERROR_get() {
+  int jresult ;
+  int result;
+  
+  {
+    try {
+      result = (int)KDL::SolverI::E_NOERROR;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (int)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_SolverI_E_NO_CONVERGE_get() {
+  int jresult ;
+  int result;
+  
+  {
+    try {
+      result = (int)KDL::SolverI::E_NO_CONVERGE;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (int)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_SolverI_E_UNDEFINED_get() {
+  int jresult ;
+  int result;
+  
+  {
+    try {
+      result = (int)KDL::SolverI::E_UNDEFINED;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (int)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_SolverI_E_NOT_UP_TO_DATE_get() {
+  int jresult ;
+  int result;
+  
+  {
+    try {
+      result = (int)KDL::SolverI::E_NOT_UP_TO_DATE;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (int)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_SolverI_E_SIZE_MISMATCH_get() {
+  int jresult ;
+  int result;
+  
+  {
+    try {
+      result = (int)KDL::SolverI::E_SIZE_MISMATCH;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (int)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_SolverI_E_MAX_ITERATIONS_EXCEEDED_get() {
+  int jresult ;
+  int result;
+  
+  {
+    try {
+      result = (int)KDL::SolverI::E_MAX_ITERATIONS_EXCEEDED;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (int)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_SolverI_E_OUT_OF_RANGE_get() {
+  int jresult ;
+  int result;
+  
+  {
+    try {
+      result = (int)KDL::SolverI::E_OUT_OF_RANGE;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (int)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_SolverI_E_NOT_IMPLEMENTED_get() {
+  int jresult ;
+  int result;
+  
+  {
+    try {
+      result = (int)KDL::SolverI::E_NOT_IMPLEMENTED;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (int)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_SolverI_E_SVD_FAILED_get() {
+  int jresult ;
+  int result;
+  
+  {
+    try {
+      result = (int)KDL::SolverI::E_SVD_FAILED;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (int)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_SolverI(void * jarg1) {
+  KDL::SolverI *arg1 = (KDL::SolverI *) 0 ;
+  
+  arg1 = (KDL::SolverI *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_SolverI_getError(void * jarg1) {
+  int jresult ;
+  KDL::SolverI *arg1 = (KDL::SolverI *) 0 ;
+  int result;
+  
+  arg1 = (KDL::SolverI *)jarg1; 
+  {
+    try {
+      result = (int)((KDL::SolverI const *)arg1)->getError();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT char * SWIGSTDCALL CSharp_Kdl_SolverI_strError(void * jarg1, int jarg2) {
+  char * jresult ;
+  KDL::SolverI *arg1 = (KDL::SolverI *) 0 ;
+  int arg2 ;
+  char *result = 0 ;
+  
+  arg1 = (KDL::SolverI *)jarg1; 
+  arg2 = (int)jarg2; 
+  {
+    try {
+      result = (char *)((KDL::SolverI const *)arg1)->strError(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = SWIG_csharp_string_callback((const char *)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_SolverI_updateInternalDataStructures(void * jarg1) {
+  KDL::SolverI *arg1 = (KDL::SolverI *) 0 ;
+  
+  arg1 = (KDL::SolverI *)jarg1; 
+  {
+    try {
+      (arg1)->updateInternalDataStructures();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_ChainJntToJacSolver(void * jarg1) {
+  void * jresult ;
+  KDL::Chain *arg1 = 0 ;
+  KDL::ChainJntToJacSolver *result = 0 ;
+  
+  arg1 = (KDL::Chain *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Chain const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::ChainJntToJacSolver *)new KDL::ChainJntToJacSolver((KDL::Chain const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_ChainJntToJacSolver(void * jarg1) {
+  KDL::ChainJntToJacSolver *arg1 = (KDL::ChainJntToJacSolver *) 0 ;
+  
+  arg1 = (KDL::ChainJntToJacSolver *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainJntToJacSolver_JntToJac__SWIG_0(void * jarg1, void * jarg2, void * jarg3, int jarg4) {
+  int jresult ;
+  KDL::ChainJntToJacSolver *arg1 = (KDL::ChainJntToJacSolver *) 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  KDL::Jacobian *arg3 = 0 ;
+  int arg4 ;
+  int result;
+  
+  arg1 = (KDL::ChainJntToJacSolver *)jarg1; 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::Jacobian *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Jacobian & type is null", 0);
+    return 0;
+  } 
+  arg4 = (int)jarg4; 
+  {
+    try {
+      result = (int)(arg1)->JntToJac((KDL::JntArray const &)*arg2,*arg3,arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainJntToJacSolver_JntToJac__SWIG_1(void * jarg1, void * jarg2, void * jarg3) {
+  int jresult ;
+  KDL::ChainJntToJacSolver *arg1 = (KDL::ChainJntToJacSolver *) 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  KDL::Jacobian *arg3 = 0 ;
+  int result;
+  
+  arg1 = (KDL::ChainJntToJacSolver *)jarg1; 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::Jacobian *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Jacobian & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (int)(arg1)->JntToJac((KDL::JntArray const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainJntToJacSolver_setLockedJoints(void * jarg1, void * jarg2) {
+  int jresult ;
+  KDL::ChainJntToJacSolver *arg1 = (KDL::ChainJntToJacSolver *) 0 ;
+  std::vector< bool > arg2 ;
+  std::vector< bool > const *argp2 ;
+  int result;
+  
+  arg1 = (KDL::ChainJntToJacSolver *)jarg1; 
+  argp2 = (std::vector< bool > *)jarg2; 
+  if (!argp2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null std::vector< bool > const", 0);
+    return 0;
+  }
+  arg2 = *argp2; 
+  {
+    try {
+      result = (int)(arg1)->setLockedJoints(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_ChainJntToJacSolver_updateInternalDataStructures(void * jarg1) {
+  KDL::ChainJntToJacSolver *arg1 = (KDL::ChainJntToJacSolver *) 0 ;
+  
+  arg1 = (KDL::ChainJntToJacSolver *)jarg1; 
+  {
+    try {
+      (arg1)->updateInternalDataStructures();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainFkSolverPos_JntToCart__SWIG_0(void * jarg1, void * jarg2, void * jarg3, int jarg4) {
+  int jresult ;
+  KDL::ChainFkSolverPos *arg1 = (KDL::ChainFkSolverPos *) 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  KDL::Frame *arg3 = 0 ;
+  int arg4 ;
+  int result;
+  
+  arg1 = (KDL::ChainFkSolverPos *)jarg1; 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::Frame *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame & type is null", 0);
+    return 0;
+  } 
+  arg4 = (int)jarg4; 
+  {
+    try {
+      result = (int)(arg1)->JntToCart((KDL::JntArray const &)*arg2,*arg3,arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainFkSolverPos_JntToCart__SWIG_1(void * jarg1, void * jarg2, void * jarg3) {
+  int jresult ;
+  KDL::ChainFkSolverPos *arg1 = (KDL::ChainFkSolverPos *) 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  KDL::Frame *arg3 = 0 ;
+  int result;
+  
+  arg1 = (KDL::ChainFkSolverPos *)jarg1; 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::Frame *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (int)(arg1)->JntToCart((KDL::JntArray const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainFkSolverPos_JntToCart__SWIG_2(void * jarg1, void * jarg2, void * jarg3, int jarg4) {
+  int jresult ;
+  KDL::ChainFkSolverPos *arg1 = (KDL::ChainFkSolverPos *) 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  std::vector< KDL::Frame > *arg3 = 0 ;
+  int arg4 ;
+  int result;
+  
+  arg1 = (KDL::ChainFkSolverPos *)jarg1; 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (std::vector< KDL::Frame > *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector< KDL::Frame > & type is null", 0);
+    return 0;
+  } 
+  arg4 = (int)jarg4; 
+  {
+    try {
+      result = (int)(arg1)->JntToCart((KDL::JntArray const &)*arg2,*arg3,arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainFkSolverPos_JntToCart__SWIG_3(void * jarg1, void * jarg2, void * jarg3) {
+  int jresult ;
+  KDL::ChainFkSolverPos *arg1 = (KDL::ChainFkSolverPos *) 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  std::vector< KDL::Frame > *arg3 = 0 ;
+  int result;
+  
+  arg1 = (KDL::ChainFkSolverPos *)jarg1; 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (std::vector< KDL::Frame > *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector< KDL::Frame > & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (int)(arg1)->JntToCart((KDL::JntArray const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_ChainFkSolverPos_updateInternalDataStructures(void * jarg1) {
+  KDL::ChainFkSolverPos *arg1 = (KDL::ChainFkSolverPos *) 0 ;
+  
+  arg1 = (KDL::ChainFkSolverPos *)jarg1; 
+  {
+    try {
+      (arg1)->updateInternalDataStructures();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_ChainFkSolverPos(void * jarg1) {
+  KDL::ChainFkSolverPos *arg1 = (KDL::ChainFkSolverPos *) 0 ;
+  
+  arg1 = (KDL::ChainFkSolverPos *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainFkSolverVel_JntToCart__SWIG_0(void * jarg1, void * jarg2, void * jarg3, int jarg4) {
+  int jresult ;
+  KDL::ChainFkSolverVel *arg1 = (KDL::ChainFkSolverVel *) 0 ;
+  KDL::JntArrayVel *arg2 = 0 ;
+  KDL::FrameVel *arg3 = 0 ;
+  int arg4 ;
+  int result;
+  
+  arg1 = (KDL::ChainFkSolverVel *)jarg1; 
+  arg2 = (KDL::JntArrayVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayVel const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::FrameVel *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameVel & type is null", 0);
+    return 0;
+  } 
+  arg4 = (int)jarg4; 
+  {
+    try {
+      result = (int)(arg1)->JntToCart((KDL::JntArrayVel const &)*arg2,*arg3,arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainFkSolverVel_JntToCart__SWIG_1(void * jarg1, void * jarg2, void * jarg3) {
+  int jresult ;
+  KDL::ChainFkSolverVel *arg1 = (KDL::ChainFkSolverVel *) 0 ;
+  KDL::JntArrayVel *arg2 = 0 ;
+  KDL::FrameVel *arg3 = 0 ;
+  int result;
+  
+  arg1 = (KDL::ChainFkSolverVel *)jarg1; 
+  arg2 = (KDL::JntArrayVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayVel const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::FrameVel *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameVel & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (int)(arg1)->JntToCart((KDL::JntArrayVel const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainFkSolverVel_JntToCart__SWIG_2(void * jarg1, void * jarg2, void * jarg3, int jarg4) {
+  int jresult ;
+  KDL::ChainFkSolverVel *arg1 = (KDL::ChainFkSolverVel *) 0 ;
+  KDL::JntArrayVel *arg2 = 0 ;
+  std::vector< KDL::FrameVel > *arg3 = 0 ;
+  int arg4 ;
+  int result;
+  
+  arg1 = (KDL::ChainFkSolverVel *)jarg1; 
+  arg2 = (KDL::JntArrayVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayVel const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (std::vector< KDL::FrameVel > *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector< KDL::FrameVel > & type is null", 0);
+    return 0;
+  } 
+  arg4 = (int)jarg4; 
+  {
+    try {
+      result = (int)(arg1)->JntToCart((KDL::JntArrayVel const &)*arg2,*arg3,arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainFkSolverVel_JntToCart__SWIG_3(void * jarg1, void * jarg2, void * jarg3) {
+  int jresult ;
+  KDL::ChainFkSolverVel *arg1 = (KDL::ChainFkSolverVel *) 0 ;
+  KDL::JntArrayVel *arg2 = 0 ;
+  std::vector< KDL::FrameVel > *arg3 = 0 ;
+  int result;
+  
+  arg1 = (KDL::ChainFkSolverVel *)jarg1; 
+  arg2 = (KDL::JntArrayVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayVel const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (std::vector< KDL::FrameVel > *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector< KDL::FrameVel > & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (int)(arg1)->JntToCart((KDL::JntArrayVel const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_ChainFkSolverVel_updateInternalDataStructures(void * jarg1) {
+  KDL::ChainFkSolverVel *arg1 = (KDL::ChainFkSolverVel *) 0 ;
+  
+  arg1 = (KDL::ChainFkSolverVel *)jarg1; 
+  {
+    try {
+      (arg1)->updateInternalDataStructures();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_ChainFkSolverVel(void * jarg1) {
+  KDL::ChainFkSolverVel *arg1 = (KDL::ChainFkSolverVel *) 0 ;
+  
+  arg1 = (KDL::ChainFkSolverVel *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainFkSolverAcc_JntToCart__SWIG_0(void * jarg1, void * jarg2, void * jarg3, int jarg4) {
+  int jresult ;
+  KDL::ChainFkSolverAcc *arg1 = (KDL::ChainFkSolverAcc *) 0 ;
+  KDL::JntArrayAcc *arg2 = 0 ;
+  KDL::FrameAcc *arg3 = 0 ;
+  int arg4 ;
+  int result;
+  
+  arg1 = (KDL::ChainFkSolverAcc *)jarg1; 
+  arg2 = (KDL::JntArrayAcc *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayAcc const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::FrameAcc *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameAcc & type is null", 0);
+    return 0;
+  } 
+  arg4 = (int)jarg4; 
+  {
+    try {
+      result = (int)(arg1)->JntToCart((KDL::JntArrayAcc const &)*arg2,*arg3,arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainFkSolverAcc_JntToCart__SWIG_1(void * jarg1, void * jarg2, void * jarg3) {
+  int jresult ;
+  KDL::ChainFkSolverAcc *arg1 = (KDL::ChainFkSolverAcc *) 0 ;
+  KDL::JntArrayAcc *arg2 = 0 ;
+  KDL::FrameAcc *arg3 = 0 ;
+  int result;
+  
+  arg1 = (KDL::ChainFkSolverAcc *)jarg1; 
+  arg2 = (KDL::JntArrayAcc *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayAcc const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::FrameAcc *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameAcc & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (int)(arg1)->JntToCart((KDL::JntArrayAcc const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainFkSolverAcc_JntToCart__SWIG_2(void * jarg1, void * jarg2, void * jarg3, int jarg4) {
+  int jresult ;
+  KDL::ChainFkSolverAcc *arg1 = (KDL::ChainFkSolverAcc *) 0 ;
+  KDL::JntArrayAcc *arg2 = 0 ;
+  std::vector< KDL::FrameAcc > *arg3 = 0 ;
+  int arg4 ;
+  int result;
+  
+  arg1 = (KDL::ChainFkSolverAcc *)jarg1; 
+  arg2 = (KDL::JntArrayAcc *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayAcc const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (std::vector< KDL::FrameAcc > *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector< KDL::FrameAcc > & type is null", 0);
+    return 0;
+  } 
+  arg4 = (int)jarg4; 
+  {
+    try {
+      result = (int)(arg1)->JntToCart((KDL::JntArrayAcc const &)*arg2,*arg3,arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainFkSolverAcc_JntToCart__SWIG_3(void * jarg1, void * jarg2, void * jarg3) {
+  int jresult ;
+  KDL::ChainFkSolverAcc *arg1 = (KDL::ChainFkSolverAcc *) 0 ;
+  KDL::JntArrayAcc *arg2 = 0 ;
+  std::vector< KDL::FrameAcc > *arg3 = 0 ;
+  int result;
+  
+  arg1 = (KDL::ChainFkSolverAcc *)jarg1; 
+  arg2 = (KDL::JntArrayAcc *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayAcc const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (std::vector< KDL::FrameAcc > *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector< KDL::FrameAcc > & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (int)(arg1)->JntToCart((KDL::JntArrayAcc const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_ChainFkSolverAcc_updateInternalDataStructures(void * jarg1) {
+  KDL::ChainFkSolverAcc *arg1 = (KDL::ChainFkSolverAcc *) 0 ;
+  
+  arg1 = (KDL::ChainFkSolverAcc *)jarg1; 
+  {
+    try {
+      (arg1)->updateInternalDataStructures();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_ChainFkSolverAcc(void * jarg1) {
+  KDL::ChainFkSolverAcc *arg1 = (KDL::ChainFkSolverAcc *) 0 ;
+  
+  arg1 = (KDL::ChainFkSolverAcc *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainIkSolverPos_CartToJnt(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
+  int jresult ;
+  KDL::ChainIkSolverPos *arg1 = (KDL::ChainIkSolverPos *) 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  KDL::Frame *arg3 = 0 ;
+  KDL::JntArray *arg4 = 0 ;
+  int result;
+  
+  arg1 = (KDL::ChainIkSolverPos *)jarg1; 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::Frame *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return 0;
+  } 
+  arg4 = (KDL::JntArray *)jarg4;
+  if (!arg4) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (int)(arg1)->CartToJnt((KDL::JntArray const &)*arg2,(KDL::Frame const &)*arg3,*arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_ChainIkSolverPos(void * jarg1) {
+  KDL::ChainIkSolverPos *arg1 = (KDL::ChainIkSolverPos *) 0 ;
+  
+  arg1 = (KDL::ChainIkSolverPos *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_ChainIkSolverPos_updateInternalDataStructures(void * jarg1) {
+  KDL::ChainIkSolverPos *arg1 = (KDL::ChainIkSolverPos *) 0 ;
+  
+  arg1 = (KDL::ChainIkSolverPos *)jarg1; 
+  {
+    try {
+      (arg1)->updateInternalDataStructures();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainIkSolverVel_CartToJnt__SWIG_0(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
+  int jresult ;
+  KDL::ChainIkSolverVel *arg1 = (KDL::ChainIkSolverVel *) 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  KDL::Twist *arg3 = 0 ;
+  KDL::JntArray *arg4 = 0 ;
+  int result;
+  
+  arg1 = (KDL::ChainIkSolverVel *)jarg1; 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::Twist *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  arg4 = (KDL::JntArray *)jarg4;
+  if (!arg4) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (int)(arg1)->CartToJnt((KDL::JntArray const &)*arg2,(KDL::Twist const &)*arg3,*arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainIkSolverVel_CartToJnt__SWIG_1(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
+  int jresult ;
+  KDL::ChainIkSolverVel *arg1 = (KDL::ChainIkSolverVel *) 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  KDL::FrameVel *arg3 = 0 ;
+  KDL::JntArrayVel *arg4 = 0 ;
+  int result;
+  
+  arg1 = (KDL::ChainIkSolverVel *)jarg1; 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::FrameVel *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameVel const & type is null", 0);
+    return 0;
+  } 
+  arg4 = (KDL::JntArrayVel *)jarg4;
+  if (!arg4) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayVel & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (int)(arg1)->CartToJnt((KDL::JntArray const &)*arg2,(KDL::FrameVel const &)*arg3,*arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_ChainIkSolverVel(void * jarg1) {
+  KDL::ChainIkSolverVel *arg1 = (KDL::ChainIkSolverVel *) 0 ;
+  
+  arg1 = (KDL::ChainIkSolverVel *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_ChainIkSolverVel_updateInternalDataStructures(void * jarg1) {
+  KDL::ChainIkSolverVel *arg1 = (KDL::ChainIkSolverVel *) 0 ;
+  
+  arg1 = (KDL::ChainIkSolverVel *)jarg1; 
+  {
+    try {
+      (arg1)->updateInternalDataStructures();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainIkSolverAcc_CartToJnt__SWIG_0(void * jarg1, void * jarg2, void * jarg3, void * jarg4, void * jarg5) {
+  int jresult ;
+  KDL::ChainIkSolverAcc *arg1 = (KDL::ChainIkSolverAcc *) 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  KDL::JntArray *arg3 = 0 ;
+  KDL::Twist arg4 ;
+  KDL::JntArray *arg5 = 0 ;
+  KDL::Twist const *argp4 ;
+  int result;
+  
+  arg1 = (KDL::ChainIkSolverAcc *)jarg1; 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::JntArray *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  argp4 = (KDL::Twist *)jarg4; 
+  if (!argp4) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null KDL::Twist const", 0);
+    return 0;
+  }
+  arg4 = *argp4; 
+  arg5 = (KDL::JntArray *)jarg5;
+  if (!arg5) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (int)(arg1)->CartToJnt((KDL::JntArray const &)*arg2,(KDL::JntArray const &)*arg3,arg4,*arg5);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainIkSolverAcc_CartTojnt__SWIG_0(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
+  int jresult ;
+  KDL::ChainIkSolverAcc *arg1 = (KDL::ChainIkSolverAcc *) 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  KDL::FrameAcc *arg3 = 0 ;
+  KDL::JntArrayAcc *arg4 = 0 ;
+  int result;
+  
+  arg1 = (KDL::ChainIkSolverAcc *)jarg1; 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::FrameAcc *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameAcc const & type is null", 0);
+    return 0;
+  } 
+  arg4 = (KDL::JntArrayAcc *)jarg4;
+  if (!arg4) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayAcc & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (int)(arg1)->CartTojnt((KDL::JntArray const &)*arg2,(KDL::FrameAcc const &)*arg3,*arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainIkSolverAcc_CartToJnt__SWIG_1(void * jarg1, void * jarg2, void * jarg3, void * jarg4, void * jarg5, void * jarg6) {
+  int jresult ;
+  KDL::ChainIkSolverAcc *arg1 = (KDL::ChainIkSolverAcc *) 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  KDL::Twist *arg3 = 0 ;
+  KDL::Twist *arg4 = 0 ;
+  KDL::JntArray *arg5 = 0 ;
+  KDL::JntArray *arg6 = 0 ;
+  int result;
+  
+  arg1 = (KDL::ChainIkSolverAcc *)jarg1; 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::Twist *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  arg4 = (KDL::Twist *)jarg4;
+  if (!arg4) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  arg5 = (KDL::JntArray *)jarg5;
+  if (!arg5) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray & type is null", 0);
+    return 0;
+  } 
+  arg6 = (KDL::JntArray *)jarg6;
+  if (!arg6) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (int)(arg1)->CartToJnt((KDL::JntArray const &)*arg2,(KDL::Twist const &)*arg3,(KDL::Twist const &)*arg4,*arg5,*arg6);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainIkSolverAcc_CartTojnt__SWIG_1(void * jarg1, void * jarg2, void * jarg3, void * jarg4, void * jarg5, void * jarg6, void * jarg7) {
+  int jresult ;
+  KDL::ChainIkSolverAcc *arg1 = (KDL::ChainIkSolverAcc *) 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  KDL::Frame *arg3 = 0 ;
+  KDL::JntArray *arg4 = 0 ;
+  KDL::Twist *arg5 = 0 ;
+  KDL::JntArray *arg6 = 0 ;
+  KDL::JntArray *arg7 = 0 ;
+  int result;
+  
+  arg1 = (KDL::ChainIkSolverAcc *)jarg1; 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::Frame *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return 0;
+  } 
+  arg4 = (KDL::JntArray *)jarg4;
+  if (!arg4) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg5 = (KDL::Twist *)jarg5;
+  if (!arg5) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  arg6 = (KDL::JntArray *)jarg6;
+  if (!arg6) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray & type is null", 0);
+    return 0;
+  } 
+  arg7 = (KDL::JntArray *)jarg7;
+  if (!arg7) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (int)(arg1)->CartTojnt((KDL::JntArray const &)*arg2,(KDL::Frame const &)*arg3,(KDL::JntArray const &)*arg4,(KDL::Twist const &)*arg5,*arg6,*arg7);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_ChainIkSolverAcc_updateInternalDataStructures(void * jarg1) {
+  KDL::ChainIkSolverAcc *arg1 = (KDL::ChainIkSolverAcc *) 0 ;
+  
+  arg1 = (KDL::ChainIkSolverAcc *)jarg1; 
+  {
+    try {
+      (arg1)->updateInternalDataStructures();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_ChainIkSolverAcc(void * jarg1) {
+  KDL::ChainIkSolverAcc *arg1 = (KDL::ChainIkSolverAcc *) 0 ;
+  
+  arg1 = (KDL::ChainIkSolverAcc *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_ChainFkSolverPos_recursive(void * jarg1) {
+  void * jresult ;
+  KDL::Chain *arg1 = 0 ;
+  KDL::ChainFkSolverPos_recursive *result = 0 ;
+  
+  arg1 = (KDL::Chain *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Chain const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::ChainFkSolverPos_recursive *)new KDL::ChainFkSolverPos_recursive((KDL::Chain const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_ChainFkSolverPos_recursive(void * jarg1) {
+  KDL::ChainFkSolverPos_recursive *arg1 = (KDL::ChainFkSolverPos_recursive *) 0 ;
+  
+  arg1 = (KDL::ChainFkSolverPos_recursive *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainFkSolverPos_recursive_JntToCart__SWIG_0(void * jarg1, void * jarg2, void * jarg3, int jarg4) {
+  int jresult ;
+  KDL::ChainFkSolverPos_recursive *arg1 = (KDL::ChainFkSolverPos_recursive *) 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  KDL::Frame *arg3 = 0 ;
+  int arg4 ;
+  int result;
+  
+  arg1 = (KDL::ChainFkSolverPos_recursive *)jarg1; 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::Frame *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame & type is null", 0);
+    return 0;
+  } 
+  arg4 = (int)jarg4; 
+  {
+    try {
+      result = (int)(arg1)->JntToCart((KDL::JntArray const &)*arg2,*arg3,arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainFkSolverPos_recursive_JntToCart__SWIG_1(void * jarg1, void * jarg2, void * jarg3) {
+  int jresult ;
+  KDL::ChainFkSolverPos_recursive *arg1 = (KDL::ChainFkSolverPos_recursive *) 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  KDL::Frame *arg3 = 0 ;
+  int result;
+  
+  arg1 = (KDL::ChainFkSolverPos_recursive *)jarg1; 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::Frame *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (int)(arg1)->JntToCart((KDL::JntArray const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainFkSolverPos_recursive_JntToCart__SWIG_2(void * jarg1, void * jarg2, void * jarg3, int jarg4) {
+  int jresult ;
+  KDL::ChainFkSolverPos_recursive *arg1 = (KDL::ChainFkSolverPos_recursive *) 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  std::vector< KDL::Frame > *arg3 = 0 ;
+  int arg4 ;
+  int result;
+  
+  arg1 = (KDL::ChainFkSolverPos_recursive *)jarg1; 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (std::vector< KDL::Frame > *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector< KDL::Frame > & type is null", 0);
+    return 0;
+  } 
+  arg4 = (int)jarg4; 
+  {
+    try {
+      result = (int)(arg1)->JntToCart((KDL::JntArray const &)*arg2,*arg3,arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainFkSolverPos_recursive_JntToCart__SWIG_3(void * jarg1, void * jarg2, void * jarg3) {
+  int jresult ;
+  KDL::ChainFkSolverPos_recursive *arg1 = (KDL::ChainFkSolverPos_recursive *) 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  std::vector< KDL::Frame > *arg3 = 0 ;
+  int result;
+  
+  arg1 = (KDL::ChainFkSolverPos_recursive *)jarg1; 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (std::vector< KDL::Frame > *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector< KDL::Frame > & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (int)(arg1)->JntToCart((KDL::JntArray const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_ChainFkSolverPos_recursive_updateInternalDataStructures(void * jarg1) {
+  KDL::ChainFkSolverPos_recursive *arg1 = (KDL::ChainFkSolverPos_recursive *) 0 ;
+  
+  arg1 = (KDL::ChainFkSolverPos_recursive *)jarg1; 
+  {
+    try {
+      (arg1)->updateInternalDataStructures();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_ChainFkSolverVel_recursive(void * jarg1) {
+  void * jresult ;
+  KDL::Chain *arg1 = 0 ;
+  KDL::ChainFkSolverVel_recursive *result = 0 ;
+  
+  arg1 = (KDL::Chain *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Chain const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::ChainFkSolverVel_recursive *)new KDL::ChainFkSolverVel_recursive((KDL::Chain const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_ChainFkSolverVel_recursive(void * jarg1) {
+  KDL::ChainFkSolverVel_recursive *arg1 = (KDL::ChainFkSolverVel_recursive *) 0 ;
+  
+  arg1 = (KDL::ChainFkSolverVel_recursive *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainFkSolverVel_recursive_JntToCart__SWIG_0(void * jarg1, void * jarg2, void * jarg3, int jarg4) {
+  int jresult ;
+  KDL::ChainFkSolverVel_recursive *arg1 = (KDL::ChainFkSolverVel_recursive *) 0 ;
+  KDL::JntArrayVel *arg2 = 0 ;
+  KDL::FrameVel *arg3 = 0 ;
+  int arg4 ;
+  int result;
+  
+  arg1 = (KDL::ChainFkSolverVel_recursive *)jarg1; 
+  arg2 = (KDL::JntArrayVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayVel const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::FrameVel *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameVel & type is null", 0);
+    return 0;
+  } 
+  arg4 = (int)jarg4; 
+  {
+    try {
+      result = (int)(arg1)->JntToCart((KDL::JntArrayVel const &)*arg2,*arg3,arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainFkSolverVel_recursive_JntToCart__SWIG_1(void * jarg1, void * jarg2, void * jarg3) {
+  int jresult ;
+  KDL::ChainFkSolverVel_recursive *arg1 = (KDL::ChainFkSolverVel_recursive *) 0 ;
+  KDL::JntArrayVel *arg2 = 0 ;
+  KDL::FrameVel *arg3 = 0 ;
+  int result;
+  
+  arg1 = (KDL::ChainFkSolverVel_recursive *)jarg1; 
+  arg2 = (KDL::JntArrayVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayVel const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::FrameVel *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameVel & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (int)(arg1)->JntToCart((KDL::JntArrayVel const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainFkSolverVel_recursive_JntToCart__SWIG_2(void * jarg1, void * jarg2, void * jarg3, int jarg4) {
+  int jresult ;
+  KDL::ChainFkSolverVel_recursive *arg1 = (KDL::ChainFkSolverVel_recursive *) 0 ;
+  KDL::JntArrayVel *arg2 = 0 ;
+  std::vector< KDL::FrameVel > *arg3 = 0 ;
+  int arg4 ;
+  int result;
+  
+  arg1 = (KDL::ChainFkSolverVel_recursive *)jarg1; 
+  arg2 = (KDL::JntArrayVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayVel const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (std::vector< KDL::FrameVel > *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector< KDL::FrameVel > & type is null", 0);
+    return 0;
+  } 
+  arg4 = (int)jarg4; 
+  {
+    try {
+      result = (int)(arg1)->JntToCart((KDL::JntArrayVel const &)*arg2,*arg3,arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainFkSolverVel_recursive_JntToCart__SWIG_3(void * jarg1, void * jarg2, void * jarg3) {
+  int jresult ;
+  KDL::ChainFkSolverVel_recursive *arg1 = (KDL::ChainFkSolverVel_recursive *) 0 ;
+  KDL::JntArrayVel *arg2 = 0 ;
+  std::vector< KDL::FrameVel > *arg3 = 0 ;
+  int result;
+  
+  arg1 = (KDL::ChainFkSolverVel_recursive *)jarg1; 
+  arg2 = (KDL::JntArrayVel *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayVel const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (std::vector< KDL::FrameVel > *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector< KDL::FrameVel > & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (int)(arg1)->JntToCart((KDL::JntArrayVel const &)*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_ChainFkSolverVel_recursive_updateInternalDataStructures(void * jarg1) {
+  KDL::ChainFkSolverVel_recursive *arg1 = (KDL::ChainFkSolverVel_recursive *) 0 ;
+  
+  arg1 = (KDL::ChainFkSolverVel_recursive *)jarg1; 
+  {
+    try {
+      (arg1)->updateInternalDataStructures();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainIkSolverPos_LMA_E_GRADIENT_JOINTS_TOO_SMALL_get() {
+  int jresult ;
+  int result;
+  
+  {
+    try {
+      result = (int)KDL::ChainIkSolverPos_LMA::E_GRADIENT_JOINTS_TOO_SMALL;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainIkSolverPos_LMA_E_INCREMENT_JOINTS_TOO_SMALL_get() {
+  int jresult ;
+  int result;
+  
+  {
+    try {
+      result = (int)KDL::ChainIkSolverPos_LMA::E_INCREMENT_JOINTS_TOO_SMALL;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_ChainIkSolverPos_LMA__SWIG_0(void * jarg1, void * jarg2, double jarg3, int jarg4, double jarg5) {
+  void * jresult ;
+  KDL::Chain *arg1 = 0 ;
+  Eigen::Matrix< double,6,1 > *arg2 = 0 ;
+  double arg3 ;
+  int arg4 ;
+  double arg5 ;
+  KDL::ChainIkSolverPos_LMA *result = 0 ;
+  
+  arg1 = (KDL::Chain *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Chain const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (Eigen::Matrix< double,6,1 > *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Eigen::Matrix< double,6,1 > const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  arg4 = (int)jarg4; 
+  arg5 = (double)jarg5; 
+  {
+    try {
+      result = (KDL::ChainIkSolverPos_LMA *)new KDL::ChainIkSolverPos_LMA((KDL::Chain const &)*arg1,(Eigen::Matrix< double,6,1 > const &)*arg2,arg3,arg4,arg5);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_ChainIkSolverPos_LMA__SWIG_1(void * jarg1, void * jarg2, double jarg3, int jarg4) {
+  void * jresult ;
+  KDL::Chain *arg1 = 0 ;
+  Eigen::Matrix< double,6,1 > *arg2 = 0 ;
+  double arg3 ;
+  int arg4 ;
+  KDL::ChainIkSolverPos_LMA *result = 0 ;
+  
+  arg1 = (KDL::Chain *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Chain const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (Eigen::Matrix< double,6,1 > *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Eigen::Matrix< double,6,1 > const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  arg4 = (int)jarg4; 
+  {
+    try {
+      result = (KDL::ChainIkSolverPos_LMA *)new KDL::ChainIkSolverPos_LMA((KDL::Chain const &)*arg1,(Eigen::Matrix< double,6,1 > const &)*arg2,arg3,arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_ChainIkSolverPos_LMA__SWIG_2(void * jarg1, void * jarg2, double jarg3) {
+  void * jresult ;
+  KDL::Chain *arg1 = 0 ;
+  Eigen::Matrix< double,6,1 > *arg2 = 0 ;
+  double arg3 ;
+  KDL::ChainIkSolverPos_LMA *result = 0 ;
+  
+  arg1 = (KDL::Chain *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Chain const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (Eigen::Matrix< double,6,1 > *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Eigen::Matrix< double,6,1 > const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      result = (KDL::ChainIkSolverPos_LMA *)new KDL::ChainIkSolverPos_LMA((KDL::Chain const &)*arg1,(Eigen::Matrix< double,6,1 > const &)*arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_ChainIkSolverPos_LMA__SWIG_3(void * jarg1, void * jarg2) {
+  void * jresult ;
+  KDL::Chain *arg1 = 0 ;
+  Eigen::Matrix< double,6,1 > *arg2 = 0 ;
+  KDL::ChainIkSolverPos_LMA *result = 0 ;
+  
+  arg1 = (KDL::Chain *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Chain const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (Eigen::Matrix< double,6,1 > *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Eigen::Matrix< double,6,1 > const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::ChainIkSolverPos_LMA *)new KDL::ChainIkSolverPos_LMA((KDL::Chain const &)*arg1,(Eigen::Matrix< double,6,1 > const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_ChainIkSolverPos_LMA__SWIG_4(void * jarg1, double jarg2, int jarg3, double jarg4) {
+  void * jresult ;
+  KDL::Chain *arg1 = 0 ;
+  double arg2 ;
+  int arg3 ;
+  double arg4 ;
+  KDL::ChainIkSolverPos_LMA *result = 0 ;
+  
+  arg1 = (KDL::Chain *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Chain const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (double)jarg2; 
+  arg3 = (int)jarg3; 
+  arg4 = (double)jarg4; 
+  {
+    try {
+      result = (KDL::ChainIkSolverPos_LMA *)new KDL::ChainIkSolverPos_LMA((KDL::Chain const &)*arg1,arg2,arg3,arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_ChainIkSolverPos_LMA__SWIG_5(void * jarg1, double jarg2, int jarg3) {
+  void * jresult ;
+  KDL::Chain *arg1 = 0 ;
+  double arg2 ;
+  int arg3 ;
+  KDL::ChainIkSolverPos_LMA *result = 0 ;
+  
+  arg1 = (KDL::Chain *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Chain const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (double)jarg2; 
+  arg3 = (int)jarg3; 
+  {
+    try {
+      result = (KDL::ChainIkSolverPos_LMA *)new KDL::ChainIkSolverPos_LMA((KDL::Chain const &)*arg1,arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_ChainIkSolverPos_LMA__SWIG_6(void * jarg1, double jarg2) {
+  void * jresult ;
+  KDL::Chain *arg1 = 0 ;
+  double arg2 ;
+  KDL::ChainIkSolverPos_LMA *result = 0 ;
+  
+  arg1 = (KDL::Chain *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Chain const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      result = (KDL::ChainIkSolverPos_LMA *)new KDL::ChainIkSolverPos_LMA((KDL::Chain const &)*arg1,arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_ChainIkSolverPos_LMA__SWIG_7(void * jarg1) {
+  void * jresult ;
+  KDL::Chain *arg1 = 0 ;
+  KDL::ChainIkSolverPos_LMA *result = 0 ;
+  
+  arg1 = (KDL::Chain *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Chain const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::ChainIkSolverPos_LMA *)new KDL::ChainIkSolverPos_LMA((KDL::Chain const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainIkSolverPos_LMA_CartToJnt(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
+  int jresult ;
+  KDL::ChainIkSolverPos_LMA *arg1 = (KDL::ChainIkSolverPos_LMA *) 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  KDL::Frame *arg3 = 0 ;
+  KDL::JntArray *arg4 = 0 ;
+  int result;
+  
+  arg1 = (KDL::ChainIkSolverPos_LMA *)jarg1; 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::Frame *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return 0;
+  } 
+  arg4 = (KDL::JntArray *)jarg4;
+  if (!arg4) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (int)(arg1)->CartToJnt((KDL::JntArray const &)*arg2,(KDL::Frame const &)*arg3,*arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_ChainIkSolverPos_LMA(void * jarg1) {
+  KDL::ChainIkSolverPos_LMA *arg1 = (KDL::ChainIkSolverPos_LMA *) 0 ;
+  
+  arg1 = (KDL::ChainIkSolverPos_LMA *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_ChainIkSolverPos_LMA_display_jac(void * jarg1, void * jarg2) {
+  KDL::ChainIkSolverPos_LMA *arg1 = (KDL::ChainIkSolverPos_LMA *) 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  
+  arg1 = (KDL::ChainIkSolverPos_LMA *)jarg1; 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      (arg1)->display_jac((KDL::JntArray const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_ChainIkSolverPos_LMA_updateInternalDataStructures(void * jarg1) {
+  KDL::ChainIkSolverPos_LMA *arg1 = (KDL::ChainIkSolverPos_LMA *) 0 ;
+  
+  arg1 = (KDL::ChainIkSolverPos_LMA *)jarg1; 
+  {
+    try {
+      (arg1)->updateInternalDataStructures();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT char * SWIGSTDCALL CSharp_Kdl_ChainIkSolverPos_LMA_strError(void * jarg1, int jarg2) {
+  char * jresult ;
+  KDL::ChainIkSolverPos_LMA *arg1 = (KDL::ChainIkSolverPos_LMA *) 0 ;
+  int arg2 ;
+  char *result = 0 ;
+  
+  arg1 = (KDL::ChainIkSolverPos_LMA *)jarg1; 
+  arg2 = (int)jarg2; 
+  {
+    try {
+      result = (char *)((KDL::ChainIkSolverPos_LMA const *)arg1)->strError(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = SWIG_csharp_string_callback((const char *)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_ChainIkSolverPos_LMA_lastNrOfIter_set(void * jarg1, int jarg2) {
+  KDL::ChainIkSolverPos_LMA *arg1 = (KDL::ChainIkSolverPos_LMA *) 0 ;
+  int arg2 ;
+  
+  arg1 = (KDL::ChainIkSolverPos_LMA *)jarg1; 
+  arg2 = (int)jarg2; 
+  {
+    try {
+      if (arg1) (arg1)->lastNrOfIter = arg2;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainIkSolverPos_LMA_lastNrOfIter_get(void * jarg1) {
+  int jresult ;
+  KDL::ChainIkSolverPos_LMA *arg1 = (KDL::ChainIkSolverPos_LMA *) 0 ;
+  int result;
+  
+  arg1 = (KDL::ChainIkSolverPos_LMA *)jarg1; 
+  {
+    try {
+      result = (int) ((arg1)->lastNrOfIter);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_ChainIkSolverPos_LMA_lastDifference_set(void * jarg1, double jarg2) {
+  KDL::ChainIkSolverPos_LMA *arg1 = (KDL::ChainIkSolverPos_LMA *) 0 ;
+  double arg2 ;
+  
+  arg1 = (KDL::ChainIkSolverPos_LMA *)jarg1; 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      if (arg1) (arg1)->lastDifference = arg2;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_ChainIkSolverPos_LMA_lastDifference_get(void * jarg1) {
+  double jresult ;
+  KDL::ChainIkSolverPos_LMA *arg1 = (KDL::ChainIkSolverPos_LMA *) 0 ;
+  double result;
+  
+  arg1 = (KDL::ChainIkSolverPos_LMA *)jarg1; 
+  {
+    try {
+      result = (double) ((arg1)->lastDifference);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_ChainIkSolverPos_LMA_lastTransDiff_set(void * jarg1, double jarg2) {
+  KDL::ChainIkSolverPos_LMA *arg1 = (KDL::ChainIkSolverPos_LMA *) 0 ;
+  double arg2 ;
+  
+  arg1 = (KDL::ChainIkSolverPos_LMA *)jarg1; 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      if (arg1) (arg1)->lastTransDiff = arg2;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_ChainIkSolverPos_LMA_lastTransDiff_get(void * jarg1) {
+  double jresult ;
+  KDL::ChainIkSolverPos_LMA *arg1 = (KDL::ChainIkSolverPos_LMA *) 0 ;
+  double result;
+  
+  arg1 = (KDL::ChainIkSolverPos_LMA *)jarg1; 
+  {
+    try {
+      result = (double) ((arg1)->lastTransDiff);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_ChainIkSolverPos_LMA_lastRotDiff_set(void * jarg1, double jarg2) {
+  KDL::ChainIkSolverPos_LMA *arg1 = (KDL::ChainIkSolverPos_LMA *) 0 ;
+  double arg2 ;
+  
+  arg1 = (KDL::ChainIkSolverPos_LMA *)jarg1; 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      if (arg1) (arg1)->lastRotDiff = arg2;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_ChainIkSolverPos_LMA_lastRotDiff_get(void * jarg1) {
+  double jresult ;
+  KDL::ChainIkSolverPos_LMA *arg1 = (KDL::ChainIkSolverPos_LMA *) 0 ;
+  double result;
+  
+  arg1 = (KDL::ChainIkSolverPos_LMA *)jarg1; 
+  {
+    try {
+      result = (double) ((arg1)->lastRotDiff);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_ChainIkSolverPos_LMA_T_base_head_set(void * jarg1, void * jarg2) {
+  KDL::ChainIkSolverPos_LMA *arg1 = (KDL::ChainIkSolverPos_LMA *) 0 ;
+  KDL::Frame *arg2 = (KDL::Frame *) 0 ;
+  
+  arg1 = (KDL::ChainIkSolverPos_LMA *)jarg1; 
+  arg2 = (KDL::Frame *)jarg2; 
+  {
+    try {
+      if (arg1) (arg1)->T_base_head = *arg2;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_ChainIkSolverPos_LMA_T_base_head_get(void * jarg1) {
+  void * jresult ;
+  KDL::ChainIkSolverPos_LMA *arg1 = (KDL::ChainIkSolverPos_LMA *) 0 ;
+  KDL::Frame *result = 0 ;
+  
+  arg1 = (KDL::ChainIkSolverPos_LMA *)jarg1; 
+  {
+    try {
+      result = (KDL::Frame *)& ((arg1)->T_base_head);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_ChainIkSolverPos_LMA_display_information_set(void * jarg1, unsigned int jarg2) {
+  KDL::ChainIkSolverPos_LMA *arg1 = (KDL::ChainIkSolverPos_LMA *) 0 ;
+  bool arg2 ;
+  
+  arg1 = (KDL::ChainIkSolverPos_LMA *)jarg1; 
+  arg2 = jarg2 ? true : false; 
+  {
+    try {
+      if (arg1) (arg1)->display_information = arg2;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_ChainIkSolverPos_LMA_display_information_get(void * jarg1) {
+  unsigned int jresult ;
+  KDL::ChainIkSolverPos_LMA *arg1 = (KDL::ChainIkSolverPos_LMA *) 0 ;
+  bool result;
+  
+  arg1 = (KDL::ChainIkSolverPos_LMA *)jarg1; 
+  {
+    try {
+      result = (bool) ((arg1)->display_information);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainIkSolverVel_pinv_E_CONVERGE_PINV_SINGULAR_get() {
+  int jresult ;
+  int result;
+  
+  {
+    try {
+      result = (int)KDL::ChainIkSolverVel_pinv::E_CONVERGE_PINV_SINGULAR;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_ChainIkSolverVel_pinv__SWIG_0(void * jarg1, double jarg2, int jarg3) {
+  void * jresult ;
+  KDL::Chain *arg1 = 0 ;
+  double arg2 ;
+  int arg3 ;
+  KDL::ChainIkSolverVel_pinv *result = 0 ;
+  
+  arg1 = (KDL::Chain *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Chain const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (double)jarg2; 
+  arg3 = (int)jarg3; 
+  {
+    try {
+      result = (KDL::ChainIkSolverVel_pinv *)new KDL::ChainIkSolverVel_pinv((KDL::Chain const &)*arg1,arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_ChainIkSolverVel_pinv__SWIG_1(void * jarg1, double jarg2) {
+  void * jresult ;
+  KDL::Chain *arg1 = 0 ;
+  double arg2 ;
+  KDL::ChainIkSolverVel_pinv *result = 0 ;
+  
+  arg1 = (KDL::Chain *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Chain const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      result = (KDL::ChainIkSolverVel_pinv *)new KDL::ChainIkSolverVel_pinv((KDL::Chain const &)*arg1,arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_ChainIkSolverVel_pinv__SWIG_2(void * jarg1) {
+  void * jresult ;
+  KDL::Chain *arg1 = 0 ;
+  KDL::ChainIkSolverVel_pinv *result = 0 ;
+  
+  arg1 = (KDL::Chain *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Chain const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::ChainIkSolverVel_pinv *)new KDL::ChainIkSolverVel_pinv((KDL::Chain const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_ChainIkSolverVel_pinv(void * jarg1) {
+  KDL::ChainIkSolverVel_pinv *arg1 = (KDL::ChainIkSolverVel_pinv *) 0 ;
+  
+  arg1 = (KDL::ChainIkSolverVel_pinv *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainIkSolverVel_pinv_CartToJnt__SWIG_0(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
+  int jresult ;
+  KDL::ChainIkSolverVel_pinv *arg1 = (KDL::ChainIkSolverVel_pinv *) 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  KDL::Twist *arg3 = 0 ;
+  KDL::JntArray *arg4 = 0 ;
+  int result;
+  
+  arg1 = (KDL::ChainIkSolverVel_pinv *)jarg1; 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::Twist *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  arg4 = (KDL::JntArray *)jarg4;
+  if (!arg4) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (int)(arg1)->CartToJnt((KDL::JntArray const &)*arg2,(KDL::Twist const &)*arg3,*arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainIkSolverVel_pinv_CartToJnt__SWIG_1(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
+  int jresult ;
+  KDL::ChainIkSolverVel_pinv *arg1 = (KDL::ChainIkSolverVel_pinv *) 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  KDL::FrameVel *arg3 = 0 ;
+  KDL::JntArrayVel *arg4 = 0 ;
+  int result;
+  
+  arg1 = (KDL::ChainIkSolverVel_pinv *)jarg1; 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::FrameVel *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameVel const & type is null", 0);
+    return 0;
+  } 
+  arg4 = (KDL::JntArrayVel *)jarg4;
+  if (!arg4) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayVel & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (int)(arg1)->CartToJnt((KDL::JntArray const &)*arg2,(KDL::FrameVel const &)*arg3,*arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_ChainIkSolverVel_pinv_getNrZeroSigmas(void * jarg1) {
+  unsigned int jresult ;
+  KDL::ChainIkSolverVel_pinv *arg1 = (KDL::ChainIkSolverVel_pinv *) 0 ;
+  unsigned int result;
+  
+  arg1 = (KDL::ChainIkSolverVel_pinv *)jarg1; 
+  {
+    try {
+      result = (unsigned int)((KDL::ChainIkSolverVel_pinv const *)arg1)->getNrZeroSigmas();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainIkSolverVel_pinv_getSVDResult(void * jarg1) {
+  int jresult ;
+  KDL::ChainIkSolverVel_pinv *arg1 = (KDL::ChainIkSolverVel_pinv *) 0 ;
+  int result;
+  
+  arg1 = (KDL::ChainIkSolverVel_pinv *)jarg1; 
+  {
+    try {
+      result = (int)((KDL::ChainIkSolverVel_pinv const *)arg1)->getSVDResult();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT char * SWIGSTDCALL CSharp_Kdl_ChainIkSolverVel_pinv_strError(void * jarg1, int jarg2) {
+  char * jresult ;
+  KDL::ChainIkSolverVel_pinv *arg1 = (KDL::ChainIkSolverVel_pinv *) 0 ;
+  int arg2 ;
+  char *result = 0 ;
+  
+  arg1 = (KDL::ChainIkSolverVel_pinv *)jarg1; 
+  arg2 = (int)jarg2; 
+  {
+    try {
+      result = (char *)((KDL::ChainIkSolverVel_pinv const *)arg1)->strError(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = SWIG_csharp_string_callback((const char *)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_ChainIkSolverVel_pinv_updateInternalDataStructures(void * jarg1) {
+  KDL::ChainIkSolverVel_pinv *arg1 = (KDL::ChainIkSolverVel_pinv *) 0 ;
+  
+  arg1 = (KDL::ChainIkSolverVel_pinv *)jarg1; 
+  {
+    try {
+      (arg1)->updateInternalDataStructures();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_ChainIkSolverVel_pinv_getSolver(void * jarg1) {
+  void * jresult ;
+  KDL::ChainIkSolverVel_pinv *arg1 = (KDL::ChainIkSolverVel_pinv *) 0 ;
+  KDL::ChainJntToJacSolver *result = 0 ;
+  
+  arg1 = (KDL::ChainIkSolverVel_pinv *)jarg1; 
+  {
+    try {
+      result = (KDL::ChainJntToJacSolver *)(arg1)->getSolver();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainIkSolverVel_wdls_E_CONVERGE_PINV_SINGULAR_get() {
+  int jresult ;
+  int result;
+  
+  {
+    try {
+      result = (int)KDL::ChainIkSolverVel_wdls::E_CONVERGE_PINV_SINGULAR;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_ChainIkSolverVel_wdls__SWIG_0(void * jarg1, double jarg2, int jarg3) {
+  void * jresult ;
+  KDL::Chain *arg1 = 0 ;
+  double arg2 ;
+  int arg3 ;
+  KDL::ChainIkSolverVel_wdls *result = 0 ;
+  
+  arg1 = (KDL::Chain *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Chain const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (double)jarg2; 
+  arg3 = (int)jarg3; 
+  {
+    try {
+      result = (KDL::ChainIkSolverVel_wdls *)new KDL::ChainIkSolverVel_wdls((KDL::Chain const &)*arg1,arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_ChainIkSolverVel_wdls__SWIG_1(void * jarg1, double jarg2) {
+  void * jresult ;
+  KDL::Chain *arg1 = 0 ;
+  double arg2 ;
+  KDL::ChainIkSolverVel_wdls *result = 0 ;
+  
+  arg1 = (KDL::Chain *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Chain const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      result = (KDL::ChainIkSolverVel_wdls *)new KDL::ChainIkSolverVel_wdls((KDL::Chain const &)*arg1,arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_ChainIkSolverVel_wdls__SWIG_2(void * jarg1) {
+  void * jresult ;
+  KDL::Chain *arg1 = 0 ;
+  KDL::ChainIkSolverVel_wdls *result = 0 ;
+  
+  arg1 = (KDL::Chain *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Chain const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::ChainIkSolverVel_wdls *)new KDL::ChainIkSolverVel_wdls((KDL::Chain const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_ChainIkSolverVel_wdls(void * jarg1) {
+  KDL::ChainIkSolverVel_wdls *arg1 = (KDL::ChainIkSolverVel_wdls *) 0 ;
+  
+  arg1 = (KDL::ChainIkSolverVel_wdls *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainIkSolverVel_wdls_CartToJnt__SWIG_0(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
+  int jresult ;
+  KDL::ChainIkSolverVel_wdls *arg1 = (KDL::ChainIkSolverVel_wdls *) 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  KDL::Twist *arg3 = 0 ;
+  KDL::JntArray *arg4 = 0 ;
+  int result;
+  
+  arg1 = (KDL::ChainIkSolverVel_wdls *)jarg1; 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::Twist *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Twist const & type is null", 0);
+    return 0;
+  } 
+  arg4 = (KDL::JntArray *)jarg4;
+  if (!arg4) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (int)(arg1)->CartToJnt((KDL::JntArray const &)*arg2,(KDL::Twist const &)*arg3,*arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainIkSolverVel_wdls_CartToJnt__SWIG_1(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
+  int jresult ;
+  KDL::ChainIkSolverVel_wdls *arg1 = (KDL::ChainIkSolverVel_wdls *) 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  KDL::FrameVel *arg3 = 0 ;
+  KDL::JntArrayVel *arg4 = 0 ;
+  int result;
+  
+  arg1 = (KDL::ChainIkSolverVel_wdls *)jarg1; 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::FrameVel *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::FrameVel const & type is null", 0);
+    return 0;
+  } 
+  arg4 = (KDL::JntArrayVel *)jarg4;
+  if (!arg4) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArrayVel & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (int)(arg1)->CartToJnt((KDL::JntArray const &)*arg2,(KDL::FrameVel const &)*arg3,*arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainIkSolverVel_wdls_setWeightJS(void * jarg1, void * jarg2) {
+  int jresult ;
+  KDL::ChainIkSolverVel_wdls *arg1 = (KDL::ChainIkSolverVel_wdls *) 0 ;
+  Eigen::MatrixXd *arg2 = 0 ;
+  int result;
+  
+  arg1 = (KDL::ChainIkSolverVel_wdls *)jarg1; 
+  arg2 = (Eigen::MatrixXd *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Eigen::MatrixXd const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (int)(arg1)->setWeightJS((Eigen::MatrixXd const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainIkSolverVel_wdls_setWeightTS(void * jarg1, void * jarg2) {
+  int jresult ;
+  KDL::ChainIkSolverVel_wdls *arg1 = (KDL::ChainIkSolverVel_wdls *) 0 ;
+  Eigen::MatrixXd *arg2 = 0 ;
+  int result;
+  
+  arg1 = (KDL::ChainIkSolverVel_wdls *)jarg1; 
+  arg2 = (Eigen::MatrixXd *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Eigen::MatrixXd const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (int)(arg1)->setWeightTS((Eigen::MatrixXd const &)*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_ChainIkSolverVel_wdls_setLambda(void * jarg1, double jarg2) {
+  KDL::ChainIkSolverVel_wdls *arg1 = (KDL::ChainIkSolverVel_wdls *) 0 ;
+  double arg2 ;
+  
+  arg1 = (KDL::ChainIkSolverVel_wdls *)jarg1; 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      (arg1)->setLambda(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_ChainIkSolverVel_wdls_setEps(void * jarg1, double jarg2) {
+  KDL::ChainIkSolverVel_wdls *arg1 = (KDL::ChainIkSolverVel_wdls *) 0 ;
+  double arg2 ;
+  
+  arg1 = (KDL::ChainIkSolverVel_wdls *)jarg1; 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      (arg1)->setEps(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_ChainIkSolverVel_wdls_setMaxIter(void * jarg1, int jarg2) {
+  KDL::ChainIkSolverVel_wdls *arg1 = (KDL::ChainIkSolverVel_wdls *) 0 ;
+  int arg2 ;
+  
+  arg1 = (KDL::ChainIkSolverVel_wdls *)jarg1; 
+  arg2 = (int)jarg2; 
+  {
+    try {
+      (arg1)->setMaxIter(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Kdl_ChainIkSolverVel_wdls_getNrZeroSigmas(void * jarg1) {
+  unsigned int jresult ;
+  KDL::ChainIkSolverVel_wdls *arg1 = (KDL::ChainIkSolverVel_wdls *) 0 ;
+  unsigned int result;
+  
+  arg1 = (KDL::ChainIkSolverVel_wdls *)jarg1; 
+  {
+    try {
+      result = (unsigned int)((KDL::ChainIkSolverVel_wdls const *)arg1)->getNrZeroSigmas();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_ChainIkSolverVel_wdls_getSigmaMin(void * jarg1) {
+  double jresult ;
+  KDL::ChainIkSolverVel_wdls *arg1 = (KDL::ChainIkSolverVel_wdls *) 0 ;
+  double result;
+  
+  arg1 = (KDL::ChainIkSolverVel_wdls *)jarg1; 
+  {
+    try {
+      result = (double)((KDL::ChainIkSolverVel_wdls const *)arg1)->getSigmaMin();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainIkSolverVel_wdls_getSigma(void * jarg1, void * jarg2) {
+  int jresult ;
+  KDL::ChainIkSolverVel_wdls *arg1 = (KDL::ChainIkSolverVel_wdls *) 0 ;
+  Eigen::VectorXd *arg2 = 0 ;
+  int result;
+  
+  arg1 = (KDL::ChainIkSolverVel_wdls *)jarg1; 
+  arg2 = (Eigen::VectorXd *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Eigen::VectorXd & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (int)(arg1)->getSigma(*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_ChainIkSolverVel_wdls_getEps(void * jarg1) {
+  double jresult ;
+  KDL::ChainIkSolverVel_wdls *arg1 = (KDL::ChainIkSolverVel_wdls *) 0 ;
+  double result;
+  
+  arg1 = (KDL::ChainIkSolverVel_wdls *)jarg1; 
+  {
+    try {
+      result = (double)((KDL::ChainIkSolverVel_wdls const *)arg1)->getEps();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_ChainIkSolverVel_wdls_getLambda(void * jarg1) {
+  double jresult ;
+  KDL::ChainIkSolverVel_wdls *arg1 = (KDL::ChainIkSolverVel_wdls *) 0 ;
+  double result;
+  
+  arg1 = (KDL::ChainIkSolverVel_wdls *)jarg1; 
+  {
+    try {
+      result = (double)((KDL::ChainIkSolverVel_wdls const *)arg1)->getLambda();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_ChainIkSolverVel_wdls_getLambdaScaled(void * jarg1) {
+  double jresult ;
+  KDL::ChainIkSolverVel_wdls *arg1 = (KDL::ChainIkSolverVel_wdls *) 0 ;
+  double result;
+  
+  arg1 = (KDL::ChainIkSolverVel_wdls *)jarg1; 
+  {
+    try {
+      result = (double)((KDL::ChainIkSolverVel_wdls const *)arg1)->getLambdaScaled();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainIkSolverVel_wdls_getSVDResult(void * jarg1) {
+  int jresult ;
+  KDL::ChainIkSolverVel_wdls *arg1 = (KDL::ChainIkSolverVel_wdls *) 0 ;
+  int result;
+  
+  arg1 = (KDL::ChainIkSolverVel_wdls *)jarg1; 
+  {
+    try {
+      result = (int)((KDL::ChainIkSolverVel_wdls const *)arg1)->getSVDResult();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT char * SWIGSTDCALL CSharp_Kdl_ChainIkSolverVel_wdls_strError(void * jarg1, int jarg2) {
+  char * jresult ;
+  KDL::ChainIkSolverVel_wdls *arg1 = (KDL::ChainIkSolverVel_wdls *) 0 ;
+  int arg2 ;
+  char *result = 0 ;
+  
+  arg1 = (KDL::ChainIkSolverVel_wdls *)jarg1; 
+  arg2 = (int)jarg2; 
+  {
+    try {
+      result = (char *)((KDL::ChainIkSolverVel_wdls const *)arg1)->strError(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = SWIG_csharp_string_callback((const char *)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_ChainIkSolverVel_wdls_updateInternalDataStructures(void * jarg1) {
+  KDL::ChainIkSolverVel_wdls *arg1 = (KDL::ChainIkSolverVel_wdls *) 0 ;
+  
+  arg1 = (KDL::ChainIkSolverVel_wdls *)jarg1; 
+  {
+    try {
+      (arg1)->updateInternalDataStructures();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_ChainIkSolverVel_wdls_getSolver(void * jarg1) {
+  void * jresult ;
+  KDL::ChainIkSolverVel_wdls *arg1 = (KDL::ChainIkSolverVel_wdls *) 0 ;
+  KDL::ChainJntToJacSolver *result = 0 ;
+  
+  arg1 = (KDL::ChainIkSolverVel_wdls *)jarg1; 
+  {
+    try {
+      result = (KDL::ChainJntToJacSolver *)(arg1)->getSolver();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT KDL::SolverI * SWIGSTDCALL CSharp_Kdl_ChainJntToJacSolver_SWIGUpcast(KDL::ChainJntToJacSolver *jarg1) {
+    return (KDL::SolverI *)jarg1;
+}
+
+SWIGEXPORT KDL::SolverI * SWIGSTDCALL CSharp_Kdl_ChainFkSolverPos_SWIGUpcast(KDL::ChainFkSolverPos *jarg1) {
+    return (KDL::SolverI *)jarg1;
+}
+
+SWIGEXPORT KDL::SolverI * SWIGSTDCALL CSharp_Kdl_ChainFkSolverVel_SWIGUpcast(KDL::ChainFkSolverVel *jarg1) {
+    return (KDL::SolverI *)jarg1;
+}
+
+SWIGEXPORT KDL::SolverI * SWIGSTDCALL CSharp_Kdl_ChainFkSolverAcc_SWIGUpcast(KDL::ChainFkSolverAcc *jarg1) {
+    return (KDL::SolverI *)jarg1;
+}
+
+SWIGEXPORT KDL::SolverI * SWIGSTDCALL CSharp_Kdl_ChainIkSolverPos_SWIGUpcast(KDL::ChainIkSolverPos *jarg1) {
+    return (KDL::SolverI *)jarg1;
+}
+
+SWIGEXPORT KDL::SolverI * SWIGSTDCALL CSharp_Kdl_ChainIkSolverVel_SWIGUpcast(KDL::ChainIkSolverVel *jarg1) {
+    return (KDL::SolverI *)jarg1;
+}
+
+SWIGEXPORT KDL::SolverI * SWIGSTDCALL CSharp_Kdl_ChainIkSolverAcc_SWIGUpcast(KDL::ChainIkSolverAcc *jarg1) {
+    return (KDL::SolverI *)jarg1;
+}
+
+SWIGEXPORT KDL::ChainFkSolverPos * SWIGSTDCALL CSharp_Kdl_ChainFkSolverPos_recursive_SWIGUpcast(KDL::ChainFkSolverPos_recursive *jarg1) {
+    return (KDL::ChainFkSolverPos *)jarg1;
+}
+
+SWIGEXPORT KDL::ChainFkSolverVel * SWIGSTDCALL CSharp_Kdl_ChainFkSolverVel_recursive_SWIGUpcast(KDL::ChainFkSolverVel_recursive *jarg1) {
+    return (KDL::ChainFkSolverVel *)jarg1;
+}
+
+SWIGEXPORT KDL::ChainIkSolverPos * SWIGSTDCALL CSharp_Kdl_ChainIkSolverPos_LMA_SWIGUpcast(KDL::ChainIkSolverPos_LMA *jarg1) {
+    return (KDL::ChainIkSolverPos *)jarg1;
+}
+
+SWIGEXPORT KDL::ChainIkSolverVel * SWIGSTDCALL CSharp_Kdl_ChainIkSolverVel_pinv_SWIGUpcast(KDL::ChainIkSolverVel_pinv *jarg1) {
+    return (KDL::ChainIkSolverVel *)jarg1;
+}
+
+SWIGEXPORT KDL::ChainIkSolverVel * SWIGSTDCALL CSharp_Kdl_ChainIkSolverVel_wdls_SWIGUpcast(KDL::ChainIkSolverVel_wdls *jarg1) {
+    return (KDL::ChainIkSolverVel *)jarg1;
+}
 
 #ifdef __cplusplus
 }
