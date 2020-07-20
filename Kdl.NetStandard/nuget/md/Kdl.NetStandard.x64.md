@@ -6,6 +6,10 @@
 
 This package supports `x64` builds.
 
+## Signing
+
+This package is strong-signed.
+
 ## Target Framework
 
 This package targets `.NET Standard 2.0`.
