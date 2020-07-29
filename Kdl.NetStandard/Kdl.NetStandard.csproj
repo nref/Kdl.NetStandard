@@ -16,4 +16,10 @@
     <Exec Command="echo rmdir /S /Q $(ProjectDir)Kdl&#xD;&#xA;rmdir /S /Q $(ProjectDir)Kdl&#xD;&#xA;&#xD;&#xA;echo xcopy /E /Y $(ProjectDir)..\kdl_wrap\generated\* $(ProjectDir)&#xD;&#xA;xcopy /E /Y $(ProjectDir)..\kdl_wrap\generated\* $(ProjectDir)&#xD;&#xA;&#xD;&#xA;echo copy $(ProjectDir)..\kdl_wrap\bin\$(Platform)\$(Configuration)\kdl_wrap.dll $(OutDir)&#xD;&#xA;copy $(ProjectDir)..\kdl_wrap\bin\$(Platform)\$(Configuration)\kdl_wrap.dll $(OutDir)" />
   </Target>
 
+  <ItemGroup>
+    <Content Include="$(ProjectDir)$(TargetName).props">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  
 </Project>
