@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
     <id>Kdl.NetStandard.x64</id>
-    <version>2.0.3</version>
+    <version>2.0.4</version>
     <title>Kdl.NetStandard (x64)</title>
     <authors>Doug Slater</authors>
     <owners>Doug Slater</owners>
