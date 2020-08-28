@@ -10,6 +10,9 @@
 #include "utilities/rall1d.h"
 #include "utilities/rall2d.h"
 #include "utilities/traits.h"
+#include "velocityprofile.hpp"
+#include "velocityprofile_spline.hpp"
+#include "velocityprofile_trap.hpp"
 #include "Properties.h"
 #include "frames.hpp"
 #include "framevel.hpp"
@@ -101,17 +104,18 @@ using namespace KDL;
 %include "utilities/rall2d.h"
 %enddef
 
+%include "velocityprofile.hpp"
+%include "velocityprofile_spline.hpp"
+%include "velocityprofile_trap.hpp"
+
 #undef IMETHOD
 #define IMETHOD /**/
 %include "frames.hpp"
 %include "Properties.h"
 %include "framevel.hpp"
 %include "frameacc.hpp"
-
 %include "joint.hpp"
-
 %include "jacobian.hpp"
-
 %include "jntarray.hpp"
 %include "jntarrayvel.hpp"
 %include "jntarrayacc.hpp"

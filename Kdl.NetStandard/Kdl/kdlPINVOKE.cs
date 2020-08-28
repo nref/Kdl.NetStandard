@@ -703,6 +703,117 @@ class kdlPINVOKE {
   [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_addDelta__SWIG_0")]
   public static extern double addDelta__SWIG_0(double jarg1, double jarg2, double jarg3);
 
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_VelocityProfile_SetProfile")]
+  public static extern void VelocityProfile_SetProfile(global::System.Runtime.InteropServices.HandleRef jarg1, double jarg2, double jarg3);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_VelocityProfile_SetProfileDuration")]
+  public static extern void VelocityProfile_SetProfileDuration(global::System.Runtime.InteropServices.HandleRef jarg1, double jarg2, double jarg3, double jarg4);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_VelocityProfile_Duration")]
+  public static extern double VelocityProfile_Duration(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_VelocityProfile_Pos")]
+  public static extern double VelocityProfile_Pos(global::System.Runtime.InteropServices.HandleRef jarg1, double jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_VelocityProfile_Vel")]
+  public static extern double VelocityProfile_Vel(global::System.Runtime.InteropServices.HandleRef jarg1, double jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_VelocityProfile_Acc")]
+  public static extern double VelocityProfile_Acc(global::System.Runtime.InteropServices.HandleRef jarg1, double jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_VelocityProfile_Write")]
+  public static extern void VelocityProfile_Write(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_VelocityProfile_Read")]
+  public static extern global::System.IntPtr VelocityProfile_Read(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_VelocityProfile_c_Clone")]
+  public static extern global::System.IntPtr VelocityProfile_c_Clone(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_delete_VelocityProfile")]
+  public static extern void delete_VelocityProfile(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_new_VelocityProfile_Spline__SWIG_0")]
+  public static extern global::System.IntPtr new_VelocityProfile_Spline__SWIG_0();
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_new_VelocityProfile_Spline__SWIG_1")]
+  public static extern global::System.IntPtr new_VelocityProfile_Spline__SWIG_1(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_delete_VelocityProfile_Spline")]
+  public static extern void delete_VelocityProfile_Spline(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_VelocityProfile_Spline_SetProfile")]
+  public static extern void VelocityProfile_Spline_SetProfile(global::System.Runtime.InteropServices.HandleRef jarg1, double jarg2, double jarg3);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_VelocityProfile_Spline_SetProfileDuration__SWIG_0")]
+  public static extern void VelocityProfile_Spline_SetProfileDuration__SWIG_0(global::System.Runtime.InteropServices.HandleRef jarg1, double jarg2, double jarg3, double jarg4);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_VelocityProfile_Spline_SetProfileDuration__SWIG_1")]
+  public static extern void VelocityProfile_Spline_SetProfileDuration__SWIG_1(global::System.Runtime.InteropServices.HandleRef jarg1, double jarg2, double jarg3, double jarg4, double jarg5, double jarg6);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_VelocityProfile_Spline_SetProfileDuration__SWIG_2")]
+  public static extern void VelocityProfile_Spline_SetProfileDuration__SWIG_2(global::System.Runtime.InteropServices.HandleRef jarg1, double jarg2, double jarg3, double jarg4, double jarg5, double jarg6, double jarg7, double jarg8);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_VelocityProfile_Spline_Duration")]
+  public static extern double VelocityProfile_Spline_Duration(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_VelocityProfile_Spline_Pos")]
+  public static extern double VelocityProfile_Spline_Pos(global::System.Runtime.InteropServices.HandleRef jarg1, double jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_VelocityProfile_Spline_Vel")]
+  public static extern double VelocityProfile_Spline_Vel(global::System.Runtime.InteropServices.HandleRef jarg1, double jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_VelocityProfile_Spline_Acc")]
+  public static extern double VelocityProfile_Spline_Acc(global::System.Runtime.InteropServices.HandleRef jarg1, double jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_VelocityProfile_Spline_Write")]
+  public static extern void VelocityProfile_Spline_Write(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_VelocityProfile_Spline_c_Clone")]
+  public static extern global::System.IntPtr VelocityProfile_Spline_c_Clone(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_new_VelocityProfile_Trap__SWIG_0")]
+  public static extern global::System.IntPtr new_VelocityProfile_Trap__SWIG_0(double jarg1, double jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_new_VelocityProfile_Trap__SWIG_1")]
+  public static extern global::System.IntPtr new_VelocityProfile_Trap__SWIG_1(double jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_new_VelocityProfile_Trap__SWIG_2")]
+  public static extern global::System.IntPtr new_VelocityProfile_Trap__SWIG_2();
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_VelocityProfile_Trap_SetProfile")]
+  public static extern void VelocityProfile_Trap_SetProfile(global::System.Runtime.InteropServices.HandleRef jarg1, double jarg2, double jarg3);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_VelocityProfile_Trap_SetProfileDuration")]
+  public static extern void VelocityProfile_Trap_SetProfileDuration(global::System.Runtime.InteropServices.HandleRef jarg1, double jarg2, double jarg3, double jarg4);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_VelocityProfile_Trap_SetProfileVelocity")]
+  public static extern void VelocityProfile_Trap_SetProfileVelocity(global::System.Runtime.InteropServices.HandleRef jarg1, double jarg2, double jarg3, double jarg4);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_VelocityProfile_Trap_SetMax")]
+  public static extern void VelocityProfile_Trap_SetMax(global::System.Runtime.InteropServices.HandleRef jarg1, double jarg2, double jarg3);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_VelocityProfile_Trap_Duration")]
+  public static extern double VelocityProfile_Trap_Duration(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_VelocityProfile_Trap_Pos")]
+  public static extern double VelocityProfile_Trap_Pos(global::System.Runtime.InteropServices.HandleRef jarg1, double jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_VelocityProfile_Trap_Vel")]
+  public static extern double VelocityProfile_Trap_Vel(global::System.Runtime.InteropServices.HandleRef jarg1, double jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_VelocityProfile_Trap_Acc")]
+  public static extern double VelocityProfile_Trap_Acc(global::System.Runtime.InteropServices.HandleRef jarg1, double jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_VelocityProfile_Trap_Write")]
+  public static extern void VelocityProfile_Trap_Write(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_VelocityProfile_Trap_c_Clone")]
+  public static extern global::System.IntPtr VelocityProfile_Trap_c_Clone(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_delete_VelocityProfile_Trap")]
+  public static extern void delete_VelocityProfile_Trap(global::System.Runtime.InteropServices.HandleRef jarg1);
+
   [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_Equal__SWIG_2")]
   public static extern bool Equal__SWIG_2(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2, double jarg3);
 
@@ -2581,6 +2692,12 @@ class kdlPINVOKE {
   [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_ChainIkSolverPos_NR_JL_strError")]
   public static extern string ChainIkSolverPos_NR_JL_strError(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2);
 
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_ChainIkSolverPos_NR_JL_getChildFkStatus")]
+  public static extern int ChainIkSolverPos_NR_JL_getChildFkStatus(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_ChainIkSolverPos_NR_JL_getChildIkStatus")]
+  public static extern int ChainIkSolverPos_NR_JL_getChildIkStatus(global::System.Runtime.InteropServices.HandleRef jarg1);
+
   [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_new_ChainFkSolverVel_recursive")]
   public static extern global::System.IntPtr new_ChainFkSolverVel_recursive(global::System.Runtime.InteropServices.HandleRef jarg1);
 
@@ -2784,6 +2901,12 @@ class kdlPINVOKE {
 
   [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_ChainIkSolverVel_wdls_getSolver")]
   public static extern global::System.IntPtr ChainIkSolverVel_wdls_getSolver(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_VelocityProfile_Spline_SWIGUpcast")]
+  public static extern global::System.IntPtr VelocityProfile_Spline_SWIGUpcast(global::System.IntPtr jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_VelocityProfile_Trap_SWIGUpcast")]
+  public static extern global::System.IntPtr VelocityProfile_Trap_SWIGUpcast(global::System.IntPtr jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_ChainJntToJacSolver_SWIGUpcast")]
   public static extern global::System.IntPtr ChainJntToJacSolver_SWIGUpcast(global::System.IntPtr jarg1);

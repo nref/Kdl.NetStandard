@@ -391,6 +391,9 @@ namespace Swig {
 #include "utilities/rall1d.h"
 #include "utilities/rall2d.h"
 #include "utilities/traits.h"
+#include "velocityprofile.hpp"
+#include "velocityprofile_spline.hpp"
+#include "velocityprofile_trap.hpp"
 #include "Properties.h"
 #include "frames.hpp"
 #include "framevel.hpp"
@@ -4812,6 +4815,788 @@ SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_addDelta__SWIG_0(double jarg1, double j
   }
   jresult = result; 
   return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_VelocityProfile_SetProfile(void * jarg1, double jarg2, double jarg3) {
+  KDL::VelocityProfile *arg1 = (KDL::VelocityProfile *) 0 ;
+  double arg2 ;
+  double arg3 ;
+  
+  arg1 = (KDL::VelocityProfile *)jarg1; 
+  arg2 = (double)jarg2; 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      (arg1)->SetProfile(arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_VelocityProfile_SetProfileDuration(void * jarg1, double jarg2, double jarg3, double jarg4) {
+  KDL::VelocityProfile *arg1 = (KDL::VelocityProfile *) 0 ;
+  double arg2 ;
+  double arg3 ;
+  double arg4 ;
+  
+  arg1 = (KDL::VelocityProfile *)jarg1; 
+  arg2 = (double)jarg2; 
+  arg3 = (double)jarg3; 
+  arg4 = (double)jarg4; 
+  {
+    try {
+      (arg1)->SetProfileDuration(arg2,arg3,arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_VelocityProfile_Duration(void * jarg1) {
+  double jresult ;
+  KDL::VelocityProfile *arg1 = (KDL::VelocityProfile *) 0 ;
+  double result;
+  
+  arg1 = (KDL::VelocityProfile *)jarg1; 
+  {
+    try {
+      result = (double)((KDL::VelocityProfile const *)arg1)->Duration();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_VelocityProfile_Pos(void * jarg1, double jarg2) {
+  double jresult ;
+  KDL::VelocityProfile *arg1 = (KDL::VelocityProfile *) 0 ;
+  double arg2 ;
+  double result;
+  
+  arg1 = (KDL::VelocityProfile *)jarg1; 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      result = (double)((KDL::VelocityProfile const *)arg1)->Pos(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_VelocityProfile_Vel(void * jarg1, double jarg2) {
+  double jresult ;
+  KDL::VelocityProfile *arg1 = (KDL::VelocityProfile *) 0 ;
+  double arg2 ;
+  double result;
+  
+  arg1 = (KDL::VelocityProfile *)jarg1; 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      result = (double)((KDL::VelocityProfile const *)arg1)->Vel(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_VelocityProfile_Acc(void * jarg1, double jarg2) {
+  double jresult ;
+  KDL::VelocityProfile *arg1 = (KDL::VelocityProfile *) 0 ;
+  double arg2 ;
+  double result;
+  
+  arg1 = (KDL::VelocityProfile *)jarg1; 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      result = (double)((KDL::VelocityProfile const *)arg1)->Acc(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_VelocityProfile_Write(void * jarg1, void * jarg2) {
+  KDL::VelocityProfile *arg1 = (KDL::VelocityProfile *) 0 ;
+  std::ostream *arg2 = 0 ;
+  
+  arg1 = (KDL::VelocityProfile *)jarg1; 
+  arg2 = (std::ostream *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::ostream & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      ((KDL::VelocityProfile const *)arg1)->Write(*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_VelocityProfile_Read(void * jarg1) {
+  void * jresult ;
+  std::istream *arg1 = 0 ;
+  KDL::VelocityProfile *result = 0 ;
+  
+  arg1 = (std::istream *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::istream & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::VelocityProfile *)KDL::VelocityProfile::Read(*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_VelocityProfile_c_Clone(void * jarg1) {
+  void * jresult ;
+  KDL::VelocityProfile *arg1 = (KDL::VelocityProfile *) 0 ;
+  KDL::VelocityProfile *result = 0 ;
+  
+  arg1 = (KDL::VelocityProfile *)jarg1; 
+  {
+    try {
+      result = (KDL::VelocityProfile *)((KDL::VelocityProfile const *)arg1)->Clone();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_VelocityProfile(void * jarg1) {
+  KDL::VelocityProfile *arg1 = (KDL::VelocityProfile *) 0 ;
+  
+  arg1 = (KDL::VelocityProfile *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_VelocityProfile_Spline__SWIG_0() {
+  void * jresult ;
+  KDL::VelocityProfile_Spline *result = 0 ;
+  
+  {
+    try {
+      result = (KDL::VelocityProfile_Spline *)new KDL::VelocityProfile_Spline();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_VelocityProfile_Spline__SWIG_1(void * jarg1) {
+  void * jresult ;
+  KDL::VelocityProfile_Spline *arg1 = 0 ;
+  KDL::VelocityProfile_Spline *result = 0 ;
+  
+  arg1 = (KDL::VelocityProfile_Spline *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::VelocityProfile_Spline const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::VelocityProfile_Spline *)new KDL::VelocityProfile_Spline((KDL::VelocityProfile_Spline const &)*arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_VelocityProfile_Spline(void * jarg1) {
+  KDL::VelocityProfile_Spline *arg1 = (KDL::VelocityProfile_Spline *) 0 ;
+  
+  arg1 = (KDL::VelocityProfile_Spline *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_VelocityProfile_Spline_SetProfile(void * jarg1, double jarg2, double jarg3) {
+  KDL::VelocityProfile_Spline *arg1 = (KDL::VelocityProfile_Spline *) 0 ;
+  double arg2 ;
+  double arg3 ;
+  
+  arg1 = (KDL::VelocityProfile_Spline *)jarg1; 
+  arg2 = (double)jarg2; 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      (arg1)->SetProfile(arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_VelocityProfile_Spline_SetProfileDuration__SWIG_0(void * jarg1, double jarg2, double jarg3, double jarg4) {
+  KDL::VelocityProfile_Spline *arg1 = (KDL::VelocityProfile_Spline *) 0 ;
+  double arg2 ;
+  double arg3 ;
+  double arg4 ;
+  
+  arg1 = (KDL::VelocityProfile_Spline *)jarg1; 
+  arg2 = (double)jarg2; 
+  arg3 = (double)jarg3; 
+  arg4 = (double)jarg4; 
+  {
+    try {
+      (arg1)->SetProfileDuration(arg2,arg3,arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_VelocityProfile_Spline_SetProfileDuration__SWIG_1(void * jarg1, double jarg2, double jarg3, double jarg4, double jarg5, double jarg6) {
+  KDL::VelocityProfile_Spline *arg1 = (KDL::VelocityProfile_Spline *) 0 ;
+  double arg2 ;
+  double arg3 ;
+  double arg4 ;
+  double arg5 ;
+  double arg6 ;
+  
+  arg1 = (KDL::VelocityProfile_Spline *)jarg1; 
+  arg2 = (double)jarg2; 
+  arg3 = (double)jarg3; 
+  arg4 = (double)jarg4; 
+  arg5 = (double)jarg5; 
+  arg6 = (double)jarg6; 
+  {
+    try {
+      (arg1)->SetProfileDuration(arg2,arg3,arg4,arg5,arg6);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_VelocityProfile_Spline_SetProfileDuration__SWIG_2(void * jarg1, double jarg2, double jarg3, double jarg4, double jarg5, double jarg6, double jarg7, double jarg8) {
+  KDL::VelocityProfile_Spline *arg1 = (KDL::VelocityProfile_Spline *) 0 ;
+  double arg2 ;
+  double arg3 ;
+  double arg4 ;
+  double arg5 ;
+  double arg6 ;
+  double arg7 ;
+  double arg8 ;
+  
+  arg1 = (KDL::VelocityProfile_Spline *)jarg1; 
+  arg2 = (double)jarg2; 
+  arg3 = (double)jarg3; 
+  arg4 = (double)jarg4; 
+  arg5 = (double)jarg5; 
+  arg6 = (double)jarg6; 
+  arg7 = (double)jarg7; 
+  arg8 = (double)jarg8; 
+  {
+    try {
+      (arg1)->SetProfileDuration(arg2,arg3,arg4,arg5,arg6,arg7,arg8);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_VelocityProfile_Spline_Duration(void * jarg1) {
+  double jresult ;
+  KDL::VelocityProfile_Spline *arg1 = (KDL::VelocityProfile_Spline *) 0 ;
+  double result;
+  
+  arg1 = (KDL::VelocityProfile_Spline *)jarg1; 
+  {
+    try {
+      result = (double)((KDL::VelocityProfile_Spline const *)arg1)->Duration();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_VelocityProfile_Spline_Pos(void * jarg1, double jarg2) {
+  double jresult ;
+  KDL::VelocityProfile_Spline *arg1 = (KDL::VelocityProfile_Spline *) 0 ;
+  double arg2 ;
+  double result;
+  
+  arg1 = (KDL::VelocityProfile_Spline *)jarg1; 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      result = (double)((KDL::VelocityProfile_Spline const *)arg1)->Pos(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_VelocityProfile_Spline_Vel(void * jarg1, double jarg2) {
+  double jresult ;
+  KDL::VelocityProfile_Spline *arg1 = (KDL::VelocityProfile_Spline *) 0 ;
+  double arg2 ;
+  double result;
+  
+  arg1 = (KDL::VelocityProfile_Spline *)jarg1; 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      result = (double)((KDL::VelocityProfile_Spline const *)arg1)->Vel(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_VelocityProfile_Spline_Acc(void * jarg1, double jarg2) {
+  double jresult ;
+  KDL::VelocityProfile_Spline *arg1 = (KDL::VelocityProfile_Spline *) 0 ;
+  double arg2 ;
+  double result;
+  
+  arg1 = (KDL::VelocityProfile_Spline *)jarg1; 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      result = (double)((KDL::VelocityProfile_Spline const *)arg1)->Acc(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_VelocityProfile_Spline_Write(void * jarg1, void * jarg2) {
+  KDL::VelocityProfile_Spline *arg1 = (KDL::VelocityProfile_Spline *) 0 ;
+  std::ostream *arg2 = 0 ;
+  
+  arg1 = (KDL::VelocityProfile_Spline *)jarg1; 
+  arg2 = (std::ostream *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::ostream & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      ((KDL::VelocityProfile_Spline const *)arg1)->Write(*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_VelocityProfile_Spline_c_Clone(void * jarg1) {
+  void * jresult ;
+  KDL::VelocityProfile_Spline *arg1 = (KDL::VelocityProfile_Spline *) 0 ;
+  KDL::VelocityProfile *result = 0 ;
+  
+  arg1 = (KDL::VelocityProfile_Spline *)jarg1; 
+  {
+    try {
+      result = (KDL::VelocityProfile *)((KDL::VelocityProfile_Spline const *)arg1)->Clone();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_VelocityProfile_Trap__SWIG_0(double jarg1, double jarg2) {
+  void * jresult ;
+  double arg1 ;
+  double arg2 ;
+  KDL::VelocityProfile_Trap *result = 0 ;
+  
+  arg1 = (double)jarg1; 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      result = (KDL::VelocityProfile_Trap *)new KDL::VelocityProfile_Trap(arg1,arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_VelocityProfile_Trap__SWIG_1(double jarg1) {
+  void * jresult ;
+  double arg1 ;
+  KDL::VelocityProfile_Trap *result = 0 ;
+  
+  arg1 = (double)jarg1; 
+  {
+    try {
+      result = (KDL::VelocityProfile_Trap *)new KDL::VelocityProfile_Trap(arg1);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_VelocityProfile_Trap__SWIG_2() {
+  void * jresult ;
+  KDL::VelocityProfile_Trap *result = 0 ;
+  
+  {
+    try {
+      result = (KDL::VelocityProfile_Trap *)new KDL::VelocityProfile_Trap();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_VelocityProfile_Trap_SetProfile(void * jarg1, double jarg2, double jarg3) {
+  KDL::VelocityProfile_Trap *arg1 = (KDL::VelocityProfile_Trap *) 0 ;
+  double arg2 ;
+  double arg3 ;
+  
+  arg1 = (KDL::VelocityProfile_Trap *)jarg1; 
+  arg2 = (double)jarg2; 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      (arg1)->SetProfile(arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_VelocityProfile_Trap_SetProfileDuration(void * jarg1, double jarg2, double jarg3, double jarg4) {
+  KDL::VelocityProfile_Trap *arg1 = (KDL::VelocityProfile_Trap *) 0 ;
+  double arg2 ;
+  double arg3 ;
+  double arg4 ;
+  
+  arg1 = (KDL::VelocityProfile_Trap *)jarg1; 
+  arg2 = (double)jarg2; 
+  arg3 = (double)jarg3; 
+  arg4 = (double)jarg4; 
+  {
+    try {
+      (arg1)->SetProfileDuration(arg2,arg3,arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_VelocityProfile_Trap_SetProfileVelocity(void * jarg1, double jarg2, double jarg3, double jarg4) {
+  KDL::VelocityProfile_Trap *arg1 = (KDL::VelocityProfile_Trap *) 0 ;
+  double arg2 ;
+  double arg3 ;
+  double arg4 ;
+  
+  arg1 = (KDL::VelocityProfile_Trap *)jarg1; 
+  arg2 = (double)jarg2; 
+  arg3 = (double)jarg3; 
+  arg4 = (double)jarg4; 
+  {
+    try {
+      (arg1)->SetProfileVelocity(arg2,arg3,arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_VelocityProfile_Trap_SetMax(void * jarg1, double jarg2, double jarg3) {
+  KDL::VelocityProfile_Trap *arg1 = (KDL::VelocityProfile_Trap *) 0 ;
+  double arg2 ;
+  double arg3 ;
+  
+  arg1 = (KDL::VelocityProfile_Trap *)jarg1; 
+  arg2 = (double)jarg2; 
+  arg3 = (double)jarg3; 
+  {
+    try {
+      (arg1)->SetMax(arg2,arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_VelocityProfile_Trap_Duration(void * jarg1) {
+  double jresult ;
+  KDL::VelocityProfile_Trap *arg1 = (KDL::VelocityProfile_Trap *) 0 ;
+  double result;
+  
+  arg1 = (KDL::VelocityProfile_Trap *)jarg1; 
+  {
+    try {
+      result = (double)((KDL::VelocityProfile_Trap const *)arg1)->Duration();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_VelocityProfile_Trap_Pos(void * jarg1, double jarg2) {
+  double jresult ;
+  KDL::VelocityProfile_Trap *arg1 = (KDL::VelocityProfile_Trap *) 0 ;
+  double arg2 ;
+  double result;
+  
+  arg1 = (KDL::VelocityProfile_Trap *)jarg1; 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      result = (double)((KDL::VelocityProfile_Trap const *)arg1)->Pos(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_VelocityProfile_Trap_Vel(void * jarg1, double jarg2) {
+  double jresult ;
+  KDL::VelocityProfile_Trap *arg1 = (KDL::VelocityProfile_Trap *) 0 ;
+  double arg2 ;
+  double result;
+  
+  arg1 = (KDL::VelocityProfile_Trap *)jarg1; 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      result = (double)((KDL::VelocityProfile_Trap const *)arg1)->Vel(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Kdl_VelocityProfile_Trap_Acc(void * jarg1, double jarg2) {
+  double jresult ;
+  KDL::VelocityProfile_Trap *arg1 = (KDL::VelocityProfile_Trap *) 0 ;
+  double arg2 ;
+  double result;
+  
+  arg1 = (KDL::VelocityProfile_Trap *)jarg1; 
+  arg2 = (double)jarg2; 
+  {
+    try {
+      result = (double)((KDL::VelocityProfile_Trap const *)arg1)->Acc(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_VelocityProfile_Trap_Write(void * jarg1, void * jarg2) {
+  KDL::VelocityProfile_Trap *arg1 = (KDL::VelocityProfile_Trap *) 0 ;
+  std::ostream *arg2 = 0 ;
+  
+  arg1 = (KDL::VelocityProfile_Trap *)jarg1; 
+  arg2 = (std::ostream *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::ostream & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      ((KDL::VelocityProfile_Trap const *)arg1)->Write(*arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_VelocityProfile_Trap_c_Clone(void * jarg1) {
+  void * jresult ;
+  KDL::VelocityProfile_Trap *arg1 = (KDL::VelocityProfile_Trap *) 0 ;
+  KDL::VelocityProfile *result = 0 ;
+  
+  arg1 = (KDL::VelocityProfile_Trap *)jarg1; 
+  {
+    try {
+      result = (KDL::VelocityProfile *)((KDL::VelocityProfile_Trap const *)arg1)->Clone();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_VelocityProfile_Trap(void * jarg1) {
+  KDL::VelocityProfile_Trap *arg1 = (KDL::VelocityProfile_Trap *) 0 ;
+  
+  arg1 = (KDL::VelocityProfile_Trap *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
 }
 
 
@@ -20458,6 +21243,46 @@ SWIGEXPORT char * SWIGSTDCALL CSharp_Kdl_ChainIkSolverPos_NR_JL_strError(void * 
 }
 
 
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainIkSolverPos_NR_JL_getChildFkStatus(void * jarg1) {
+  int jresult ;
+  KDL::ChainIkSolverPos_NR_JL *arg1 = (KDL::ChainIkSolverPos_NR_JL *) 0 ;
+  int result;
+  
+  arg1 = (KDL::ChainIkSolverPos_NR_JL *)jarg1; 
+  {
+    try {
+      result = (int)(arg1)->getChildFkStatus();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainIkSolverPos_NR_JL_getChildIkStatus(void * jarg1) {
+  int jresult ;
+  KDL::ChainIkSolverPos_NR_JL *arg1 = (KDL::ChainIkSolverPos_NR_JL *) 0 ;
+  int result;
+  
+  arg1 = (KDL::ChainIkSolverPos_NR_JL *)jarg1; 
+  {
+    try {
+      result = (int)(arg1)->getChildIkStatus();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
 SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_ChainFkSolverVel_recursive(void * jarg1) {
   void * jresult ;
   KDL::Chain *arg1 = 0 ;
@@ -22047,6 +22872,14 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_ChainIkSolverVel_wdls_getSolver(void * 
   return jresult;
 }
 
+
+SWIGEXPORT KDL::VelocityProfile * SWIGSTDCALL CSharp_Kdl_VelocityProfile_Spline_SWIGUpcast(KDL::VelocityProfile_Spline *jarg1) {
+    return (KDL::VelocityProfile *)jarg1;
+}
+
+SWIGEXPORT KDL::VelocityProfile * SWIGSTDCALL CSharp_Kdl_VelocityProfile_Trap_SWIGUpcast(KDL::VelocityProfile_Trap *jarg1) {
+    return (KDL::VelocityProfile *)jarg1;
+}
 
 SWIGEXPORT KDL::SolverI * SWIGSTDCALL CSharp_Kdl_ChainJntToJacSolver_SWIGUpcast(KDL::ChainJntToJacSolver *jarg1) {
     return (KDL::SolverI *)jarg1;

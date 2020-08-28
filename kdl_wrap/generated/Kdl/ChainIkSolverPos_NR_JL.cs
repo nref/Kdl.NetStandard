@@ -81,6 +81,18 @@ public class ChainIkSolverPos_NR_JL : ChainIkSolverPos {
     return ret;
   }
 
+  public int getChildFkStatus() {
+    int ret = kdlPINVOKE.ChainIkSolverPos_NR_JL_getChildFkStatus(swigCPtr);
+    if (kdlPINVOKE.SWIGPendingException.Pending) throw kdlPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  public int getChildIkStatus() {
+    int ret = kdlPINVOKE.ChainIkSolverPos_NR_JL_getChildIkStatus(swigCPtr);
+    if (kdlPINVOKE.SWIGPendingException.Pending) throw kdlPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
   public static readonly int E_IKSOLVERVEL_FAILED = kdlPINVOKE.ChainIkSolverPos_NR_JL_E_IKSOLVERVEL_FAILED_get();
   public static readonly int E_FKSOLVERPOS_FAILED = kdlPINVOKE.ChainIkSolverPos_NR_JL_E_FKSOLVERPOS_FAILED_get();
 }
