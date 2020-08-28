@@ -1,1 +1,0 @@
-nuget pack nuspec/Kdl.NetStandard.x64.nuspec -OutputDirectory nupkg -Properties Configuration=Release

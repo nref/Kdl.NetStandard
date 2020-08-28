@@ -408,6 +408,7 @@ namespace Swig {
 #include "chainfksolver.hpp"
 #include "chainiksolver.hpp"
 #include "chainfksolverpos_recursive.hpp"
+#include "chainiksolverpos_nr_jl.hpp"
 #include "chainfksolvervel_recursive.hpp"
 #include "chainiksolverpos_lma.hpp"
 #include "chainiksolvervel_pinv.hpp"
@@ -20033,6 +20034,430 @@ SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_ChainFkSolverPos_recursive_updateInternal
 }
 
 
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainIkSolverPos_NR_JL_E_IKSOLVERVEL_FAILED_get() {
+  int jresult ;
+  int result;
+  
+  {
+    try {
+      result = (int)KDL::ChainIkSolverPos_NR_JL::E_IKSOLVERVEL_FAILED;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainIkSolverPos_NR_JL_E_FKSOLVERPOS_FAILED_get() {
+  int jresult ;
+  int result;
+  
+  {
+    try {
+      result = (int)KDL::ChainIkSolverPos_NR_JL::E_FKSOLVERPOS_FAILED;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_ChainIkSolverPos_NR_JL__SWIG_0(void * jarg1, void * jarg2, void * jarg3, void * jarg4, void * jarg5, unsigned int jarg6, double jarg7) {
+  void * jresult ;
+  KDL::Chain *arg1 = 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  KDL::JntArray *arg3 = 0 ;
+  KDL::ChainFkSolverPos *arg4 = 0 ;
+  KDL::ChainIkSolverVel *arg5 = 0 ;
+  unsigned int arg6 ;
+  double arg7 ;
+  KDL::ChainIkSolverPos_NR_JL *result = 0 ;
+  
+  arg1 = (KDL::Chain *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Chain const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::JntArray *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg4 = (KDL::ChainFkSolverPos *)jarg4;
+  if (!arg4) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::ChainFkSolverPos & type is null", 0);
+    return 0;
+  } 
+  arg5 = (KDL::ChainIkSolverVel *)jarg5;
+  if (!arg5) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::ChainIkSolverVel & type is null", 0);
+    return 0;
+  } 
+  arg6 = (unsigned int)jarg6; 
+  arg7 = (double)jarg7; 
+  {
+    try {
+      result = (KDL::ChainIkSolverPos_NR_JL *)new KDL::ChainIkSolverPos_NR_JL((KDL::Chain const &)*arg1,(KDL::JntArray const &)*arg2,(KDL::JntArray const &)*arg3,*arg4,*arg5,arg6,arg7);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_ChainIkSolverPos_NR_JL__SWIG_1(void * jarg1, void * jarg2, void * jarg3, void * jarg4, void * jarg5, unsigned int jarg6) {
+  void * jresult ;
+  KDL::Chain *arg1 = 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  KDL::JntArray *arg3 = 0 ;
+  KDL::ChainFkSolverPos *arg4 = 0 ;
+  KDL::ChainIkSolverVel *arg5 = 0 ;
+  unsigned int arg6 ;
+  KDL::ChainIkSolverPos_NR_JL *result = 0 ;
+  
+  arg1 = (KDL::Chain *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Chain const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::JntArray *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg4 = (KDL::ChainFkSolverPos *)jarg4;
+  if (!arg4) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::ChainFkSolverPos & type is null", 0);
+    return 0;
+  } 
+  arg5 = (KDL::ChainIkSolverVel *)jarg5;
+  if (!arg5) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::ChainIkSolverVel & type is null", 0);
+    return 0;
+  } 
+  arg6 = (unsigned int)jarg6; 
+  {
+    try {
+      result = (KDL::ChainIkSolverPos_NR_JL *)new KDL::ChainIkSolverPos_NR_JL((KDL::Chain const &)*arg1,(KDL::JntArray const &)*arg2,(KDL::JntArray const &)*arg3,*arg4,*arg5,arg6);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_ChainIkSolverPos_NR_JL__SWIG_2(void * jarg1, void * jarg2, void * jarg3, void * jarg4, void * jarg5) {
+  void * jresult ;
+  KDL::Chain *arg1 = 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  KDL::JntArray *arg3 = 0 ;
+  KDL::ChainFkSolverPos *arg4 = 0 ;
+  KDL::ChainIkSolverVel *arg5 = 0 ;
+  KDL::ChainIkSolverPos_NR_JL *result = 0 ;
+  
+  arg1 = (KDL::Chain *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Chain const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::JntArray *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg4 = (KDL::ChainFkSolverPos *)jarg4;
+  if (!arg4) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::ChainFkSolverPos & type is null", 0);
+    return 0;
+  } 
+  arg5 = (KDL::ChainIkSolverVel *)jarg5;
+  if (!arg5) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::ChainIkSolverVel & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::ChainIkSolverPos_NR_JL *)new KDL::ChainIkSolverPos_NR_JL((KDL::Chain const &)*arg1,(KDL::JntArray const &)*arg2,(KDL::JntArray const &)*arg3,*arg4,*arg5);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_ChainIkSolverPos_NR_JL__SWIG_3(void * jarg1, void * jarg2, void * jarg3, unsigned int jarg4, double jarg5) {
+  void * jresult ;
+  KDL::Chain *arg1 = 0 ;
+  KDL::ChainFkSolverPos *arg2 = 0 ;
+  KDL::ChainIkSolverVel *arg3 = 0 ;
+  unsigned int arg4 ;
+  double arg5 ;
+  KDL::ChainIkSolverPos_NR_JL *result = 0 ;
+  
+  arg1 = (KDL::Chain *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Chain const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::ChainFkSolverPos *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::ChainFkSolverPos & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::ChainIkSolverVel *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::ChainIkSolverVel & type is null", 0);
+    return 0;
+  } 
+  arg4 = (unsigned int)jarg4; 
+  arg5 = (double)jarg5; 
+  {
+    try {
+      result = (KDL::ChainIkSolverPos_NR_JL *)new KDL::ChainIkSolverPos_NR_JL((KDL::Chain const &)*arg1,*arg2,*arg3,arg4,arg5);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_ChainIkSolverPos_NR_JL__SWIG_4(void * jarg1, void * jarg2, void * jarg3, unsigned int jarg4) {
+  void * jresult ;
+  KDL::Chain *arg1 = 0 ;
+  KDL::ChainFkSolverPos *arg2 = 0 ;
+  KDL::ChainIkSolverVel *arg3 = 0 ;
+  unsigned int arg4 ;
+  KDL::ChainIkSolverPos_NR_JL *result = 0 ;
+  
+  arg1 = (KDL::Chain *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Chain const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::ChainFkSolverPos *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::ChainFkSolverPos & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::ChainIkSolverVel *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::ChainIkSolverVel & type is null", 0);
+    return 0;
+  } 
+  arg4 = (unsigned int)jarg4; 
+  {
+    try {
+      result = (KDL::ChainIkSolverPos_NR_JL *)new KDL::ChainIkSolverPos_NR_JL((KDL::Chain const &)*arg1,*arg2,*arg3,arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_ChainIkSolverPos_NR_JL__SWIG_5(void * jarg1, void * jarg2, void * jarg3) {
+  void * jresult ;
+  KDL::Chain *arg1 = 0 ;
+  KDL::ChainFkSolverPos *arg2 = 0 ;
+  KDL::ChainIkSolverVel *arg3 = 0 ;
+  KDL::ChainIkSolverPos_NR_JL *result = 0 ;
+  
+  arg1 = (KDL::Chain *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Chain const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (KDL::ChainFkSolverPos *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::ChainFkSolverPos & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::ChainIkSolverVel *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::ChainIkSolverVel & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (KDL::ChainIkSolverPos_NR_JL *)new KDL::ChainIkSolverPos_NR_JL((KDL::Chain const &)*arg1,*arg2,*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_delete_ChainIkSolverPos_NR_JL(void * jarg1) {
+  KDL::ChainIkSolverPos_NR_JL *arg1 = (KDL::ChainIkSolverPos_NR_JL *) 0 ;
+  
+  arg1 = (KDL::ChainIkSolverPos_NR_JL *)jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainIkSolverPos_NR_JL_CartToJnt(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
+  int jresult ;
+  KDL::ChainIkSolverPos_NR_JL *arg1 = (KDL::ChainIkSolverPos_NR_JL *) 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  KDL::Frame *arg3 = 0 ;
+  KDL::JntArray *arg4 = 0 ;
+  int result;
+  
+  arg1 = (KDL::ChainIkSolverPos_NR_JL *)jarg1; 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::Frame *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::Frame const & type is null", 0);
+    return 0;
+  } 
+  arg4 = (KDL::JntArray *)jarg4;
+  if (!arg4) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (int)(arg1)->CartToJnt((KDL::JntArray const &)*arg2,(KDL::Frame const &)*arg3,*arg4);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Kdl_ChainIkSolverPos_NR_JL_setJointLimits(void * jarg1, void * jarg2, void * jarg3) {
+  int jresult ;
+  KDL::ChainIkSolverPos_NR_JL *arg1 = (KDL::ChainIkSolverPos_NR_JL *) 0 ;
+  KDL::JntArray *arg2 = 0 ;
+  KDL::JntArray *arg3 = 0 ;
+  int result;
+  
+  arg1 = (KDL::ChainIkSolverPos_NR_JL *)jarg1; 
+  arg2 = (KDL::JntArray *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  arg3 = (KDL::JntArray *)jarg3;
+  if (!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "KDL::JntArray const & type is null", 0);
+    return 0;
+  } 
+  {
+    try {
+      result = (int)(arg1)->setJointLimits((KDL::JntArray const &)*arg2,(KDL::JntArray const &)*arg3);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kdl_ChainIkSolverPos_NR_JL_updateInternalDataStructures(void * jarg1) {
+  KDL::ChainIkSolverPos_NR_JL *arg1 = (KDL::ChainIkSolverPos_NR_JL *) 0 ;
+  
+  arg1 = (KDL::ChainIkSolverPos_NR_JL *)jarg1; 
+  {
+    try {
+      (arg1)->updateInternalDataStructures();
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT char * SWIGSTDCALL CSharp_Kdl_ChainIkSolverPos_NR_JL_strError(void * jarg1, int jarg2) {
+  char * jresult ;
+  KDL::ChainIkSolverPos_NR_JL *arg1 = (KDL::ChainIkSolverPos_NR_JL *) 0 ;
+  int arg2 ;
+  char *result = 0 ;
+  
+  arg1 = (KDL::ChainIkSolverPos_NR_JL *)jarg1; 
+  arg2 = (int)jarg2; 
+  {
+    try {
+      result = (char *)((KDL::ChainIkSolverPos_NR_JL const *)arg1)->strError(arg2);
+    } catch (const std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0; 
+      };
+    }
+  }
+  jresult = SWIG_csharp_string_callback((const char *)result); 
+  return jresult;
+}
+
+
 SWIGEXPORT void * SWIGSTDCALL CSharp_Kdl_new_ChainFkSolverVel_recursive(void * jarg1) {
   void * jresult ;
   KDL::Chain *arg1 = 0 ;
@@ -21653,6 +22078,10 @@ SWIGEXPORT KDL::SolverI * SWIGSTDCALL CSharp_Kdl_ChainIkSolverAcc_SWIGUpcast(KDL
 
 SWIGEXPORT KDL::ChainFkSolverPos * SWIGSTDCALL CSharp_Kdl_ChainFkSolverPos_recursive_SWIGUpcast(KDL::ChainFkSolverPos_recursive *jarg1) {
     return (KDL::ChainFkSolverPos *)jarg1;
+}
+
+SWIGEXPORT KDL::ChainIkSolverPos * SWIGSTDCALL CSharp_Kdl_ChainIkSolverPos_NR_JL_SWIGUpcast(KDL::ChainIkSolverPos_NR_JL *jarg1) {
+    return (KDL::ChainIkSolverPos *)jarg1;
 }
 
 SWIGEXPORT KDL::ChainFkSolverVel * SWIGSTDCALL CSharp_Kdl_ChainFkSolverVel_recursive_SWIGUpcast(KDL::ChainFkSolverVel_recursive *jarg1) {

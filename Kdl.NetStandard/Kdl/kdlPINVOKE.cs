@@ -2542,6 +2542,45 @@ class kdlPINVOKE {
   [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_ChainFkSolverPos_recursive_updateInternalDataStructures")]
   public static extern void ChainFkSolverPos_recursive_updateInternalDataStructures(global::System.Runtime.InteropServices.HandleRef jarg1);
 
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_ChainIkSolverPos_NR_JL_E_IKSOLVERVEL_FAILED_get")]
+  public static extern int ChainIkSolverPos_NR_JL_E_IKSOLVERVEL_FAILED_get();
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_ChainIkSolverPos_NR_JL_E_FKSOLVERPOS_FAILED_get")]
+  public static extern int ChainIkSolverPos_NR_JL_E_FKSOLVERPOS_FAILED_get();
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_new_ChainIkSolverPos_NR_JL__SWIG_0")]
+  public static extern global::System.IntPtr new_ChainIkSolverPos_NR_JL__SWIG_0(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2, global::System.Runtime.InteropServices.HandleRef jarg3, global::System.Runtime.InteropServices.HandleRef jarg4, global::System.Runtime.InteropServices.HandleRef jarg5, uint jarg6, double jarg7);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_new_ChainIkSolverPos_NR_JL__SWIG_1")]
+  public static extern global::System.IntPtr new_ChainIkSolverPos_NR_JL__SWIG_1(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2, global::System.Runtime.InteropServices.HandleRef jarg3, global::System.Runtime.InteropServices.HandleRef jarg4, global::System.Runtime.InteropServices.HandleRef jarg5, uint jarg6);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_new_ChainIkSolverPos_NR_JL__SWIG_2")]
+  public static extern global::System.IntPtr new_ChainIkSolverPos_NR_JL__SWIG_2(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2, global::System.Runtime.InteropServices.HandleRef jarg3, global::System.Runtime.InteropServices.HandleRef jarg4, global::System.Runtime.InteropServices.HandleRef jarg5);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_new_ChainIkSolverPos_NR_JL__SWIG_3")]
+  public static extern global::System.IntPtr new_ChainIkSolverPos_NR_JL__SWIG_3(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2, global::System.Runtime.InteropServices.HandleRef jarg3, uint jarg4, double jarg5);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_new_ChainIkSolverPos_NR_JL__SWIG_4")]
+  public static extern global::System.IntPtr new_ChainIkSolverPos_NR_JL__SWIG_4(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2, global::System.Runtime.InteropServices.HandleRef jarg3, uint jarg4);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_new_ChainIkSolverPos_NR_JL__SWIG_5")]
+  public static extern global::System.IntPtr new_ChainIkSolverPos_NR_JL__SWIG_5(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_delete_ChainIkSolverPos_NR_JL")]
+  public static extern void delete_ChainIkSolverPos_NR_JL(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_ChainIkSolverPos_NR_JL_CartToJnt")]
+  public static extern int ChainIkSolverPos_NR_JL_CartToJnt(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2, global::System.Runtime.InteropServices.HandleRef jarg3, global::System.Runtime.InteropServices.HandleRef jarg4);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_ChainIkSolverPos_NR_JL_setJointLimits")]
+  public static extern int ChainIkSolverPos_NR_JL_setJointLimits(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_ChainIkSolverPos_NR_JL_updateInternalDataStructures")]
+  public static extern void ChainIkSolverPos_NR_JL_updateInternalDataStructures(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_ChainIkSolverPos_NR_JL_strError")]
+  public static extern string ChainIkSolverPos_NR_JL_strError(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2);
+
   [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_new_ChainFkSolverVel_recursive")]
   public static extern global::System.IntPtr new_ChainFkSolverVel_recursive(global::System.Runtime.InteropServices.HandleRef jarg1);
 
@@ -2769,6 +2808,9 @@ class kdlPINVOKE {
 
   [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_ChainFkSolverPos_recursive_SWIGUpcast")]
   public static extern global::System.IntPtr ChainFkSolverPos_recursive_SWIGUpcast(global::System.IntPtr jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_ChainIkSolverPos_NR_JL_SWIGUpcast")]
+  public static extern global::System.IntPtr ChainIkSolverPos_NR_JL_SWIGUpcast(global::System.IntPtr jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("kdl_wrap", EntryPoint="CSharp_Kdl_ChainFkSolverVel_recursive_SWIGUpcast")]
   public static extern global::System.IntPtr ChainFkSolverVel_recursive_SWIGUpcast(global::System.IntPtr jarg1);
