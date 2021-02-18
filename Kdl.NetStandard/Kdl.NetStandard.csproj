@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RunPostBuildEvent></RunPostBuildEvent>
-    <Platforms>x64</Platforms>
+    <Platforms>x64;x86</Platforms>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>Kdl.NetStandard.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="echo rmdir /S /Q $(ProjectDir)Kdl&#xD;&#xA;rmdir /S /Q $(ProjectDir)Kdl&#xD;&#xA;&#xD;&#xA;echo xcopy /E /Y $(ProjectDir)..\kdl_wrap\generated\* $(ProjectDir)&#xD;&#xA;xcopy /E /Y $(ProjectDir)..\kdl_wrap\generated\* $(ProjectDir)&#xD;&#xA;&#xD;&#xA;echo copy $(ProjectDir)..\kdl_wrap\bin\$(Platform)\$(Configuration)\kdl_wrap.dll $(OutDir)&#xD;&#xA;copy $(ProjectDir)..\kdl_wrap\bin\$(Platform)\$(Configuration)\kdl_wrap.dll $(OutDir)" />
+    <Exec Command="echo rmdir /S /Q $(ProjectDir)Kdl&#xD;&#xA;rmdir /S /Q $(ProjectDir)Kdl&#xD;&#xA;&#xD;&#xA;echo xcopy /E /Y $(ProjectDir)..\kdl_wrap\generated\* $(ProjectDir)&#xD;&#xA;xcopy /E /Y $(ProjectDir)..\kdl_wrap\generated\* $(ProjectDir)&#xD;&#xA;&#xD;&#xA;mklink /J $(ProjectDir)..\kdl_wrap\bin\x86 $(ProjectDir)..\kdl_wrap\bin\Win32&#xD;&#xA;echo copy $(ProjectDir)..\kdl_wrap\bin\$(Platform)\$(Configuration)\kdl_wrap.dll $(OutDir)&#xD;&#xA;copy $(ProjectDir)..\kdl_wrap\bin\$(Platform)\$(Configuration)\kdl_wrap.dll $(OutDir)" />
   </Target>
 
   <ItemGroup>

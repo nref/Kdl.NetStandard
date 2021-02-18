@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Kdl.NetStandard.x86</id>
+    <version>2.0.5</version>
+    <title>Kdl.NetStandard (x86)</title>
+    <authors>Doug Slater</authors>
+    <owners>Doug Slater</owners>
+    <license type="file">LICENSE</license>
+    <projectUrl>https://github.com/slater1/Kdl.NetStandard</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A wrapper of Orocos Kinematics-Dynamics Library for .NET Standard 2.0 (x86)</description>
+    <summary>A wrapper of Orocos Kinematics-Dynamics Library for .NET Standard 2.0 (x86)</summary>
+    <releaseNotes>Initial release for .NET Standard 2.0 (x86)</releaseNotes>
+    <copyright>Copyright 2020 Doug Slater</copyright>
+    <tags>Orocos Kinematics Dynamics Robotics</tags>
+    <!-- https://github.com/NuGet/Home/wiki/Packaging-Documentation-within-the-nupkg -->
+    <!-- https://github.com/NuGet/Home/issues/6873 -->
+    <!-- <readme>readme.md</readme> -->
+    <dependencies>
+      <group targetFramework="netstandard2.0" >
+      </group>
+    </dependencies>
+    <references>
+      <group targetFramework="netstandard2.0" >
+        <reference file="Kdl.NetStandard.dll" />
+      </group>
+    </references>
+  </metadata>
+  
+  <files>
+    <file src="..\..\..\LICENSE" target="LICENSE" />
+    <file src="..\..\bin\x86\Release\netstandard2.0\kdl_wrap.dll" target="build" />
+    <file src="..\..\bin\x86\Release\netstandard2.0\Kdl.NetStandard.props" target="build\Kdl.NetStandard.x86.props" />
+    
+    <file src="..\..\bin\x86\Release\netstandard2.0\Kdl.NetStandard.dll" target="lib\netstandard2.0" />
+    <file src="..\..\bin\x86\Release\netstandard2.0\Kdl.NetStandard.pdb" target="lib\netstandard2.0" />
+    <file src="..\..\bin\x86\Release\netstandard2.0\Kdl.NetStandard.deps.json" target="lib\netstandard2.0" />
+
+    <file src="..\..\bin\x86\Release\netstandard2.0\Kdl.NetStandard.dll" target="ref\netstandard2.0" />
+    
+    <file src="..\md\Kdl.NetStandard.x86.md" target="readme.md"/>
+  </files>
+
+</package>
