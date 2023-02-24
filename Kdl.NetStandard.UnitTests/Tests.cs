@@ -68,8 +68,6 @@ public class Tests
         double y = cartesianPos.p.y();
         double z = cartesianPos.p.z();
 
-        cartesianPos.M.GetEulerZYX(out double alfa, out double beta, out double gamma);
-
         Assert.AreEqual(500, x);
         Assert.AreEqual(0, y);
         Assert.AreEqual(820, z);
