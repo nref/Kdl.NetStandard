@@ -4,11 +4,7 @@
 
 ## Architecture
 
-This package supports `x64` builds.
-
-## Signing
-
-This package is strong-signed.
+This package supports Windows `x64` builds.
 
 ## Target Framework
 

@@ -1,5 +1,29 @@
 %module(directors="1") kdl
 
+%include <typemaps.i>
+
+// https://swig.org/Doc4.1/Arguments.html
+// Map all C++ "double&" (double reference parameters) to "ref double" in C#
+//apply double &INOUT { double& };
+
+// Map all "double&" parameters to "out double" in C#
+%apply double &OUTPUT { double& };
+
+// Map only "double& foo" (double reference parameters named "foo") to "out double foo"
+//%apply double &OUTPUT { double& foo };
+
+// Clear the %apply directive for the given type:
+//%clear double& foo
+
+// Example:
+// frames.hpp:
+// // in Rotation class
+// inline void GetEulerZYX(double& Alfa,double& Beta,double& Gamma) const { ... }
+//
+// Rotation.cs:
+//
+// public void GetEulerZYX(out double Alfa, out double Beta, out double Gamma) {
+
 %{
 
 #define EIGEN_NO_DEPRECATED_WARNING
@@ -43,7 +67,6 @@ using namespace KDL;
 
 %include "std_string.i"
 
-// Pass std::exception up to C#
 %include "exception.i"
 %allowexception;
 %exception {
@@ -54,13 +77,17 @@ using namespace KDL;
   }
 }
 
-%include "cpointer.i"
-%pointer_class(double, DoublePointer);
+%extend KDL::JntArray {
 
-%rename(get) KDL::JntArray::operator()(unsigned int i,unsigned int j=0) const;
-%rename(pointer) KDL::JntArray::operator()(unsigned int i,unsigned int j=0);
-%rename(get) KDL::JntArrayVel::operator()(unsigned int i,unsigned int j=0) const;
-%rename(pointer) KDL::JntArrayVel::operator()(unsigned int i,unsigned int j=0);
+  double get(int index) {
+    return (*$self)(index, 0);
+  }
+
+  void set(int index, double value) {
+    double& elem = (*$self)(index, 0);
+    elem = value;
+  }
+}
 
 %include "std_vector.i"
 
